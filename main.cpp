@@ -14,4 +14,6 @@ Phone: 0146202605, 0193320041, 0139071648, 0194090095
 #include <iostream>
 using namespace std;
 
-int main() {}
+int main() {
+    cout << "Hello World!" << endl;
+}
