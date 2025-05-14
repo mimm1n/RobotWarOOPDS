@@ -7,8 +7,10 @@ using namespace std;
 Robot::Robot(int robotX, int robotY, string name, string type){
     setRobotX(robotX);
     setRobotY(robotY);
-    setRobotName(name);
-    setRobotType(type);
+    robotName = name;
+    robotType = type;
+    // setRobotName(name);
+    // setRobotType(type);
 }
 
 // virtual ~Robot(){}

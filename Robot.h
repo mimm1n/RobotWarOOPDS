@@ -4,8 +4,8 @@
 class Robot{
     private:
         int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
-        void setRobotName(string name);
-        void setRobotType(string type);
+        // void setRobotName(string name);
+        // void setRobotType(string type);
     
     protected:
         int killCount = 0;
@@ -22,7 +22,7 @@ class Robot{
 
         void setRobotY(int y);
         int getRobotY() const;
-        
+
         string getRobotName() const;
         string getRobotType() const;
 };
