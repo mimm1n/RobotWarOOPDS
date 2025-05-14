@@ -4,43 +4,43 @@
 #include <string>
 using namespace std;
 
-Robot(int robotX, int robotY, string name, string type){
+Robot::Robot(int robotX, int robotY, string name, string type){
     setRobotX(robotX);
     setRobotY(robotY);
     setRobotName(name);
     setRobotType(type);
 }
 
-virtual ~Robot(){}
+// virtual ~Robot(){}
 
-void setRobotX(int x){
+void Robot::setRobotX(int x){
     robotX = x;
 }
 
-int getRobotX() const{
+int Robot::getRobotX() const{
     return robotX;
 }
 
-void setRobotY(int y){
+void Robot::setRobotY(int y){
     robotY = y;
 }
 
-int getRobotY() const{
+int Robot::getRobotY() const{
     return robotY;
 }
 
-void setRobotName(string name){
+void Robot::setRobotName(string name){
     robotName = name;
 }
 
-string getRobotName() const{
+string Robot::getRobotName() const{
     return robotName;
 }
 
-void setRobotType(string type){
+void Robot::setRobotType(string type){
     robotType = type;
 }
 
-string getRobotType() const{
+string Robot::getRobotType() const{
     return robotType;
 }
