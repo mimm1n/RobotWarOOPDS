@@ -11,9 +11,14 @@ Phone: 0146202605, 0193320041, 0139071648, 0194090095
 **********|**********|**********/
 
 #include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <vector>
 #include "Robot.h"
 using namespace std;
 
 int main() {
     cout << "Hello World!" << endl;
+
+    return 0;
 }
