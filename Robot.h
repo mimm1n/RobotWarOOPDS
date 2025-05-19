@@ -42,7 +42,17 @@ class Robot{
         int getRobotY() const;
 
         string getRobotName() const;
+
+        void setRobotType(string type);
         string getRobotType() const;
+
+        bool addLife();
+        bool reduceLife();
+        int getLives() const;
+        bool isAlive() const;
+
+        bool incrementKills();
+
 
         virtual void setLocation(int x, int y) = 0;
         virtual void actions(Battlefield* battlefield) = 0;
