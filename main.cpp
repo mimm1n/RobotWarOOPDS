@@ -14,6 +14,7 @@ Phone: 0146202605, 0193320041, 0139071648, 0194090095
 #include "Robot.h"
 using namespace std;
 
+/* CLASS DEFINITIONS */
 class ThinkingRobot : public Robot{
     public:
         virtual void setLocation(int x, int y);
@@ -42,6 +43,7 @@ int main() {
     cout << "Hello World!" << endl;
 }
 
+/* FUNCTION DEFINITIONS */
 virtual void ThinkingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
