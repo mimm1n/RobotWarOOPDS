@@ -20,12 +20,8 @@ Robot::Robot(int x, int y, string name, string type){
     setRobotX(x);
     setRobotY(y);
     robotName = name;
-    robotType = type;
-    // setRobotName(name);
-    // setRobotType(type);
+    setRobotType(type);
 }
-
-// virtual ~Robot(){}
 
 void Robot::setRobotX(int x){
     robotX = x;
@@ -43,10 +39,6 @@ int Robot::getRobotY() const{
     return robotY;
 }
 
-void Robot::setRobotName(string name){
-    robotName = name;
-}
-
 string Robot::getRobotName() const{
     return robotName;
 }
@@ -58,3 +50,26 @@ void Robot::setRobotType(string type){
 string Robot::getRobotType() const{
     return robotType;
 }
+
+bool Robot::addLife(){
+    return lives++;
+}
+
+bool Robot::reduceLife(){
+    if(lives>0)
+        return lives--;
+    return false;
+}
+
+int Robot::getLives() const{
+    return lives;
+}
+
+bool Robot::isAlive() const{
+    return lives>0;
+}
+
+bool Robot::incrementKills(){
+    return killCount++;
+}
+

@@ -19,12 +19,8 @@ Phone: 0146202605, 0193320041, 0139071648, 0194090095
 using namespace std;
 
 class Robot{
-    private:
-        int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
-        // void setRobotName(string name);
-        // void setRobotType(string type);
-    
     protected:
+        int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
         int killCount = 0;
         int lives = 3;
         int robotId = -1;
@@ -33,7 +29,7 @@ class Robot{
 
     public:
         Robot(int x, int y, string name, string type);
-        virtual ~Robot();
+        virtual ~Robot(){}
         
         void setRobotX(int x);
         int getRobotX() const;
@@ -42,7 +38,17 @@ class Robot{
         int getRobotY() const;
 
         string getRobotName() const;
+
+        void setRobotType(string type);
         string getRobotType() const;
+
+        bool addLife();
+        bool reduceLife();
+        int getLives() const;
+        bool isAlive() const;
+
+        bool incrementKills();
+
 
         virtual void setLocation(int x, int y) = 0;
         virtual void actions(Battlefield* battlefield) = 0;
