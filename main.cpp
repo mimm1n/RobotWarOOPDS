@@ -14,6 +14,26 @@ Phone: 0146202605, 0193320041, 0139071648, 0194090095
 #include "Robot.h"
 using namespace std;
 
+class ThinkingRobot : public Robot{
+    public:
+        virtual void actionThink(Battlefield* battlefield) = 0;
+};
+
+class SeeingRobot : public Robot{
+    public:
+        virtual void actionLook(Battlefield* battlefield) = 0;
+};
+
+class MovingRobot : public Robot{
+    public:
+        virtual void actionMove(Battlefield* battlefield) = 0;
+};
+
+class ShootingRobot : public Robot{
+    public:
+        virtual void actionFire(Battlefield* battlefield) = 0;
+};
+
 int main() {
     cout << "Hello World!" << endl;
 }
