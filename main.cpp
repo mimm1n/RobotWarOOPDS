@@ -44,22 +44,22 @@ int main() {
 }
 
 /* FUNCTION DEFINITIONS */
-virtual void ThinkingRobot::setLocation(int x, int y){
+void ThinkingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
 
-virtual void SeeingRobot::setLocation(int x, int y){
+void SeeingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
 
-virtual void MovingRobot:: setLocation(int x, int y){
+void MovingRobot:: setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
 
-virtual void ShootingRobot:: setLocation(int x, int y){
+void ShootingRobot:: setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
