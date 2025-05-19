@@ -51,6 +51,6 @@ class Robot{
 
 
         virtual void setLocation(int x, int y) = 0;
-        virtual void actions(Battlefield* battlefield) = 0;
+        //virtual void actions(Battlefield* battlefield) = 0;
 };
 #endif
