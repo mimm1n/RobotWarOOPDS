@@ -54,12 +54,12 @@ void SeeingRobot::setLocation(int x, int y){
     setRobotY(y);
 }
 
-void MovingRobot:: setLocation(int x, int y){
+void MovingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
 
-void ShootingRobot:: setLocation(int x, int y){
+void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
