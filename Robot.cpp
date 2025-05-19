@@ -23,8 +23,6 @@ Robot::Robot(int x, int y, string name, string type){
     setRobotType(type);
 }
 
-virtual ~Robot(){}
-
 void Robot::setRobotX(int x){
     robotX = x;
 }

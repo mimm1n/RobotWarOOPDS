@@ -29,7 +29,7 @@ class Robot{
 
     public:
         Robot(int x, int y, string name, string type);
-        virtual ~Robot();
+        virtual ~Robot(){}
         
         void setRobotX(int x);
         int getRobotX() const;
