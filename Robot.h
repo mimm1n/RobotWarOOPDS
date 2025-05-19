@@ -19,12 +19,8 @@ Phone: 0146202605, 0193320041, 0139071648, 0194090095
 using namespace std;
 
 class Robot{
-    private:
-        int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
-        // void setRobotName(string name);
-        // void setRobotType(string type);
-    
     protected:
+        int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
         int killCount = 0;
         int lives = 3;
         int robotId = -1;
