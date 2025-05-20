@@ -21,36 +21,41 @@ using namespace std;
 class Robot{
     protected:
         int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
-        int killCount = 0;
-        int lives = 3;
-        int robotId = -1;
-        string robotName = "";
-        string robotType = "";
+        int killCount = 0; // Number of robots this robot managed to destroy/kill
+        int lives = 3; // Number of lives of this robot (initial is 3)
+        int robotId = -1; // The ID of this robot
+        string robotName = ""; // The name of this robot
+        string robotType = ""; // This robot's type; Jump, Hide, etc.
 
     public:
-        Robot(int x, int y, string name, string type);
-        virtual ~Robot(){}
+        Robot(int x, int y, string name, string type); // Constructor
+        virtual ~Robot(){} // Destructor
         
-        void setRobotX(int x);
+        // Set and get the x coordinate of this robot
+        void setRobotX(int x); 
         int getRobotX() const;
 
+        // Set and get the y coordinate of this robot
         void setRobotY(int y);
         int getRobotY() const;
 
+        // Get the name of this robot(fixed so can't set)
         string getRobotName() const;
 
+        // Set and get the robot's type
         void setRobotType(string type);
         string getRobotType() const;
 
-        bool addLife();
-        bool reduceLife();
-        int getLives() const;
-        bool isAlive() const;
+        int addLife(); // Adds 1 life to the lives count 
+        bool reduceLife(); // Reduces the lives count by 1
+        int getLives() const; // Get this robot's lives count
+        bool isAlive() const; // Checks if this robot's lives count is more than 0
 
-        bool incrementKills();
+        int incrementKills(); // Adds 1 to the kill count
 
+        // For child classes to rewrite and set new x and y coordinates
+        virtual void setLocation(int x, int y) = 0; 
 
-        virtual void setLocation(int x, int y) = 0;
         //virtual void actions(Battlefield* battlefield) = 0;
 };
 #endif
