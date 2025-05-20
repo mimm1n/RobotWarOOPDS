@@ -108,7 +108,7 @@ int Robot::addLife(){
  * reduceLife
  * task: Decreases the lives count by 1 if the robot isAlive
  * data out: true if robot is alive after decreasing the lives count 
- *           by 1, false if robot dead/destroyed in the first place
+ *           by 1, false if robot dead/destroyed
  *********************************************************************/
 bool Robot::reduceLife(){
     if(isAlive()){
