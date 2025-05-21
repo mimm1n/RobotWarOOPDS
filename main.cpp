@@ -17,6 +17,9 @@
 // ******************************************************** 
 
 #include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <vector>
 #include "Robot.h"
 using namespace std;
 
@@ -47,6 +50,8 @@ class ShootingRobot : public Robot{
 
 int main() {
     cout << "Hello World!" << endl;
+
+    return 0;
 }
 
 /* FUNCTION DEFINITIONS */
