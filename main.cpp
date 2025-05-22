@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <vector>
 #include "Robot.h"
+#include "Battlefield.h"
 using namespace std;
 
 /* CLASS DEFINITIONS */
@@ -50,6 +51,8 @@ class ShootingRobot : public Robot{
 
 int main() {
     cout << "Hello World!" << endl;
+     Battlefield battlefield;
+    battlefield.readFile("inputFile.txt");
 
     return 0;
 }

@@ -1,9 +1,9 @@
 M by N: 20 20
 Turns: 300
 Robots: 5
-GenericRobot Kidd 3 6
-GenericRobot Jet 1 1
-GenericRobot Alpha 5 2
-GenericRobot Beta 2 7
-GenericRobot Star random random
+Kidd 3 6
+Jet 1 1
+Alpha 5 2
+Beta 2 7
+Star random random
 
