@@ -57,7 +57,10 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
     private: 
         static int robotIncrement = 0;
     public: 
-        GenericRobot(string id = "GR0", int x, int y){
+        GenericRobot(string id = "GR0", int x, int y) : ShootingRobot(x, y, id, "Shooting"),
+                                                        MovingRobot(x, y, id, "Moving"),
+                                                        SeeingRobot(x, y, id, "Seeing"),
+                                                        ThinkingRobot(x, y, id, "Thinking"){
             robotId_ = id + to_string(robotIncrement);
             robotPosX = x; 
             robotPosY = y; 
@@ -65,14 +68,18 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
             robotIncrement++;
         }
 
-    virtual void actionShoot(Battlefield* battlefield){}
+        string getRobotID() const { return robotId_; }
+
+    virtual void actionShoot(Battlefield* battlefield){
+        // ShootingRobot::actionShoot(battlefield); 
+    }
     virtual void actionMove(Battlefield* battlefield){}
     virtual void actionSee(Battlefield* battlefield){}
     virtual void actionThink(Battlefield* battlefield){}
     void actionRand(Battlefield* battlefield){
-        random_device rd; // obtain a random number from hardware
-        mt19937 gen(rd()); // seed the generator
-        uniform_int_distribution<> distr(0, 10); // define the range
+        random_device rd; 
+        mt19937 gen(rd()); 
+        uniform_int_distribution<> distr(0, 10); // define range
 
         actionThink(battlefield);
         actionSee(battlefield); 
@@ -94,14 +101,13 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
 int main() {
     cout << "Hello World!" << endl;
-     Battlefield battlefield;
+    Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
 
     return 0;
 }
 
 /* FUNCTION DEFINITIONS */
-// Robot Actions
 void ThinkingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
