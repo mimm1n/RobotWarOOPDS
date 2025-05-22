@@ -19,6 +19,7 @@
 // Member_4:
 // ********************************************************
 
+#include "Battlefield.h"
 #include "Robot.h"
 #include <cstdlib>
 #include <fstream>
@@ -27,88 +28,134 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
+#include <iomanip>
 using namespace std;
 
-class Battlefield {
-private:
-  int battlefieldCols_ = -1; // variable to assign number of columns
-  int battlefieldRows_ = -1; // variable to assign number of rows
 
-  int totalTurns_ = -1; // variable to assign total turns
-  int currentTurn_ = 0; //??
 
-  int numOfRobots_ = -1; // variable to assign number of robots
-
-  vector<Robot *> robots_; // dynamic vecot robots_ points to Robot* object
-  queue<Robot *> destroyedRobots_;
-  queue<Robot *> waitingRobots_;
-
-  vector<vector<string>> battlefield_;
-
-public:
-  // Get function
-  int battlefieldCols() { return battlefieldCols_; }
-  int battlefieldRows() { return battlefieldRows_; }
-  int turn() { return totalTurns_; }
-  int numOfRobots() { return numOfRobots_; }
-
-  void readFile(string filename);
-  void placeRobots();
-};
-
-// Read file to initialize battleield and robots
 void Battlefield::readFile(string filename) {
+
+struct Place {
+  string name;
+  int x,y;
+};
 
   ifstream infile(filename);
   string line;
 
-  getline(infile, line);
-  istringstream iss(line);
-  iss >> battlefieldRows_ >>
-      battlefieldCols_; // stores the matrix to columns and rows
+  //find matrix
+  getline(infile, line); //read first line
+  size_t pos1 = line.find(":");
+  if (pos1 != string::npos){
+  string numStr = line.substr(pos1+2);
+  stringstream ss(numStr);
+  string colstr, rowstr;
+  ss >> rowstr >> colstr;
+  battlefieldRows_ = stoi(rowstr);
+  battlefieldCols_ = stoi(colstr);
+  }
+battlefield_ = vector<vector<string>>(battlefieldRows_+1, vector<string>(battlefieldCols_+1, ""));
+  //find total turn
+  getline(infile, line); //read second line
+  size_t pos2 = line.find(":");
+  if (pos2 != string::npos){
+  string numStr2 = line.substr(pos2+2);
+  totalTurns_ = stoi(numStr2);
 
-  battlefield_.resize(battlefieldRows_, vector<string>(battlefieldCols_, ""));
-  getline(infile, line);    // read the second line
-  totalTurns_ = stoi(line); // stoi convert string to int
-  getline(infile, line);    // read the third line
-  numOfRobots_ = stoi(line);
+  }
+  
+  //find total robot
+  getline(infile, line);// read the third line
+  size_t pos3 = line.find(":");
+  if (pos3 != string::npos){
+  string numStr3 = line.substr(pos3+2);
+  numOfRobots_ = stoi(numStr3);
+  }
 
-  for (int i = 0; i < numOfRobots_; i++) {
+cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
+
+for (int i = 0; i < numOfRobots_; i++) {
     getline(infile, line);
     istringstream robotLine(line);
-    string name, robotType;
+    string name, xStr, yStr;
     int x, y;
-    robotLine >> robotType >> name >> x >> y;
-    robots_.push_back(new Robot(x, y, name, robotType));
-    cout << "Robot added: " << name << " at (" << x << "," << y << ")"
-         << endl; // try
-  }
+    robotLine >> name >> yStr >> xStr;
+    if (xStr == "random" && yStr == "random"){
+      x = rand() % (battlefieldRows_)+1;
+      y = rand() % (battlefieldCols_)+1;
+    }else{
+      x = stoi(xStr);
+      y = stoi(yStr);
+    }
+//robots_.push_back(new GenericRobot(name, x, y));
 }
 
-void Battlefield::placeRobots() {
-  for (int i = 0; i < battlefield_.size(); ++i) {
-    for (int j = 0; j < battlefield_[i].size(); ++j) {
-      battlefield_[i][j] = ""; // empty string
-    }
-  }
+/*for(GenericRobot* robot : robots_ ){
+  delete robot;
+}
 
-  for (int i = 0; i < robots_.size(); ++i) {
-    if (robots_[i]->getRobotY() < battlefield_.size() &&
-        robots_[i]->getRobotX() < battlefield_[0].size()) {
-      battlefield_[robots_[i]->getRobotY()][robots_[i]->getRobotX()] =
-          robots_[i]->getRobotName();
-    } else {
-      cout << "Error message: Invalid location for the robot "
-           << robots_[i]->getRobotName() << endl;
+robots_.clear();*/
+
+}
+
+/*void Battlefield::placeRobots(){
+for(int i=0;i<battlefield_.size() i++){
+for (int j=0; i<battlefield_[i].size(); j++){
+  battlefield_[i][j]="";
+}
+  }
+  for (int i=0;i<robots_.size(); i++){
+    if(robot_[i].getRobotY()<battlefield_.size && robot_[i].getRobotX()<battlefield_[0].size()){
+      battlefied_[robot_[i].getRobotY()][robot_[i].getRobotX()]=robot_[i].getRobotName();
+    }
+    else
+    {
+      cout << "Error message: Invalid location for the robot " << robot_[i].getRobotName() << endl;
       exit(1);
     }
   }
+}*/
+
+void Battlefield::displayBattlefield() const{
+  cout << "Display Battlefield";
+  cout << endl << "    ";
+  for (int j=0; j< battlefield_[0].size();j++){
+    cout << "   " << right << setfill('0') << setw(2) << j << "";
+  }
+  cout << endl;
+ for (int i=0; i< battlefield_.size();i++){
+    cout << "     ";
+    for (int j = 0; j < battlefield_[i].size(); j++)
+    cout << "+----";
+  cout << "+" << endl;
+  cout << "   " << right << setfill('0') << setw(2) << i;
+  for (int j = 0;j <battlefield_[0].size(); j++)
+  {
+    if(battlefield_[i][j] == "")
+    {
+      cout << "|" << "    ";
+    }
+    else
+    {
+      cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
+    }
+  }
+  cout << "|" << endl;
+  }
+  cout << "     ";
+  for (int j = 0;j<battlefield_[0].size();j++)
+  cout << "+----";
+  cout << "+" << endl;
 }
 
 int main() {
-  Battlefield battlefield;
-  battlefield.readFile("inputFile.txt");
+    cout << "Hello World!" << endl;
+     Battlefield battlefield;
+    battlefield.readFile("inputFile3.txt");
+    battlefield.displayBattlefield();
 
-  return 0;
+    return 0;
 }
+
+
+

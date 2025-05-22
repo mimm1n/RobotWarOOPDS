@@ -1,0 +1,9 @@
+M by N: 30 30
+Turns: 300
+Robots: 6
+Fury 15 28
+Specter 12 7
+Claw 10 10
+Weapon 17 2
+Huston random random
+Kira random random
