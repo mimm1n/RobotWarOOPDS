@@ -103,7 +103,7 @@ int main() {
     cout << "Hello World!" << endl;
     Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
-
+    battlefield.displayBattlefield();
     return 0;
 }
 

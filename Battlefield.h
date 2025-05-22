@@ -20,9 +20,9 @@ private:
 
   int numOfRobots_ = -1; // variable to assign number of robots
 
-  //vector<GenericRobot *> robots_; 
-  queue<Robot *> destroyedRobots_;
-  queue<Robot *> waitingRobots_;
+  vector<GenericRobot *> robots_; 
+  queue<GenericRobot *> destroyedRobots_;
+  queue<GenericRobot *> waitingRobots_;
 
   vector<vector<string>> battlefield_;
 
