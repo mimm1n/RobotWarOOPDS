@@ -1,0 +1,10 @@
+M by N: 40 40
+Turns: 200
+Robots: 7
+Shadow 15 28
+Viper 12 7
+Raven 10 10
+Wraith 17 2
+Blaze random random
+Titan random random
+Knight 20 20
