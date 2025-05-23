@@ -56,14 +56,15 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     public SeeingRobot, public ThinkingRobot{
     private: 
         static int robotIncrement = 0;
+        string robotId_;
     public: 
         GenericRobot(string id = "GR0", int x, int y) : ShootingRobot(x, y, id, "Shooting"),
                                                         MovingRobot(x, y, id, "Moving"),
                                                         SeeingRobot(x, y, id, "Seeing"),
                                                         ThinkingRobot(x, y, id, "Thinking"){
             robotId_ = id + to_string(robotIncrement);
-            robotPosX = x; 
-            robotPosY = y; 
+            int robotPosX = x; 
+            int robotPosY = y; 
 
             robotIncrement++;
         }
