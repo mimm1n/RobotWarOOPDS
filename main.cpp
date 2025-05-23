@@ -55,10 +55,21 @@ class ShootingRobot : public Robot{
 class GenericRobot : public ShootingRobot, public MovingRobot, 
                     public SeeingRobot, public ThinkingRobot{
     private: 
-        static int robotIncrement = 0;
+        static int robotIncrement;
         string robotId_;
     public: 
-        GenericRobot(string id = "GR0", int x, int y) : ShootingRobot(x, y, id, "Shooting"),
+        // GenericRobot(string id = "GR0", int x = -1, int y = -1) : ShootingRobot(x, y, id, "Shooting"),
+        //                                                 MovingRobot(x, y, id, "Moving"),
+        //                                                 SeeingRobot(x, y, id, "Seeing"),
+        //                                                 ThinkingRobot(x, y, id, "Thinking"){
+        //     robotId_ = id + to_string(robotIncrement);
+        //     int robotPosX = x; 
+        //     int robotPosY = y; 
+
+        //     robotIncrement++;
+        // }
+
+            GenericRobot(string name, int x = -1, int y = -1) : ShootingRobot(x, y, id, "Shooting"),
                                                         MovingRobot(x, y, id, "Moving"),
                                                         SeeingRobot(x, y, id, "Seeing"),
                                                         ThinkingRobot(x, y, id, "Thinking"){
@@ -68,6 +79,8 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
             robotIncrement++;
         }
+
+
 
         string getRobotID() const { return robotId_; }
 
@@ -99,104 +112,13 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
     }
 };
 
-class ScoutBot : public SeeingRobot {
-private:
-    int lookCount = 0;
-    const int maxLooks = 3;
-
-public:
-    void actionLook(Battlefield* battlefield) override {
-        if (lookCount < maxLooks) {
-            // Logic to scan the entire battlefield
-            battlefield->scanEntireField(this);
-            lookCount++;
-        }
-    }
-};
-
-class TrackBot : public SeeingRobot {
-private:
-    int trackersUsed = 0;
-    const int maxTrackers = 3;
-
-public:
-    void actionLook(Battlefield* battlefield) override {
-        if (trackersUsed < maxTrackers) {
-            Robot* target = battlefield->selectEnemyToTrack();
-            if (target) {
-                battlefield->trackEnemy(target, this);
-                trackersUsed++;
-            }
-        }
-    }
-};
-class LongShotBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield) override {
-        int targetX, targetY;
-        if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
-            battlefield->fireAt(targetX, targetY);
-        }
-    }
-};
-class SemiAutoBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield) override {
-        int targetX, targetY;
-        if (battlefield->getTarget(this, targetX, targetY)) {
-            for (int i = 0; i < 3; ++i) {
-                battlefield->fireAt(targetX, targetY); // 3 shells
-            }
-        }
-    }
-};
-class ThirtyShotBot : public ShootingRobot {
-private:
-    int ammo = 0;
-
-public:
-    void actionFire(Battlefield* battlefield) override {
-        ammo = 30; // Reload
-    }
-};
-class HideBot : public ThinkingRobot {
-private:
-    int hideTurnsUsed = 0;
-    const int maxHideTurns = 3;
-    bool isHidden = false;
-
-public:
-    void actionThink(Battlefield* battlefield) override {
-        if (hideTurnsUsed < maxHideTurns) {
-            isHidden = true;
-            hideTurnsUsed++;
-            battlefield->setHidden(this, true);
-        }
-    }
-};
-class JumpBot : public MovingRobot {
-private:
-    int jumpsUsed = 0;
-    const int maxJumps = 3;
-
-public:
-    void actionMove(Battlefield* battlefield) override {
-        if (jumpsUsed < maxJumps) {
-            int newX, newY;
-            battlefield->getRandomLocation(newX, newY);
-            setLocation(newX, newY);
-            jumpsUsed++;
-        }
-    }
-};
-
-
+int GenericRobot::robotIncrement = 0; 
 
 int main() {
     cout << "Hello World!" << endl;
     Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
-    battlefield.displayBattlefield();
+
     return 0;
 }
 
@@ -219,7 +141,6 @@ void MovingRobot::setLocation(int x, int y){
 void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
-
 }
 
 
