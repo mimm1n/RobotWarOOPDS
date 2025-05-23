@@ -82,13 +82,13 @@ for (int i = 0; i < numOfRobots_; i++) {
       x = stoi(xStr);
       y = stoi(yStr);
     }
-robots_.push_back(GenericRobot(name, x, y));
+//
 }
 
 }
 
 
-void Battlefield::placeRobots(){
+/*void Battlefield::placeRobots(){
 for(int i=0;i<battlefield_.size(); i++){
 for (int j=0; i<battlefield_[i].size(); j++){
   battlefield_[i][j]="";
@@ -104,7 +104,7 @@ for (int j=0; i<battlefield_[i].size(); j++){
       exit(1);
     }
   }
-}
+}*/
 
 void Battlefield::displayBattlefield() const{
   cout << "Display Battlefield";
@@ -136,6 +136,15 @@ void Battlefield::displayBattlefield() const{
   for (int j = 0;j<battlefield_[0].size();j++)
   cout << "+----";
   cout << "+" << endl;
+}
+
+int main() {
+    cout << "Hello World!" << endl;
+    Battlefield battlefield;
+    battlefield.readFile("inputFile.txt");
+    battlefield.displayBattlefield();
+    
+    return 0;
 }
 
 

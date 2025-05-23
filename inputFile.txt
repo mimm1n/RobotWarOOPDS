@@ -1,4 +1,4 @@
-M by N: 20 20
+M by N: 10 10
 Turns: 300
 Robots: 5
 Kidd 3 6
