@@ -99,37 +99,105 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
     }
 };
 
+class ScoutBot : public SeeingRobot {
+private:
+    int lookCount = 0;
+    const int maxLooks = 3;
+
+public:
+    void actionLook(Battlefield* battlefield) override {
+        if (lookCount < maxLooks) {
+            // Logic to scan the entire battlefield
+            battlefield->scanEntireField(this);
+            lookCount++;
+        }
+    }
+};
+
+class TrackBot : public SeeingRobot {
+private:
+    int trackersUsed = 0;
+    const int maxTrackers = 3;
+
+public:
+    void actionLook(Battlefield* battlefield) override {
+        if (trackersUsed < maxTrackers) {
+            Robot* target = battlefield->selectEnemyToTrack();
+            if (target) {
+                battlefield->trackEnemy(target, this);
+                trackersUsed++;
+            }
+        }
+    }
+};
+class LongShotBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int targetX, targetY;
+        if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
+            battlefield->fireAt(targetX, targetY);
+        }
+    }
+};
+class SemiAutoBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int targetX, targetY;
+        if (battlefield->getTarget(this, targetX, targetY)) {
+            for (int i = 0; i < 3; ++i) {
+                battlefield->fireAt(targetX, targetY); // 3 shells
+            }
+        }
+    }
+};
+class ThirtyShotBot : public ShootingRobot {
+private:
+    int ammo = 0;
+
+public:
+    void actionFire(Battlefield* battlefield) override {
+        ammo = 30; // Reload
+    }
+};
+class HideBot : public ThinkingRobot {
+private:
+    int hideTurnsUsed = 0;
+    const int maxHideTurns = 3;
+    bool isHidden = false;
+
+public:
+    void actionThink(Battlefield* battlefield) override {
+        if (hideTurnsUsed < maxHideTurns) {
+            isHidden = true;
+            hideTurnsUsed++;
+            battlefield->setHidden(this, true);
+        }
+    }
+};
+class JumpBot : public MovingRobot {
+private:
+    int jumpsUsed = 0;
+    const int maxJumps = 3;
+
+public:
+    void actionMove(Battlefield* battlefield) override {
+        if (jumpsUsed < maxJumps) {
+            int newX, newY;
+            battlefield->getRandomLocation(newX, newY);
+            setLocation(newX, newY);
+            jumpsUsed++;
+        }
+    }
+};
+
+
 
 int main() {
     cout << "Hello World!" << endl;
-<<<<<<< HEAD
-
-    ScoutBot scout;
-    scout.actionLook(&field);
-
-    TrackBot track;
-    track.actionLook(&field);
-
-    LongShotBot longShot;
-    longShot.actionFire(&field);
-
-    SemiAutoBot semiAuto;
-    semiAuto.actionFire(&field);
-
-    ThirtyShotBot thirtyShot;
-    thirtyShot.actionFire(&field);
-
-    HideBot hide;
-    hide.actionMove(&field);
-
-    JumpBot jump;
-    jump.actionMove(&field);
-=======
     Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
     battlefield.displayBattlefield();
     return 0;
->>>>>>> 84607456af756870e2a33bd435898d57e8eac9cf
 }
 
 /* FUNCTION DEFINITIONS */
@@ -151,65 +219,7 @@ void MovingRobot::setLocation(int x, int y){
 void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
+
 }
 
-<<<<<<< HEAD
-class ScoutBot : public Robot,
-                 public SeeingRobot<ScoutBot> {
-public:
-    void doLook(Battlefield* battlefield) {
-        cout << "ScoutBot is scanning the area..." <<endl; // i don't know this is right or wrong
-        battlefield->status();
-    }
-};
 
-class TrackBot : public Robot,
-                 public SeeingRobot<TrackBot> {
-public:
-    void doLook(Battlefield* battlefield) {
-        std::cout << "TrackBot is planting a tracker on an enemy robot..." <<endl; // i don't know this is right or wrong
-    }
-};
-
-class LongShotBot : public Robot,
-                    public ShootingRobot<LongShotBot> {
-public:
-    void doFire(Battlefield* battlefield) {
-        cout << "LongShotBot is firing up to three units distance away..." <<endl; // i don't know this is right or wrong
-    }
-};
-
-class SemiAutoBot : public Robot,
-                    public ShootingRobot<SemiAutoBot> {
-public:
-    void doFire(Battlefield* battlefield) {
-        cout << "SemiAutoBot is firing three consecutive shells into one location..." <<endl; // i don't know this is right or wrong
-    }
-};
-
-class ThirtyShotBot : public Robot,
-                      public ShootingRobot<ThirtyShotBot> {
-public:
-    void doFire(Battlefield* battlefield) {
-        cout << "ThirtyShotBot is firing with a fresh load of 30 shells..." <<endl; // i don't know this is right or wrong
-    }
-};
-
-class HideBot : public Robot,
-                public MovingRobot<HideBot> {
-public:
-    void doMove(Battlefield* battlefield) {
-        cout << "HideBot is hiding for three turns..." << endl; // i don't know this is right or wrong
-    }
-};
-
-class JumpBot : public Robot,
-                public MovingRobot<JumpBot> {
-public:
-    void doMove(Battlefield* battlefield) {
-        cout << "JumpBot is jumping to a new location..." <<endl; // i don't know this is right or wrong
-    }
-};
-=======
-
->>>>>>> 84607456af756870e2a33bd435898d57e8eac9cf
