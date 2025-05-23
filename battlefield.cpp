@@ -1,105 +1,152 @@
-/**********|**********|**********|
-Program: main.cpp
-Course: OOPDS
-Trimester: 2510
-Name: Aliyah, Khayrin, Aimi, Amirul
-ID: 243UC24665 , 243UC246KQ , 243UC247CJ, 241UC24199
-Lecture Section: TC2L
-Tutorial Section: TT7L
-Email: NOR.ALIYAH.SYAHIRAH@student.mmu.edu.my, KHAYRIN.SOFIYA.JAMEL@student.mmu.edu.my, AIMI.MOHD.FAIZAL@student.mmu.edu.my, AMIRUL.IHTISYAM.IDRUS@student.mmu.edu.my
-Phone: 0146202605, 0193320041, 0139071648, 0194090095
-**********|**********|**********/
+///*********************************************************   
+// Program: Battlefield.cpp   
+// Course: CCP6124 OOPDS  
+// Lecture Class: TC2L 
+// Tutorial Class: TT7L 
+// Trimester: 2510 
+// Member_1: 243UC24665 | NOR ALIYAH SYAHIRAH BINTI MUHD HASSANAL | NOR.ALIYAH.SYAHIRAH@student.mmu.edu.my | 0146202605 
+// Member_2: 243UC246KQ | KHAYRIN SOFIYA BINTI JAMEL | KHAYRIN.SOFIYA.JAMEL@student.mmu.edu.my | 0193320041 
+// Member_3: 243UC247CJ | AIMI BINTI MOHD FAIZAL | AIMI.MOHD.FAIZAL@student.mmu.edu.my | 0139071648 
+// Member_4: 241UC24199 | AMIRUL IHTISYAM BIN IDRUS | AMIRUL.IHTISYAM.IDRUS@student.mmu.edu.my | 0194090095	  
+//********************************************************* 
+// Task Distribution 
+// Member_1:   
+// Member_2:   
+// Member_3:   
+// Member_4: 
+// ******************************************************** 
 
-#include "Robot.h"
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <queue>
+#include "Battlefield.h"
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <queue>
+#include <sstream>
 #include <string>
+#include <vector>
+#include <iomanip>
+#include <random>
 using namespace std;
 
 
-class Battlefield{
-    private:
-    int battlefieldCols_ = -1; //variable to assign number of columns
-    int battlefieldRows_ = -1; //variable to assign number of rows
 
-    int totalTurns_ = -1; //variable to assign total turns
-    int currentTurn_ = 0; //??
+void Battlefield::readFile(string filename) {
 
-    int numOfRobots_ = -1; //variable to assign number of robots
+  ifstream infile(filename);
+  string line;
 
-    vector<Robot*> robots_;  //dynamic vecot robots_ points to Robot* object
-    queue<Robot*> destroyedRobots_;
-    queue<Robot*> waitingRobots_;
+  //find matrix
+  getline(infile, line); //read first line
+  size_t pos1 = line.find(":");
+  if (pos1 != string::npos){
+  string numStr = line.substr(pos1+2);
+  stringstream ss(numStr);
+  string colstr, rowstr;
+  ss >> rowstr >> colstr;
+  battlefieldRows_ = stoi(rowstr);
+  battlefieldCols_ = stoi(colstr);
+  }
 
-vector <vector<string>> battlefield_; 
+battlefield_ = vector<vector<string>>(battlefieldRows_+1, vector<string>(battlefieldCols_+1, "")); //2D vector for rows and columns
 
-    public:
-    //Get function 
-    int battlefieldCols(){return battlefieldCols_;}
-    int battlefieldRows(){return battlefieldRows_;}
-    int turn(){return totalTurns_;}
-    int numOfRobots(){return numOfRobots_;}
+  //find total turn
+  getline(infile, line); //read second line
+  size_t pos2 = line.find(":");
+  if (pos2 != string::npos){
+  string numStr2 = line.substr(pos2+2);
+  totalTurns_ = stoi(numStr2);
 
-    void readFile(string filename);
-    void placeRobots();
+  }
+  
+  //find total robot
+  getline(infile, line);// read the third line
+  size_t pos3 = line.find(":");
+  if (pos3 != string::npos){
+  string numStr3 = line.substr(pos3+2);
+  numOfRobots_ = stoi(numStr3);
+  }
 
-};
+cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
 
-// Read file to initialize battleield and robots
-void Battlefield::readFile(string filename){
-
-ifstream infile(filename);
-string line; 
-
-getline(infile, line); 
-istringstream iss(line);
-iss >> battlefieldRows_ >> battlefieldCols_; //stores the matrix to columns and rows
-
-battlefield_.resize(battlefieldRows_, vector<string>(battlefieldCols_,""));
-getline(infile, line); //read the second line
-totalTurns_= stoi(line); //stoi convert string to int
-getline(infile, line); //read the third line
-numOfRobots_ = stoi(line);
-
-for (int i = 0; i<numOfRobots_;i++){
+  //find robot name and position
+for (int i = 0; i < numOfRobots_; i++) {
     getline(infile, line);
     istringstream robotLine(line);
-    string name, robotType;
+    string name, xStr, yStr;
     int x, y;
-    robotLine >> robotType >> name >> x >> y;
-    robots_.push_back(new Robot(x, y, name, robotType));
-    cout << "Robot added: " << name << " at (" << x << "," << y << ")" << endl; //try
+    robotLine >> name >> yStr >> xStr;
+    if (xStr == "random" && yStr == "random"){
+      x = rand() % (battlefieldRows_)+1;
+      y = rand() % (battlefieldCols_)+1;
+    }else{
+      x = stoi(xStr);
+      y = stoi(yStr);
+    }
+//
+}
 
 }
+
+
+/*void Battlefield::placeRobots(){
+for(int i=0;i<battlefield_.size(); i++){
+for (int j=0; i<battlefield_[i].size(); j++){
+  battlefield_[i][j]="";
 }
-
-void Battlefield::placeRobots()
-{
-    for(int i=0; i<battlefield_.size();++i){
-        for (int j=0;j<battlefield_[i].size();++j){
-            battlefield_[i][j]=""; //empty string
-        }
+  }
+  for (int i=0;i<robots_.size(); i++){
+    if(robots_[i].getRobotY()<battlefield_.size() && robots_[i].getRobotX()<battlefield_[0].size()){
+      battlefield_[robots_[i].getRobotY()][robots_[i].getRobotX()]=robots_[i].getRobotName();
     }
-
-    for (int i = 0;i<robots_.size();++i){
-        if(robots_[i]->getRobotY() < battlefield_.size() && robots_[i]->getRobotX() < battlefield_[0].size()){
-            battlefield_[robots_[i]->getRobotY()][robots_[i]->getRobotX()]=robots_[i]->getRobotName();
-        }
-        else{
-            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
-            exit(1);
-        }
-
+    else
+    {
+      cout << "Error message: Invalid location for the robot " << robots_[i].getRobotName() << endl;
+      exit(1);
     }
+  }
+}*/
+
+void Battlefield::displayBattlefield() const{
+  cout << "Display Battlefield";
+  cout << endl << "    ";
+  for (int j=0; j< battlefield_[0].size();j++){
+    cout << "   " << right << setfill('0') << setw(2) << j << "";
+  }
+  cout << endl;
+ for (int i=0; i< battlefield_.size();i++){
+    cout << "     ";
+    for (int j = 0; j < battlefield_[i].size(); j++)
+    cout << "+----";
+  cout << "+" << endl;
+  cout << "   " << right << setfill('0') << setw(2) << i;
+  for (int j = 0;j <battlefield_[0].size(); j++)
+  {
+    if(battlefield_[i][j] == "")
+    {
+      cout << "|" << "    ";
+    }
+    else
+    {
+      cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
+    }
+  }
+  cout << "|" << endl;
+  }
+  cout << "     ";
+  for (int j = 0;j<battlefield_[0].size();j++)
+  cout << "+----";
+  cout << "+" << endl;
 }
 
 int main() {
+    cout << "Hello World!" << endl;
     Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
-
+    battlefield.displayBattlefield();
+    
     return 0;
 }
+
+
+
+
