@@ -25,10 +25,13 @@
 #include "Battlefield.h"
 using namespace std;
 
+enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+
 /* CLASS DEFINITIONS */
 // Robot Actions
 class ThinkingRobot : public Robot{
     public:
+        ThinkingRobot(int x, int y, )
         virtual void setLocation(int x, int y);
         virtual void actionThink(Battlefield* battlefield) = 0;
 };

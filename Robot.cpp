@@ -88,18 +88,18 @@ string Robot::getRobotName() const{
  * task: sets the robot's type
  * @param type - type of robot
  *********************************************************************/
-void Robot::setRobotType(string type){
-    robotType = type;
-}
+// void Robot::setRobotType(string type){
+//     robotType = type;
+// }
 
-/**********************************************************************
- * getRobotType
- * task: gets the type of the robot
- * @return robotType - type of the robot
- *********************************************************************/
-string Robot::getRobotType() const{
-    return robotType;
-}
+// /**********************************************************************
+//  * getRobotType
+//  * task: gets the type of the robot
+//  * @return robotType - type of the robot
+//  *********************************************************************/
+// string Robot::getRobotType() const{
+//     return robotType;
+// }
 
 /**********************************************************************
  * addLife
