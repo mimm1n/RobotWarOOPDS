@@ -104,6 +104,7 @@ int main() {
     Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
     battlefield.displayBattlefield();
+    
     return 0;
 }
 
