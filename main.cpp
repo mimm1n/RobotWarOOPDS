@@ -31,7 +31,7 @@ enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLEC
 // Robot Actions
 class ThinkingRobot : public Robot{
     public:
-        ThinkingRobot(int x, int y, )
+        //ThinkingRobot(int x, int y, )
         virtual void setLocation(int x, int y);
         virtual void actionThink(Battlefield* battlefield) = 0;
 };
