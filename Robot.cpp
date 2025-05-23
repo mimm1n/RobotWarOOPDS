@@ -22,6 +22,8 @@
 #include <string>
 using namespace std;
 
+enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+
 /**********************************************************************
  * Robot (constructor)
  * task: Constructs a robot object by assigning it's x and y 
@@ -29,13 +31,11 @@ using namespace std;
  * @param x - x coordinate
  *        y - y coordinate
  *        name - robot's name
- *        type - robot's type
  *********************************************************************/
-Robot::Robot(int x, int y, string name, string type){
+Robot::Robot(int x, int y, string name){
     setRobotX(x);
     setRobotY(y);
     robotName = name;
-    setRobotType(type);
 }
 
 /**********************************************************************
