@@ -99,6 +99,98 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
     }
 };
 
+class ScoutBot : public SeeingRobot {
+private:
+    int lookCount = 0;
+    const int maxLooks = 3;
+
+public:
+    void actionLook(Battlefield* battlefield) override {
+        if (lookCount < maxLooks) {
+            // Logic to scan the entire battlefield
+            battlefield->scanEntireField(this);
+            lookCount++;
+        }
+    }
+};
+
+class TrackBot : public SeeingRobot {
+private:
+    int trackersUsed = 0;
+    const int maxTrackers = 3;
+
+public:
+    void actionLook(Battlefield* battlefield) override {
+        if (trackersUsed < maxTrackers) {
+            Robot* target = battlefield->selectEnemyToTrack();
+            if (target) {
+                battlefield->trackEnemy(target, this);
+                trackersUsed++;
+            }
+        }
+    }
+};
+class LongShotBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int targetX, targetY;
+        if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
+            battlefield->fireAt(targetX, targetY);
+        }
+    }
+};
+class SemiAutoBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int targetX, targetY;
+        if (battlefield->getTarget(this, targetX, targetY)) {
+            for (int i = 0; i < 3; ++i) {
+                battlefield->fireAt(targetX, targetY); // 3 shells
+            }
+        }
+    }
+};
+class ThirtyShotBot : public ShootingRobot {
+private:
+    int ammo = 0;
+
+public:
+    void actionFire(Battlefield* battlefield) override {
+        ammo = 30; // Reload
+    }
+};
+class HideBot : public ThinkingRobot {
+private:
+    int hideTurnsUsed = 0;
+    const int maxHideTurns = 3;
+    bool isHidden = false;
+
+public:
+    void actionThink(Battlefield* battlefield) override {
+        if (hideTurnsUsed < maxHideTurns) {
+            isHidden = true;
+            hideTurnsUsed++;
+            battlefield->setHidden(this, true);
+        }
+    }
+};
+class JumpBot : public MovingRobot {
+private:
+    int jumpsUsed = 0;
+    const int maxJumps = 3;
+
+public:
+    void actionMove(Battlefield* battlefield) override {
+        if (jumpsUsed < maxJumps) {
+            int newX, newY;
+            battlefield->getRandomLocation(newX, newY);
+            setLocation(newX, newY);
+            jumpsUsed++;
+        }
+    }
+};
+
+
 
 int main() {
     cout << "Hello World!" << endl;
@@ -127,6 +219,7 @@ void MovingRobot::setLocation(int x, int y){
 void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
+
 }
 
 
