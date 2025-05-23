@@ -20,10 +20,13 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <random>
 #include "Robot.h"
+#include "Battlefield.h"
 using namespace std;
 
 /* CLASS DEFINITIONS */
+// Robot Actions
 class ThinkingRobot : public Robot{
     public:
         virtual void setLocation(int x, int y);
@@ -48,9 +51,59 @@ class ShootingRobot : public Robot{
         virtual void actionFire(Battlefield* battlefield) = 0;
 };
 
+//GenericRobot
+class GenericRobot : public ShootingRobot, public MovingRobot, 
+                    public SeeingRobot, public ThinkingRobot{
+    private: 
+        static int robotIncrement = 0;
+    public: 
+        GenericRobot(string id = "GR0", int x, int y) : ShootingRobot(x, y, id, "Shooting"),
+                                                        MovingRobot(x, y, id, "Moving"),
+                                                        SeeingRobot(x, y, id, "Seeing"),
+                                                        ThinkingRobot(x, y, id, "Thinking"){
+            robotId_ = id + to_string(robotIncrement);
+            robotPosX = x; 
+            robotPosY = y; 
+
+            robotIncrement++;
+        }
+
+        string getRobotID() const { return robotId_; }
+
+    virtual void actionShoot(Battlefield* battlefield){
+        // ShootingRobot::actionShoot(battlefield); 
+    }
+    virtual void actionMove(Battlefield* battlefield){}
+    virtual void actionSee(Battlefield* battlefield){}
+    virtual void actionThink(Battlefield* battlefield){}
+    void actionRand(Battlefield* battlefield){
+        random_device rd; 
+        mt19937 gen(rd()); 
+        uniform_int_distribution<> distr(0, 10); // define range
+
+        actionThink(battlefield);
+        actionSee(battlefield); 
+
+        int randomInt = distr(gen);
+
+        if(randomInt % 2 == 0) { 
+            actionMove(battlefield);
+            actionFire(battlefield); 
+        }
+
+        else if(randomInt % 2 == 1){
+            actionFire(battlefield);
+            actionMove(battlefield); 
+        }
+    }
+};
+
+
 int main() {
     cout << "Hello World!" << endl;
-
+    Battlefield battlefield;
+    battlefield.readFile("inputFile.txt");
+    battlefield.displayBattlefield();
     return 0;
 }
 
@@ -74,3 +127,5 @@ void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
 }
+
+
