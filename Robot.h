@@ -24,6 +24,8 @@
 #include <string>
 using namespace std;
 
+enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+
 class Robot{
     protected:
         int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
@@ -34,7 +36,7 @@ class Robot{
         int robotType = -1; // This robot's type; Jump, Hide, etc.
 
     public:
-        Robot(int x, int y, string name, string type); // Constructor
+        Robot(int x, int y, string name); // Constructor
         virtual ~Robot(){} // Destructor
         
         // Set and get the x coordinate of this robot

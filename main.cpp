@@ -29,26 +29,25 @@ enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLEC
 
 /* CLASS DEFINITIONS */
 // Robot Actions
-class ThinkingRobot : public Robot{
+class ThinkingRobot : virtual public Robot{
     public:
-        //ThinkingRobot(int x, int y, )
         virtual void setLocation(int x, int y);
         virtual void actionThink(Battlefield* battlefield) = 0;
 };
 
-class SeeingRobot : public Robot{
+class SeeingRobot : virtual public Robot{
     public:
         virtual void setLocation(int x, int y);
         virtual void actionLook(Battlefield* battlefield) = 0;
 };
 
-class MovingRobot : public Robot{
+class MovingRobot : virtual public Robot{
     public:
         virtual void setLocation(int x, int y);
         virtual void actionMove(Battlefield* battlefield) = 0;
 };
 
-class ShootingRobot : public Robot{
+class ShootingRobot : virtual public Robot{
     public:
         virtual void setLocation(int x, int y);
         virtual void actionFire(Battlefield* battlefield) = 0;
@@ -71,6 +70,11 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
             robotIncrement++;
         }
+
+        // Hi mimi, this is what chatgpt gave for constructor 
+        //GenericRobot(string name, int x, int y) : Robot (x, y, name){
+        //  robotId = robotIncrement;
+        //}
 
         string getRobotID() const { return robotId_; }
 
