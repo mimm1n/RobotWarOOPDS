@@ -29,18 +29,22 @@ using namespace std;
 // Robot Actions
 class ThinkingRobot : virtual public Robot{
     public:
+        ThinkingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionThink(Battlefield* battlefield) = 0;
+        
 };
 
 class SeeingRobot : virtual public Robot{
     public:
+        SeeingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionLook(Battlefield* battlefield) = 0;
 };
 
 class MovingRobot : virtual public Robot{
     public:
+        MovingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionMove(Battlefield* battlefield) = 0;
 };
@@ -49,6 +53,7 @@ class ShootingRobot : virtual public Robot{
     private:
         int shells = 10;
     public:
+        ShootingRobot(){}
         void setShells(int num);
         int getShells() const;
         virtual void setLocation(int x, int y);
@@ -59,153 +64,56 @@ class ShootingRobot : virtual public Robot{
 class GenericRobot : public ShootingRobot, public MovingRobot, 
                     public SeeingRobot, public ThinkingRobot{
     private: 
-        static int robotIncrement = 0;
-        string robotId_;
+        static int robotIncrement;
+        int robotId_;
     public: 
-        GenericRobot(string id = "GR0", int x, int y) : ShootingRobot(x, y, id, "Shooting"),
-                                                        MovingRobot(x, y, id, "Moving"),
-                                                        SeeingRobot(x, y, id, "Seeing"),
-                                                        ThinkingRobot(x, y, id, "Thinking"){
-            robotId_ = id + to_string(robotIncrement);
-            int robotPosX = x; 
-            int robotPosY = y; 
-
+        GenericRobot(string name, int x, int y) {
+            robotId_ = robotIncrement; 
             robotIncrement++;
         }
 
-        // Hi mimi, this is what chatgpt gave for constructor 
-        //GenericRobot(string name, int x, int y) : Robot (x, y, name){
-        //  robotId = robotIncrement;
-        //}
+        int getRobotID() const { return robotId_; }
 
-        string getRobotID() const { return robotId_; }
-
-    virtual void actionShoot(Battlefield* battlefield){
-        // ShootingRobot::actionShoot(battlefield); 
-    }
-    virtual void actionMove(Battlefield* battlefield){}
-    virtual void actionSee(Battlefield* battlefield){}
-    virtual void actionThink(Battlefield* battlefield){}
-    void actionRand(Battlefield* battlefield){
-        random_device rd; 
-        mt19937 gen(rd()); 
-        uniform_int_distribution<> distr(0, 10); // define range
-
-        actionThink(battlefield);
-        actionSee(battlefield); 
-
-        int randomInt = distr(gen);
-
-        if(randomInt % 2 == 0) { 
-            actionMove(battlefield);
-            actionFire(battlefield); 
+        virtual void actionFire(Battlefield* battlefield) override {
+            // ShootingRobot::actionShoot(battlefield); 
         }
+        virtual void actionMove(Battlefield* battlefield) override {}
+        virtual void actionLook(Battlefield* battlefield) override {}
+        virtual void actionThink(Battlefield* battlefield){}
+        void actionRand(Battlefield* battlefield){
+            random_device rd; 
+            mt19937 gen(rd()); 
+            uniform_int_distribution<> distr(0, 10); // define range
 
-        else if(randomInt % 2 == 1){
-            actionFire(battlefield);
-            actionMove(battlefield); 
-        }
-    }
-};
+            actionThink(battlefield);
+            actionLook(battlefield); 
 
-class ScoutBot : public SeeingRobot {
-private:
-    int lookCount = 0;
-    const int maxLooks = 3;
+            int randomInt = distr(gen);
 
-public:
-    void actionLook(Battlefield* battlefield) override {
-        if (lookCount < maxLooks) {
-            // Logic to scan the entire battlefield
-            battlefield->scanEntireField(this);
-            lookCount++;
-        }
-    }
-};
+            if(randomInt % 2 == 0) { 
+                actionMove(battlefield);
+                actionFire(battlefield); 
+            }
 
-class TrackBot : public SeeingRobot {
-private:
-    int trackersUsed = 0;
-    const int maxTrackers = 3;
-
-public:
-    void actionLook(Battlefield* battlefield) override {
-        if (trackersUsed < maxTrackers) {
-            Robot* target = battlefield->selectEnemyToTrack();
-            if (target) {
-                battlefield->trackEnemy(target, this);
-                trackersUsed++;
+            else if(randomInt % 2 == 1){
+                actionFire(battlefield);
+                actionMove(battlefield); 
             }
         }
-    }
-};
-class LongShotBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield) override {
-        int targetX, targetY;
-        if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
-            battlefield->fireAt(targetX, targetY);
-        }
-    }
-};
-class SemiAutoBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield) override {
-        int targetX, targetY;
-        if (battlefield->getTarget(this, targetX, targetY)) {
-            for (int i = 0; i < 3; ++i) {
-                battlefield->fireAt(targetX, targetY); // 3 shells
-            }
-        }
-    }
-};
-class ThirtyShotBot : public ShootingRobot {
-private:
-    int ammo = 0;
 
-public:
-    void actionFire(Battlefield* battlefield) override {
-        ammo = 30; // Reload
-    }
-};
-class HideBot : public ThinkingRobot {
-private:
-    int hideTurnsUsed = 0;
-    const int maxHideTurns = 3;
-    bool isHidden = false;
-
-public:
-    void actionThink(Battlefield* battlefield) override {
-        if (hideTurnsUsed < maxHideTurns) {
-            isHidden = true;
-            hideTurnsUsed++;
-            battlefield->setHidden(this, true);
-        }
-    }
-};
-class JumpBot : public MovingRobot {
-private:
-    int jumpsUsed = 0;
-    const int maxJumps = 3;
-
-public:
-    void actionMove(Battlefield* battlefield) override {
-        if (jumpsUsed < maxJumps) {
-            int newX, newY;
-            battlefield->getRandomLocation(newX, newY);
-            setLocation(newX, newY);
-            jumpsUsed++;
-        }
+    void setLocation(int x, int y) override {
+        setRobotX(x);
+        setRobotY(y);
     }
 };
 
-
+int GenericRobot::robotIncrement = 0; 
 
 int main() {
     cout << "Hello World!" << endl;
     Battlefield battlefield;
     battlefield.readFile("inputFile.txt");
-    battlefield.displayBattlefield();
+
     return 0;
 }
 
@@ -228,7 +136,6 @@ void MovingRobot::setLocation(int x, int y){
 void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
-
 }
 
 void ShootingRobot::setShells(int num){
