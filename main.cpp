@@ -25,8 +25,6 @@
 #include "Battlefield.h"
 using namespace std;
 
-// enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
-
 /* CLASS DEFINITIONS */
 // Robot Actions
 class ThinkingRobot : virtual public Robot{
@@ -52,8 +50,12 @@ class MovingRobot : virtual public Robot{
 };
 
 class ShootingRobot : virtual public Robot{
+    private:
+        int shells = 10;
     public:
         ShootingRobot(){}
+        void setShells(int num);
+        int getShells() const;
         virtual void setLocation(int x, int y);
         virtual void actionFire(Battlefield* battlefield) = 0;
 };
@@ -134,6 +136,22 @@ void MovingRobot::setLocation(int x, int y){
 void ShootingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
+}
+
+void ShootingRobot::setShells(int num){
+    shells = num;
+}
+
+int ShootingRobot::getShells() const{
+    return shells;
+}
+
+void ShootingRobot::setShells(int num){
+    shells = num;
+}
+
+int ShootingRobot::getShells() const{
+    return shells;
 }
 
 

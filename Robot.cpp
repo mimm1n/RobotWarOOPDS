@@ -22,8 +22,6 @@
 #include <string>
 using namespace std;
 
-// enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
-
 /**********************************************************************
  * Robot (constructor)
  * task: Constructs a robot object by assigning it's x and y 
@@ -82,24 +80,6 @@ int Robot::getRobotY() const{
 string Robot::getRobotName() const{
     return robotName;
 }
-
-/**********************************************************************
- * setRobotType
- * task: sets the robot's type
- * @param type - type of robot
- *********************************************************************/
-// void Robot::setRobotType(string type){
-//     robotType = type;
-// }
-
-// /**********************************************************************
-//  * getRobotType
-//  * task: gets the type of the robot
-//  * @return robotType - type of the robot
-//  *********************************************************************/
-// string Robot::getRobotType() const{
-//     return robotType;
-// }
 
 /**********************************************************************
  * addLife
