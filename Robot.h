@@ -24,6 +24,8 @@
 #include <string>
 using namespace std;
 
+enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+
 class Robot{
     protected:
         int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
@@ -31,10 +33,10 @@ class Robot{
         int lives = 3; // Number of lives of this robot (initial is 3)
         int robotId = -1; // The ID of this robot
         string robotName = ""; // The name of this robot
-        string robotType = ""; // This robot's type; Jump, Hide, etc.
+        int robotType = -1; // This robot's type; Jump, Hide, etc.
 
     public:
-        Robot(int x, int y, string name, string type); // Constructor
+        Robot(int x, int y, string name); // Constructor
         virtual ~Robot(){} // Destructor
         
         // Set and get the x coordinate of this robot
@@ -48,10 +50,6 @@ class Robot{
         // Get the name of this robot(fixed so can't set)
         string getRobotName() const;
 
-        // Set and get the robot's type
-        void setRobotType(string type);
-        string getRobotType() const;
-
         int addLife(); // Adds 1 life to the lives count 
         bool reduceLife(); // Reduces the lives count by 1
         int getLives() const; // Get this robot's lives count
@@ -61,6 +59,10 @@ class Robot{
 
         // For child classes to rewrite and set new x and y coordinates
         virtual void setLocation(int x, int y) = 0; 
+
+        // Set and get the robot's type
+        virtual void setRobotType(int type) = 0;
+        virtual int getRobotType() const = 0;
 
         //virtual void actions(Battlefield* battlefield) = 0;
 };
