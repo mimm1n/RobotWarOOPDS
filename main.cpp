@@ -25,30 +25,35 @@
 #include "Battlefield.h"
 using namespace std;
 
-enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+// enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
 
 /* CLASS DEFINITIONS */
 // Robot Actions
 class ThinkingRobot : virtual public Robot{
     public:
+        ThinkingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionThink(Battlefield* battlefield) = 0;
+        
 };
 
 class SeeingRobot : virtual public Robot{
     public:
+        SeeingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionLook(Battlefield* battlefield) = 0;
 };
 
 class MovingRobot : virtual public Robot{
     public:
+        MovingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionMove(Battlefield* battlefield) = 0;
 };
 
 class ShootingRobot : virtual public Robot{
     public:
+        ShootingRobot(){}
         virtual void setLocation(int x, int y);
         virtual void actionFire(Battlefield* battlefield) = 0;
 };
@@ -58,62 +63,45 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     public SeeingRobot, public ThinkingRobot{
     private: 
         static int robotIncrement;
-        string robotId_;
+        int robotId_;
     public: 
-        // GenericRobot(string id = "GR0", int x = -1, int y = -1) : ShootingRobot(x, y, id, "Shooting"),
-        //                                                 MovingRobot(x, y, id, "Moving"),
-        //                                                 SeeingRobot(x, y, id, "Seeing"),
-        //                                                 ThinkingRobot(x, y, id, "Thinking"){
-        //     robotId_ = id + to_string(robotIncrement);
-        //     int robotPosX = x; 
-        //     int robotPosY = y; 
-
-        //     robotIncrement++;
-        // }
-
-            GenericRobot(string name, int x = -1, int y = -1) : ShootingRobot(x, y, id, "Shooting"),
-                                                        MovingRobot(x, y, id, "Moving"),
-                                                        SeeingRobot(x, y, id, "Seeing"),
-                                                        ThinkingRobot(x, y, id, "Thinking"){
-            robotId_ = id + to_string(robotIncrement);
-            int robotPosX = x; 
-            int robotPosY = y; 
-
+        GenericRobot(string name, int x, int y) {
+            robotId_ = robotIncrement; 
             robotIncrement++;
         }
 
-        // Hi mimi, this is what chatgpt gave for constructor 
-        //GenericRobot(string name, int x, int y) : Robot (x, y, name){
-        //  robotId = robotIncrement;
-        //}
+        int getRobotID() const { return robotId_; }
 
-        string getRobotID() const { return robotId_; }
+        virtual void actionFire(Battlefield* battlefield) override {
+            // ShootingRobot::actionShoot(battlefield); 
+        }
+        virtual void actionMove(Battlefield* battlefield) override {}
+        virtual void actionLook(Battlefield* battlefield) override {}
+        virtual void actionThink(Battlefield* battlefield){}
+        void actionRand(Battlefield* battlefield){
+            random_device rd; 
+            mt19937 gen(rd()); 
+            uniform_int_distribution<> distr(0, 10); // define range
 
-    virtual void actionShoot(Battlefield* battlefield){
-        // ShootingRobot::actionShoot(battlefield); 
-    }
-    virtual void actionMove(Battlefield* battlefield){}
-    virtual void actionSee(Battlefield* battlefield){}
-    virtual void actionThink(Battlefield* battlefield){}
-    void actionRand(Battlefield* battlefield){
-        random_device rd; 
-        mt19937 gen(rd()); 
-        uniform_int_distribution<> distr(0, 10); // define range
+            actionThink(battlefield);
+            actionLook(battlefield); 
 
-        actionThink(battlefield);
-        actionSee(battlefield); 
+            int randomInt = distr(gen);
 
-        int randomInt = distr(gen);
+            if(randomInt % 2 == 0) { 
+                actionMove(battlefield);
+                actionFire(battlefield); 
+            }
 
-        if(randomInt % 2 == 0) { 
-            actionMove(battlefield);
-            actionFire(battlefield); 
+            else if(randomInt % 2 == 1){
+                actionFire(battlefield);
+                actionMove(battlefield); 
+            }
         }
 
-        else if(randomInt % 2 == 1){
-            actionFire(battlefield);
-            actionMove(battlefield); 
-        }
+    void setLocation(int x, int y) override {
+        setRobotX(x);
+        setRobotY(y);
     }
 };
 

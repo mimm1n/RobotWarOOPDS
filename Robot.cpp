@@ -22,7 +22,7 @@
 #include <string>
 using namespace std;
 
-enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+// enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
 
 /**********************************************************************
  * Robot (constructor)
