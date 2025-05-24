@@ -25,8 +25,6 @@
 #include "Battlefield.h"
 using namespace std;
 
-enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
-
 /* CLASS DEFINITIONS */
 // Robot Actions
 class ThinkingRobot : virtual public Robot{

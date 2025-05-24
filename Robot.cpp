@@ -22,8 +22,6 @@
 #include <string>
 using namespace std;
 
-enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
-
 /**********************************************************************
  * Robot (constructor)
  * task: Constructs a robot object by assigning it's x and y 
