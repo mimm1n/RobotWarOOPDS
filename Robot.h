@@ -27,12 +27,13 @@ using namespace std;
 enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
 
 class Robot{
-    protected:
+    private:
         int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
+        string robotName = ""; // The name of this robot        
+    protected:
         int killCount = 0; // Number of robots this robot managed to destroy/kill
         int lives = 3; // Number of lives of this robot (initial is 3)
         int robotId = -1; // The ID of this robot
-        string robotName = ""; // The name of this robot
         int robotType = -1; // This robot's type; Jump, Hide, etc.
 
     public:
