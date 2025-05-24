@@ -120,7 +120,7 @@ int Robot::getLives() const{
  *********************************************************************/
 bool Robot::isAlive() const{
     if(lives<=0){
-        cout << "Robot" << robotName << "is dead!"
+        cout << "Robot" << robotName << "is dead!";
         return false;
     }
     return true;

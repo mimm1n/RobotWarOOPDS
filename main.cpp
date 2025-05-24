@@ -146,12 +146,4 @@ int ShootingRobot::getShells() const{
     return shells;
 }
 
-void ShootingRobot::setShells(int num){
-    shells = num;
-}
-
-int ShootingRobot::getShells() const{
-    return shells;
-}
-
 
