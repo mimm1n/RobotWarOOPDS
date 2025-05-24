@@ -138,14 +138,14 @@ void Battlefield::displayBattlefield() const{
   cout << "+" << endl;
 }
 
-// int main() {
-//     cout << "Hello World!" << endl;
-//     Battlefield battlefield;
-//     battlefield.readFile("inputFile.txt");
-//     battlefield.displayBattlefield();
+int main() {
+    cout << "Hello World!" << endl;
+    Battlefield battlefield;
+    battlefield.readFile("inputFile.txt");
+    battlefield.displayBattlefield();
     
-//     return 0;
-// }
+    return 0;
+}
 
 
 
