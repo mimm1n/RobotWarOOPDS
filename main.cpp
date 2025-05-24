@@ -49,10 +49,10 @@ class ShootingRobot : virtual public Robot{
     private:
         int shells = 10;
     public:
-        virtual void setLocation(int x, int y);
-        virtual void actionFire(Battlefield* battlefield) = 0;
         void setShells(int num);
         int getShells() const;
+        virtual void setLocation(int x, int y);
+        virtual void actionFire(Battlefield* battlefield) = 0;
 };
 
 //GenericRobot
