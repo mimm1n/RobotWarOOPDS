@@ -92,18 +92,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     public SeeingRobot, public ThinkingRobot{
     private: 
         static int robotIncrement;
-        int robotId_;
     public: 
-        GenericRobot(string id = "GR0", int x, int y) : ShootingRobot(x, y, id, "Shooting"),
-                                                        MovingRobot(x, y, id, "Moving"),
-                                                        SeeingRobot(x, y, id, "Seeing"),
-                                                        ThinkingRobot(x, y, id, "Thinking"){
-            robotId_ = id + to_string(robotIncrement);
-           int robotPosX = x; 
-           int robotPosY = y; 
-
-        GenericRobot(string name, int x, int y) {
-            robotId_ = robotIncrement; 
+        GenericRobot(string name, int x, int y) : Robot(x, y, name){
+            robotId = robotIncrement; 
             robotIncrement++;
         }
 
