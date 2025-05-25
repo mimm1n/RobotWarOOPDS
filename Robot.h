@@ -57,10 +57,10 @@ class Robot{
         int getLives() const; // Get this robot's lives count
         bool isAlive() const; // Checks if this robot's lives count is more than 0
 
-        int incrementKills(); // Adds 1 to the kill count
+        void incrementKills(); // Adds 1 to the kill count
 
-        // For child classes to rewrite and set new x and y coordinates
-       void setLocation(int x, int y); 
+        // // For child classes to rewrite and set new x and y coordinates
+        // void setLocation(int x, int y); 
 
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
