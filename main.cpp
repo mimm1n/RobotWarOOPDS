@@ -107,15 +107,15 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         static int robotIncrement;
     public: 
         GenericRobot(string name, int x, int y) : Robot(x, y, name){
-robotId = robotIncrement; 
-robotIncrement++;
+            robotId = robotIncrement; 
+            robotIncrement++;
         }
 
         int getRobotID() const { return robotId; }
 
         //setter
         void setRobotType(int type) override {
-robotType = type;
+            robotType = type;
         }
 
         //getter
@@ -128,25 +128,25 @@ robotType = type;
         virtual void actionLook(Battlefield* battlefield) override {}
         virtual void actionThink(Battlefield* battlefield)override {}
         void actionRand(Battlefield* battlefield){
-random_device rd; 
-mt19937 gen(rd()); 
-uniform_int_distribution<> distr(0, 10); // define range
+            random_device rd; 
+            mt19937 gen(rd()); 
+            uniform_int_distribution<> distr(0, 10); // define range
 
-actionThink(battlefield);
-actionLook(battlefield); 
+            actionThink(battlefield);
+            actionLook(battlefield); 
 
-int randomInt = distr(gen);
+            int randomInt = distr(gen);
 
-if(randomInt % 2 == 0) { 
-    actionMove(battlefield);
-    actionFire(battlefield); 
-}
+            if(randomInt % 2 == 0) { 
+                actionMove(battlefield);
+                actionFire(battlefield); 
+            }
 
-        else if(randomInt % 2 == 1){
-actionFire(battlefield);
-actionMove(battlefield); 
+            else if(randomInt % 2 == 1){
+            actionFire(battlefield);
+            actionMove(battlefield); 
+            }
         }
-    }
 };
 
 int GenericRobot::robotIncrement = 1;
@@ -158,9 +158,8 @@ int main() {
     battlefield.placeRobots();
     battlefield.displayBattlefield();
 
-
-    
-
+    return 0;
+}
 
 // do{
 //     cout << endl << endl;
@@ -170,9 +169,6 @@ int main() {
 
 // }while(battlefield.currentTurn() != battlefield.turns());
 
-
-    return 0;
-}
 
 /**********************************************************************
 Function Definitions
@@ -227,14 +223,14 @@ void Battlefield::readFile(string filename) {
         int x, y;
         robotLine >> name >> yStr >> xStr;
         if (xStr == "random" && yStr == "random"){
-x = rand() % (battlefieldRows_);
-y = rand() % (battlefieldCols_);
-cout << x << y << endl;
-        } else {
-x = stoi(xStr);
-y = stoi(yStr);
-        }
-        robots_.push_back(new GenericRobot(name,x,y));
+        x = rand() % (battlefieldRows_);
+        y = rand() % (battlefieldCols_);
+        cout << x << y << endl;
+                } else {
+        x = stoi(xStr);
+        y = stoi(yStr);
+                }
+                robots_.push_back(new GenericRobot(name,x,y));
     }
 }
 
