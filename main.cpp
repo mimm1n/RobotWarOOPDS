@@ -26,9 +26,11 @@
 #include "Robot.h"
 using namespace std;
 
-/* CLASS DEFINITIONS */
 class GenericRobot;
 
+/**********************************************************************
+Battlefield Class 
+ *********************************************************************/
 class Battlefield {
 private:
   int battlefieldCols_ = -1; // variable to assign number of columns
@@ -58,7 +60,9 @@ public:
   void respawnRobot();
 };
 
-// Robot Actions
+/**********************************************************************
+Robot Action Classes 
+ *********************************************************************/
 class ThinkingRobot : virtual public Robot{
     public:
         ThinkingRobot(){}
@@ -69,7 +73,6 @@ class ThinkingRobot : virtual public Robot{
 class SeeingRobot : virtual public Robot{
     public:
         SeeingRobot(){}
-
         virtual void actionLook(Battlefield* battlefield) = 0;
 };
 
@@ -92,7 +95,9 @@ class ShootingRobot : virtual public Robot{
 };
 
 
-//GenericRobot
+/**********************************************************************
+Generic Robot Class 
+ *********************************************************************/
 class GenericRobot : public ShootingRobot, public MovingRobot, 
                     public SeeingRobot, public ThinkingRobot{
     private: 
@@ -104,6 +109,14 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
 
         int getRobotID() const { return robotId; }
+
+        //setter
+        void setRobotType(int RobotType) override {
+            robotType = RobotType;
+        }
+
+        //getter
+        int getRobotType() const override { return RobotType; }
 
         virtual void actionFire(Battlefield* battlefield) override {
             // ShootingRobot::actionShoot(battlefield); 
@@ -131,11 +144,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
             actionMove(battlefield); 
         }
     }
-        virtual void setRobotType(int type) override{}
-        virtual int getRobotType() const override {return 0;}
 };
 
-   int GenericRobot::robotIncrement=0;
+    int GenericRobot::robotIncrement = 0;
 
 int main() {
     cout << "Hello World!" << endl;
@@ -148,7 +159,9 @@ int main() {
     return 0;
 }
 
-/* FUNCTION DEFINITIONS */
+/**********************************************************************
+Function Definitions
+ *********************************************************************/
 // void ThinkingRobot::setLocation(int x, int y){
 //     setRobotX(x);
 //     setRobotY(y);
@@ -177,6 +190,10 @@ int ShootingRobot::getShells() const{
     return shells;
 }
 
+
+/**********************************************************************
+Battlefield Functions
+ *********************************************************************/
 void Battlefield::readFile(string filename) {
 
   ifstream infile(filename);
