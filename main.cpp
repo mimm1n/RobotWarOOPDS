@@ -112,6 +112,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         public SeeingRobot, public ThinkingRobot{
     private: 
         static int robotIncrement;
+        int upgradeCount = 0; 
+        const int MAX_UPGRADE = 3; 
+        Robot* robotUpgraded = nullptr; 
     public: 
         GenericRobot(string name, int x, int y) : Robot(x, y, name){
             robotId = robotIncrement; 
@@ -129,11 +132,66 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int getRobotType() const override { return robotType; }
 
         virtual void actionFire(Battlefield* battlefield) override {
-// ShootingRobot::actionShoot(battlefield); 
         }
-        virtual void actionMove(Battlefield* battlefield) override {}
-        virtual void actionLook(Battlefield* battlefield) override {}
-        virtual void actionThink(Battlefield* battlefield)override {}
+        virtual void actionMove(Battlefield* battlefield) override {
+            if(robotUpgraded)
+                robotUpgraded->actionMove(battlefield);
+        }
+        virtual void actionLook(Battlefield* battlefield, int x, int y) override {
+            if(robotUpgraded)
+                robotUpgraded->actionLook(battlefield);
+        }
+        virtual void actionThink(Battlefield* battlefield)override {
+            actionRand();
+
+            if(robotUpgraded)
+                robotUpgraded->actionThink(battlefield);
+        }
+
+        void upgradeRobot(int upgradeType, int x, int y){
+            if (upgradeCount >= MAX_UPGRADE) { 
+                cout << "Max upgrade reached." ; 
+                return; 
+            }
+
+            switch(upgradeType){
+                case 1:
+                    robotUpgraded = new ScoutBot(x, y);
+                    break;
+                case 2:
+                    robotUpgraded = new TrackBot(x, y);
+                    break;
+                case 3:
+                    robotUpgraded = new LongShotBot(x, y);
+                    break;
+                case 4:
+                    robotUpgraded = new SemiAutoBot(x, y);
+                    break;
+                case 5:
+                    robotUpgraded = new ThirtyShotBot(x, y);
+                    break;
+                case 6:
+                    robotUpgraded = new JumpBot(x, y);
+                    break;
+                case 7:
+                    robotUpgraded = new HideBot(x, y);
+                    break;
+                case 8:
+                    robotUpgraded = new ReflectShotBot(x, y);
+                    break;
+                case 9:
+                    robotUpgraded = new HealBot(x, y);
+                    break;
+                case 10:
+                    robotUpgraded = new BombBot(x, y);
+                    break;
+                default: 
+                    return;
+            }
+
+            upgradeCount++;
+        }
+
         void actionRand(Battlefield* battlefield){
             random_device rd; 
             mt19937 gen(rd()); 
@@ -390,7 +448,6 @@ void Battlefield::nextTurn(){
     waitingRobots_.push(front);
 }
 
-
 // class ScoutBot : public SeeingRobot {
 // private:
 //     int lookCount = 0;
@@ -410,7 +467,6 @@ void Battlefield::nextTurn(){
 // private:
 //     int trackersUsed = 0;
 //     const int maxTrackers = 3;
-
 // public:
 //     void actionLook(Battlefield* battlefield) override {
 //         if (trackersUsed < maxTrackers) {
@@ -446,16 +502,16 @@ void Battlefield::nextTurn(){
 // // private:
 // //     int ammo = 0;
 
-// // public:
-// //     void actionFire(Battlefield* battlefield) override {
-// //         ammo = 30; // Reload
-// //     }
-// // };
-// // class HideBot : public ThinkingRobot {
-// // private:
-// //     int hideTurnsUsed = 0;
-// //     const int maxHideTurns = 3;
-// //     bool isHidden = false;
+// public:
+//     void actionFire(Battlefield* battlefield) override {
+//         ammo = 30; // Reload
+//     }
+// };
+// class HideBot : public ThinkingRobot {
+// private:
+//     int hideTurnsUsed = 0;
+//     const int maxHideTurns = 3;
+//     bool isHidden = false;
 
 // // public:
 // //     void actionThink(Battlefield* battlefield) override {
@@ -486,7 +542,6 @@ void Battlefield::nextTurn(){
 // private:
 //     int health = 3;
 //     const int maxHealth = 3;
-
 // public:
 //     void actionFire(Battlefield* battlefield) override {
 //         int tx, ty;
@@ -500,7 +555,6 @@ void Battlefield::nextTurn(){
 // }
 //         }
 //     }
-
 //     int getHealth() const { return health; }
 // };
 // class ReflectShotBot : public ThinkingRobot {
