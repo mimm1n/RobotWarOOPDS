@@ -26,41 +26,6 @@
 #include "Robot.h"
 using namespace std;
 
-/* CLASS DEFINITIONS */
-// Robot Actions
-class ThinkingRobot : virtual public Robot{
-    public:
-        ThinkingRobot(){}
-        virtual void setLocation(int x, int y);
-        virtual void actionThink(Battlefield* battlefield) = 0;
-        
-};
-
-class SeeingRobot : virtual public Robot{
-    public:
-        SeeingRobot(){}
-        virtual void setLocation(int x, int y);
-        virtual void actionLook(Battlefield* battlefield) = 0;
-};
-
-class MovingRobot : virtual public Robot{
-    public:
-        MovingRobot(){}
-        virtual void setLocation(int x, int y);
-        virtual void actionMove(Battlefield* battlefield) = 0;
-};
-
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
-    public:
-        ShootingRobot(){}
-        void setShells(int num);
-        int getShells() const;
-        virtual void setLocation(int x, int y);
-        virtual void actionFire(Battlefield* battlefield) = 0;
-};
-
 /**********************************************************************
 Battlefield Class 
  *********************************************************************/
@@ -93,8 +58,9 @@ public:
   void respawnRobot();
 };
 
-
-// Robot Actions
+/**********************************************************************
+Robot Action Classes 
+ *********************************************************************/
 class ThinkingRobot : virtual public Robot{
     public:
         ThinkingRobot(){}
@@ -105,7 +71,6 @@ class ThinkingRobot : virtual public Robot{
 class SeeingRobot : virtual public Robot{
     public:
         SeeingRobot(){}
-
         virtual void actionLook(Battlefield* battlefield) = 0;
 };
 
@@ -179,7 +144,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
     }
 };
 
-   int GenericRobot::robotIncrement=0;
+    int GenericRobot::robotIncrement = 0;
 
 int main() {
     cout << "Hello World!" << endl;
