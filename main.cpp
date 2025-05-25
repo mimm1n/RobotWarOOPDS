@@ -17,6 +17,7 @@
 // ******************************************************** 
 
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -69,11 +70,11 @@ private:
 
   int numOfRobots_ = -1; // variable to assign number of robots
 
-vector<Robot *> robots_; 
-queue<Robot *> destroyedRobots_;
-queue<Robot *> waitingRobots_;  
+vector<GenericRobot *> robots_; 
+queue<GenericRobot *> destroyedRobots_;
+queue<GenericRobot *> waitingRobots_;  
 
-  vector<vector<string>> battlefield_;
+vector<vector<string>> battlefield_;
 
 public:
   // Get function
@@ -287,7 +288,7 @@ void Battlefield::readFile(string filename) {
   battlefieldCols_ = stoi(colstr);
   }
 
-  battlefield_ = vector<vector<string>>(battlefieldRows_+1, vector<string>(battlefieldCols_+1, "")); //2D vector for rows and columns
+  battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
 
   //find total turn
   getline(infile, line); //read second line
@@ -318,10 +319,13 @@ for (int i = 0; i < numOfRobots_; i++) {
     if (xStr == "random" && yStr == "random"){
       x = rand() % (battlefieldRows_);
       y = rand() % (battlefieldCols_);
+
     }else{
       x = stoi(xStr);
       y = stoi(yStr);
     }
+placeRobots();
+robots_.push_back(new GenericRobot(name,x,y));
 }
 }
 
