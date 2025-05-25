@@ -71,7 +71,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
             robotIncrement++;
         }
 
-        int getRobotID() const { return robotId_; }
+        int getRobotID() const { return robotId; }
 
         virtual void actionFire(Battlefield* battlefield) override {
             // ShootingRobot::actionShoot(battlefield); 
