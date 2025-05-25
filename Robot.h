@@ -60,7 +60,7 @@ class Robot{
         int incrementKills(); // Adds 1 to the kill count
 
         // For child classes to rewrite and set new x and y coordinates
-        virtual void setLocation(int x, int y) = 0; 
+       void setLocation(int x, int y); 
 
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
