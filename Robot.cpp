@@ -135,3 +135,7 @@ int Robot::incrementKills(){
     return killCount++;
 }
 
+void Robot::setLocation(int x, int y){
+    
+}
+
