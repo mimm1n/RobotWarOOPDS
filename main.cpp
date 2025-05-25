@@ -111,12 +111,12 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int getRobotID() const { return robotId; }
 
         //setter
-        void setRobotType(int RobotType) override {
-            robotType = RobotType;
+        void setRobotType(int type) override {
+            robotType = type;
         }
 
         //getter
-        int getRobotType() const override { return RobotType; }
+        int getRobotType() const override { return robotType; }
 
         virtual void actionFire(Battlefield* battlefield) override {
             // ShootingRobot::actionShoot(battlefield); 
