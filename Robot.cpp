@@ -29,13 +29,11 @@ using namespace std;
  * @param x - x coordinate
  *        y - y coordinate
  *        name - robot's name
- *        type - robot's type
  *********************************************************************/
-Robot::Robot(int x, int y, string name, string type){
+Robot::Robot(int x, int y, string name){
     setRobotX(x);
     setRobotY(y);
     robotName = name;
-    setRobotType(type);
 }
 
 /**********************************************************************
@@ -84,24 +82,6 @@ string Robot::getRobotName() const{
 }
 
 /**********************************************************************
- * setRobotType
- * task: sets the robot's type
- * @param type - type of robot
- *********************************************************************/
-void Robot::setRobotType(string type){
-    robotType = type;
-}
-
-/**********************************************************************
- * getRobotType
- * task: gets the type of the robot
- * @return robotType - type of the robot
- *********************************************************************/
-string Robot::getRobotType() const{
-    return robotType;
-}
-
-/**********************************************************************
  * addLife
  * task: Increases the lives count by 1
  * @return lives - number of lives the robot has 
@@ -140,7 +120,7 @@ int Robot::getLives() const{
  *********************************************************************/
 bool Robot::isAlive() const{
     if(lives<=0){
-        cout << "Robot" << robotName << "is dead!"
+        cout << "Robot" << robotName << "is dead!";
         return false;
     }
     return true;
@@ -153,5 +133,9 @@ bool Robot::isAlive() const{
  *********************************************************************/
 int Robot::incrementKills(){
     return killCount++;
+}
+
+void Robot::setLocation(int x, int y){
+    
 }
 
