@@ -137,7 +137,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield);
         }
-        virtual void actionLook(Battlefield* battlefield) override {
+        virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionLook(battlefield);
         }
@@ -463,11 +463,10 @@ void Battlefield::nextTurn(){
 //     }
 // };
 
-class TrackBot : public SeeingRobot {
-private:
-    int trackersUsed = 0;
-    const int maxTrackers = 3;
-
+// class TrackBot : public SeeingRobot {
+// private:
+//     int trackersUsed = 0;
+//     const int maxTrackers = 3;
 // public:
 //     void actionLook(Battlefield* battlefield) override {
 //         if (trackersUsed < maxTrackers) {
@@ -503,16 +502,16 @@ private:
 // // private:
 // //     int ammo = 0;
 
-public:
-    void actionFire(Battlefield* battlefield) override {
-        ammo = 30; // Reload
-    }
-};
-class HideBot : public ThinkingRobot {
-private:
-    int hideTurnsUsed = 0;
-    const int maxHideTurns = 3;
-    bool isHidden = false;
+// public:
+//     void actionFire(Battlefield* battlefield) override {
+//         ammo = 30; // Reload
+//     }
+// };
+// class HideBot : public ThinkingRobot {
+// private:
+//     int hideTurnsUsed = 0;
+//     const int maxHideTurns = 3;
+//     bool isHidden = false;
 
 // // public:
 // //     void actionThink(Battlefield* battlefield) override {
@@ -539,11 +538,10 @@ private:
 // //     }
 // // };
 
-class HealBot : public ShootingRobot {
-private:
-    int health = 3;
-    const int maxHealth = 3;
-
+// class HealBot : public ShootingRobot {
+// private:
+//     int health = 3;
+//     const int maxHealth = 3;
 // public:
 //     void actionFire(Battlefield* battlefield) override {
 //         int tx, ty;
@@ -557,14 +555,13 @@ private:
 // }
 //         }
 //     }
-
-    int getHealth() const { return health; }
-};
-class ReflectShotBot : public ThinkingRobot {
-public:
-    void actionThink(Battlefield* battlefield) override {
-        // Passive ability: no action needed unless attacked
-    }
+//     int getHealth() const { return health; }
+// };
+// class ReflectShotBot : public ThinkingRobot {
+// public:
+//     void actionThink(Battlefield* battlefield) override {
+//         // Passive ability: no action needed unless attacked
+//     }
 
 //     void onHit(Robot* attacker, Battlefield* battlefield) {
 //         if (attacker) {
