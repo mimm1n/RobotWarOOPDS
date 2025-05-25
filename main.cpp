@@ -133,13 +133,30 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
         virtual void actionFire(Battlefield* battlefield) override {
         }
-        virtual void actionMove(Battlefield* battlefield) override {
+        virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield);
         }
         virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
-                robotUpgraded->actionLook(battlefield);
+                robotUpgraded->actionLook(battlefield, -1, -1);
+
+            int currentX = getX();  // get current pos, center position like (0,0)
+            int currentY = getY(); 
+
+            for (int dx = -1; dx <= 1; ++dx) {
+                for (int dy = -1; dy <= 1; ++dy) {
+                    int lookX = currentX + dx;
+                    int looktY = currentY + dy;
+
+                if (targetX >= 0 && targetX < battlefield->battlefieldRows() &&  //check if its in bound 
+                targetY >= 0 && targetY < battlefield->battlefieldCols()) {
+                    if(battlefield->battlefield_[lookY][lookX] != ""){
+                        int 
+                    }
+                    
+                }
+            }
         }
         virtual void actionThink(Battlefield* battlefield)override {
             actionRand();
