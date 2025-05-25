@@ -83,14 +83,14 @@ class ThinkingRobot : virtual public Robot{
 class SeeingRobot : virtual public Robot{
     public:
         SeeingRobot(){}
-        virtual void actionLook(Battlefield* battlefield) = 0;
+        virtual void actionLook(Battlefield* battlefield,int x, int y) = 0;
 };
 
 class MovingRobot : virtual public Robot{
     public:
         MovingRobot(){}
         // virtual void setLocation(int x, int y);
-        virtual void actionMove(Battlefield* battlefield) = 0;
+        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
 };
 
 class ShootingRobot : virtual public Robot{
@@ -133,13 +133,13 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
         virtual void actionFire(Battlefield* battlefield) override {
         }
-        virtual void actionMove(Battlefield* battlefield) override {
+        virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield);
         }
         virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
-                robotUpgraded->actionLook(battlefield);
+                robotUpgraded->actionLook(battlefield, -1, -1);
         }
         virtual void actionThink(Battlefield* battlefield)override {
             actionRand();
@@ -217,7 +217,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 int GenericRobot::robotIncrement = 1;
 
 int main() {
-    int option;
+    int option, x, y, choice;
     bool exitGame = false;
     Battlefield* battlefield;
     GenericRobot* currentPlayer;
@@ -262,13 +262,59 @@ int main() {
                 currentPlayer->actionThink(battlefield);
                 break;
             case 2:
-                currentPlayer->actionLook(battlefield);
+                cout << "Choose where you want to look" << endl;
+                cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Center\n 6. Right\n 7. DownLeft\n 8. Down\n 9. DownRight" << endl;
+                cin  >> choice;
+                switch(choice){
+                    case 1: 
+                        x = -1;
+                        y = 1;
+                        break;
+                    case 2:
+                        x = 0;
+                        y = 1;
+                        break;
+                    case 3:
+                        x = 1;
+                        y = 1;
+                        break;
+                    case 4:
+                        x = -1;
+                        y = 0;
+                        break;
+                    case 5:
+                        x = 0;
+                        y = 0;
+                        break;
+                    case 6:
+                        x = 1;
+                        y = 0;
+                        break;
+                    case 7:
+                        x = -1;
+                        y = -1;
+                        break;
+                    case 8:
+                        x = 0;
+                        y = -1;
+                        break;
+                    case 9:
+                        x = 1;
+                        y = -1;
+                        break;
+                    default:
+                        x = 0;
+                        y = 0;
+                        break;
+                }
+                currentPlayer->actionLook(battlefield, x, y);
                 break;
             case 3:
                 currentPlayer->actionFire(battlefield);
                 break;
             case 4:
-             
+                cout << "Choose where you want"
+                currentPlayer->actionMove(battlefield, x, y);
                 break;
             case 5:
                 if(currentPlayer->getRobotType() != -1){ 
@@ -382,7 +428,7 @@ void Battlefield::placeRobots(){
     }
 };
 
-void Battlefield::displayBattlefield() const{
+void Battlefield::displayBattlefield(int x, int y) const{
     cout << "Display Battlefield";
     cout << endl << "    ";
 
@@ -404,13 +450,22 @@ cout << "+----";
             if(battlefield_[i][j] == ""){
                 cout << "|" << "    ";
             } else { //placesRobot
-                if(battlefield_[i][j] == getCurrentPlayer()->getRobotID()){
+                if(x==-1 && y == -1){     //scout  
                     cout << "|" << "GR";
-
-                    if(numOfRobots_<10)
-                        cout << "0";   
+                    cout << "0";   
                     cout << battlefield_[i][j];
-                //    cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
+                }else {
+                    if (battlefield_[i][j] == getCurrentPlayer()->getRobotID()){ //general
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                   
+                    }
+                    if(y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
                 }
             }
         }
@@ -461,10 +516,10 @@ void Battlefield::nextTurn(){
 //     const int maxLooks = 3;
 
 // public:
-//     void actionLook(Battlefield* battlefield) override {
+//     void actionLook(Battlefield* battlefield, int x, int y) override {
 //         if (lookCount < maxLooks) {
 // // Logic to scan the entire battlefield
-// battlefield->scanEntireField(this);
+// battlefield->displayBattlefield(x, y);
 // lookCount++;
 //         }
 //     }
