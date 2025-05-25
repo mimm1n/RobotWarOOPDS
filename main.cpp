@@ -17,12 +17,12 @@
 // ******************************************************** 
 
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <iomanip>
 #include <vector>
 #include <random>
 #include "Robot.h"
-#include "Battlefield.h"
 using namespace std;
 
 /* CLASS DEFINITIONS */
@@ -58,6 +58,34 @@ class ShootingRobot : virtual public Robot{
         int getShells() const;
         virtual void setLocation(int x, int y);
         virtual void actionFire(Battlefield* battlefield) = 0;
+};
+
+class Battlefield {
+private:
+  int battlefieldCols_ = -1; // variable to assign number of columns
+  int battlefieldRows_ = -1; // variable to assign number of rows
+
+  int totalTurns_ = -1; // variable to assign total turns
+  int currentTurn_ = 0; //??
+
+  int numOfRobots_ = -1; // variable to assign number of robots
+
+vector<GenericRobot *> robots_; 
+queue<GenericRobot *> destroyedRobots_;
+queue<GenericRobot *> waitingRobots_;  
+
+vector<vector<string>> battlefield_;
+
+public:
+  // Get function
+  int battlefieldCols() { return battlefieldCols_; }
+  int battlefieldRows() { return battlefieldRows_; }
+  int turn() { return totalTurns_; }
+  int numOfRobots() { return numOfRobots_; }
+  
+  void readFile(string filename);
+  void placeRobots();
+  void displayBattlefield() const;
 };
 
 //GenericRobot
@@ -100,6 +128,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
     }
 };
+
 
 class ScoutBot : public SeeingRobot {
 private:
@@ -250,7 +279,7 @@ void Battlefield::readFile(string filename) {
   battlefieldCols_ = stoi(colstr);
   }
 
-  battlefield_ = vector<vector<string>>(battlefieldRows_+1, vector<string>(battlefieldCols_+1, "")); //2D vector for rows and columns
+  battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
 
   //find total turn
   getline(infile, line); //read second line
@@ -281,10 +310,13 @@ for (int i = 0; i < numOfRobots_; i++) {
     if (xStr == "random" && yStr == "random"){
       x = rand() % (battlefieldRows_);
       y = rand() % (battlefieldCols_);
+
     }else{
       x = stoi(xStr);
       y = stoi(yStr);
     }
+placeRobots();
+robots_.push_back(new GenericRobot(name,x,y));
 }
 }
 
@@ -304,7 +336,7 @@ for (int j=0; j<battlefield_[i].size(); j++){
     cout << robots_[i]->getRobotName();
 
     GenericRobot* current = new GenericRobot(name, x, y);
-    if(current->getLives() <= 3 && current->getLives != 0)
+    if(current->getLives()<= 3 && current->getLives != 0)
     {
     destroyedRobots_.push_back(current);
     if(!GenericRobot){
