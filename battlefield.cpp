@@ -83,10 +83,8 @@ for (int i = 0; i < numOfRobots_; i++) {
       x = stoi(xStr);
       y = stoi(yStr);
     }
-
-
 }
-
+}
 
 void Battlefield::placeRobots(){
 for(int i=0;i<battlefield_.size(); i++){
@@ -97,11 +95,25 @@ for (int j=0; j<battlefield_[i].size(); j++){
   for (int i=0;i<robots_.size(); i++){
     int y = robots_[i]->getRobotY();
     int x = robots_[i]->getRobotX();
+
     if(y < battlefield_.size() && x < battlefield_[0].size()){
 
-      battlefield_[y][x]=robots_[i]->getRobotName();
-      cout << robots_[i]->getRobotName();
+    battlefield_[y][x]=robots_[i]->getRobotName();
+    cout << robots_[i]->getRobotName();
+
+    // Robot* current = Robot(x, y, name);
+    // if(current->getLives() <= 3 && current->getLives != 0)
+    // {
+    //   destroyedRobots_.push_back(current);
+    //   if(!GenericRobot){
+    //     Robot* destroyed = destroyedRobots_.front(); // retrieve first element in destroyedRobots_ queue
+    //     destroyedRobot_.pop_front(); // remove first element in destroyedRobot_ queue
+    //     waitingRobots_.push_back(destroyed); //put the removed destroyedRobot_ in waitingRobots
+    //     Robot* enter = waitingRobots_front();
+    //   }
+    // } 
     }
+
     else{
       cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
       exit(1);
