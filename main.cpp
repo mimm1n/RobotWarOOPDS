@@ -30,39 +30,39 @@ class GenericRobot;
 
 /**********************************************************************
 Battlefield Class 
- *********************************************************************/
+**********************************************************************/
 class Battlefield {
-private:
-  int battlefieldCols_ = -1; // variable to assign number of columns
-  int battlefieldRows_ = -1; // variable to assign number of rows
+    private:
+        int battlefieldCols_ = -1; // variable to assign number of columns
+        int battlefieldRows_ = -1; // variable to assign number of rows
 
-  int totalTurns_ = -1; // variable to assign total turns
-  int currentTurn_ = 0; //??
+        int totalTurns_ = -1; // variable to assign total turns
+        int currentTurn_ = 0; //??
 
-  int numOfRobots_ = -1; // variable to assign number of robots
+        int numOfRobots_ = -1; // variable to assign number of robots
 
-vector<GenericRobot *> robots_; 
-// queue<Robot *> destroyedRobots_;
-// queue<Robot *> waitingRobots_;  
+        vector<GenericRobot *> robots_; 
+        // queue<Robot *> destroyedRobots_;
+        // queue<Robot *> waitingRobots_;  
 
-vector<vector<string>> battlefield_;
+        vector<vector<string>> battlefield_;
 
-public:
-  // Get function
-  int battlefieldCols() { return battlefieldCols_; }
-  int battlefieldRows() { return battlefieldRows_; }
-  int turn() { return totalTurns_; }
-  int numOfRobots() { return numOfRobots_; }
-  
-  void readFile(string filename);
-  void placeRobots();
-  void displayBattlefield() const;
-  void respawnRobot();
+    public:
+        // Get function
+        int battlefieldCols() { return battlefieldCols_; }
+        int battlefieldRows() { return battlefieldRows_; }
+        int turn() { return totalTurns_; }
+        int numOfRobots() { return numOfRobots_; }
+        
+        void readFile(string filename);
+        void placeRobots();
+        void displayBattlefield() const;
+        void respawnRobot();
 };
 
 /**********************************************************************
 Robot Action Classes 
- *********************************************************************/
+**********************************************************************/
 class ThinkingRobot : virtual public Robot{
     public:
         ThinkingRobot(){}
@@ -88,8 +88,8 @@ class ShootingRobot : virtual public Robot{
         int shells = 10;
     public:
         ShootingRobot(){}
-        void setShells(int num);
-        int getShells() const;
+        void setShells(int num) { shells = num; }
+        int getShells() const { return shells; }
         // virtual void setLocation(int x, int y);
         virtual void actionFire(Battlefield* battlefield) = 0;
 };
@@ -97,7 +97,7 @@ class ShootingRobot : virtual public Robot{
 
 /**********************************************************************
 Generic Robot Class 
- *********************************************************************/
+**********************************************************************/
 class GenericRobot : public ShootingRobot, public MovingRobot, 
                     public SeeingRobot, public ThinkingRobot{
     private: 
@@ -161,150 +161,119 @@ int main() {
 
 /**********************************************************************
 Function Definitions
- *********************************************************************/
-// void ThinkingRobot::setLocation(int x, int y){
-//     setRobotX(x);
-//     setRobotY(y);
-// }
-
-// // void SeeingRobot::setLocation(int x, int y){
-// //     setRobotX(x);
-// //     setRobotY(y);
-// // }
-
-// void MovingRobot::setLocation(int x, int y){
-//     setRobotX(x);
-//     setRobotY(y);
-// }
-
-// void ShootingRobot::setLocation(int x, int y){
-//     setRobotX(x);
-//     setRobotY(y);
-// }
-
-void ShootingRobot::setShells(int num){
-    shells = num;
-}
-
-int ShootingRobot::getShells() const{
-    return shells;
-}
+**********************************************************************/
 
 
 /**********************************************************************
 Battlefield Functions
- *********************************************************************/
+**********************************************************************/
 void Battlefield::readFile(string filename) {
 
-  ifstream infile(filename);
-  string line;
+    ifstream infile(filename);
+    string line;
 
-  //find matrix
-  getline(infile, line); //read first line
-  size_t pos1 = line.find(":");
-  if (pos1 != string::npos){
-  string numStr = line.substr(pos1+2);
-  stringstream ss(numStr);
-  string colstr, rowstr;
-  ss >> rowstr >> colstr;
-  battlefieldRows_ = stoi(rowstr);
-  battlefieldCols_ = stoi(colstr);
-  }
-
-  battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
-
-  //find total turn
-  getline(infile, line); //read second line
-  size_t pos2 = line.find(":");
-  if (pos2 != string::npos){
-  string numStr2 = line.substr(pos2+2);
-  totalTurns_ = stoi(numStr2);
-
-  }
-  
-  //find total robot
-  getline(infile, line);// read the third line
-  size_t pos3 = line.find(":");
-  if (pos3 != string::npos){
-  string numStr3 = line.substr(pos3+2);
-  numOfRobots_ = stoi(numStr3);
-  }
-
-cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
-
-  //find robot name and position
-for (int i = 0; i < numOfRobots_; i++) {
-    getline(infile, line);
-    istringstream robotLine(line);
-    string name, xStr, yStr;
-    int x, y;
-    robotLine >> name >> yStr >> xStr;
-    if (xStr == "random" && yStr == "random"){
-      x = rand() % (battlefieldRows_);
-      y = rand() % (battlefieldCols_);
-
-    }else{
-      x = stoi(xStr);
-      y = stoi(yStr);
+    //find matrix
+    getline(infile, line); //read first line
+    size_t pos1 = line.find(":");
+    if (pos1 != string::npos){
+        string numStr = line.substr(pos1+2);
+        stringstream ss(numStr);
+        string colstr, rowstr;
+        ss >> rowstr >> colstr;
+        battlefieldRows_ = stoi(rowstr);
+        battlefieldCols_ = stoi(colstr);
     }
-robots_.push_back(new GenericRobot(name,x,y));
-}
+
+    battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
+
+    //find total turn
+    getline(infile, line); //read second line
+    size_t pos2 = line.find(":");
+    if (pos2 != string::npos){
+        string numStr2 = line.substr(pos2+2);
+        totalTurns_ = stoi(numStr2);
+    }
+    
+    //find total robot
+    getline(infile, line);// read the third line
+    size_t pos3 = line.find(":");
+    if (pos3 != string::npos){
+        string numStr3 = line.substr(pos3+2);
+        numOfRobots_ = stoi(numStr3);
+    }
+
+    cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
+
+    //find robot name and position
+    for (int i = 0; i < numOfRobots_; i++) {
+        getline(infile, line);
+        istringstream robotLine(line);
+        string name, xStr, yStr;
+        int x, y;
+        robotLine >> name >> yStr >> xStr;
+        if (xStr == "random" && yStr == "random"){
+            x = rand() % (battlefieldRows_);
+            y = rand() % (battlefieldCols_);
+        } else {
+            x = stoi(xStr);
+            y = stoi(yStr);
+        }
+        robots_.push_back(new GenericRobot(name,x,y));
+    }
 }
 
 void Battlefield::placeRobots(){
-for(int i=0;i<battlefield_.size(); i++){
-for (int j=0; j<battlefield_[i].size(); j++){
-  battlefield_[i][j]="";
-}
-  }
-  for (int i=0;i<robots_.size(); i++){
-    int y = robots_[i]->getRobotY();
-    int x = robots_[i]->getRobotX();
-
-    if(y < battlefield_.size() && x < battlefield_[0].size()){
-
-    battlefield_[y][x]=robots_[i]->getRobotID();
-    cout << robots_[i]->getRobotID();
-
+    for(int i=0;i<battlefield_.size(); i++){
+        for (int j=0; j<battlefield_[i].size(); j++){
+            battlefield_[i][j]="";
+        }
     }
 
-    else{
-      cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
-      exit(1);
+    for (int i=0;i<robots_.size(); i++){
+        int y = robots_[i]->getRobotY();
+        int x = robots_[i]->getRobotX();
+
+        if(y < battlefield_.size() && x < battlefield_[0].size()){
+            battlefield_[y][x]=robots_[i]->getRobotID();
+            cout << robots_[i]->getRobotID();
+        } else {
+            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
+            exit(1);
+        }
     }
-  }
 };
 
 void Battlefield::displayBattlefield() const{
-  cout << "Display Battlefield";
-  cout << endl << "    ";
-  for (int j=0; j< battlefield_[0].size();j++){
-    cout << "   " << right << setfill('0') << setw(2) << j << "";
-  }
-  cout << endl;
- for (int i=0; i< battlefield_.size();i++){
+    cout << "Display Battlefield";
+    cout << endl << "    ";
+
+    for (int j=0; j< battlefield_[0].size();j++)
+        cout << "   " << right << setfill('0') << setw(2) << j << "";
+
+    cout << endl;
+
+    for (int i=0; i< battlefield_.size();i++){
+        cout << "     ";
+
+        for (int j = 0; j < battlefield_[i].size(); j++){
+            cout << "+----";
+            cout << "+" << endl;
+            cout << "   " << right << setfill('0') << setw(2) << i;
+        }
+
+        for (int j = 0;j <battlefield_[0].size(); j++){
+            if(battlefield_[i][j] == ""){
+                cout << "|" << "    ";
+            } else {
+                cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
+            }
+        }
+        cout << "|" << endl;
+    }
     cout << "     ";
-    for (int j = 0; j < battlefield_[i].size(); j++)
-    cout << "+----";
-  cout << "+" << endl;
-  cout << "   " << right << setfill('0') << setw(2) << i;
-  for (int j = 0;j <battlefield_[0].size(); j++)
-  {
-    if(battlefield_[i][j] == "")
-    {
-      cout << "|" << "    ";
-    }
-    else
-    {
-      cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
-    }
-  }
-  cout << "|" << endl;
-  }
-  cout << "     ";
-  for (int j = 0;j<battlefield_[0].size();j++)
-  cout << "+----";
-  cout << "+" << endl;
+    for (int j = 0;j<battlefield_[0].size();j++)
+        cout << "+----";
+    cout << "+" << endl;
 }
 
 // void Battlefield::respawnRobot(){
