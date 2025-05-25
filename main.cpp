@@ -383,5 +383,56 @@ void Battlefield::displayBattlefield() const{
 //     }
 // };
 
+class HealBot : public ShootingRobot {
+private:
+    int health = 3;
+    const int maxHealth = 3;
+
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int tx, ty;
+        if (battlefield->getTarget(this, tx, ty)) {
+            bool destroyed = battlefield->fireAt(tx, ty); // returns true if a robot was destroyed
+            if (destroyed && health < maxHealth) {
+                health++;
+                cout << "HealBot gained 1 health! Current health: " << health << endl;
+            } else if (destroyed) {
+                cout << "HealBot destroyed a robot but is already at max health." << endl;
+            }
+        }
+    }
+
+    int getHealth() const { return health; }
+};
+class ReflectShotBot : public ThinkingRobot {
+public:
+    void actionThink(Battlefield* battlefield) override {
+        // Passive ability: no action needed unless attacked
+    }
+
+    void onHit(Robot* attacker, Battlefield* battlefield) {
+        if (attacker) {
+            cout << "ReflectShotBot reflects the shot back to attacker!\n";
+            battlefield->fireAt(attacker->getX(), attacker->getY());
+        }
+    }
+};
+class BombBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int cx = getX();
+        int cy = getY();
+
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip self
+                int tx = cx + dx;
+                int ty = cy + dy;
+                battlefield->fireAt(tx, ty);
+            }
+        }
+        cout << "BombBot bombed surrounding squares!\n";
+    }
+};
 
 

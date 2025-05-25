@@ -131,11 +131,7 @@ bool Robot::isAlive() const{
  * task: Increases the kill count by 1
  * @return killCount - number of kills so far
  *********************************************************************/
-int Robot::incrementKills(){
+void Robot::incrementKills(){
     return killCount++;
-}
-
-void Robot::setLocation(int x, int y){
-    
 }
 
