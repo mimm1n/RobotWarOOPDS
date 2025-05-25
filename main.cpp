@@ -42,7 +42,8 @@ class Battlefield {
 
         int totalTurns_ = -1; // variable to assign total turns
         int currentTurn_ = 1; 
-        int nextTurn_;
+        int currentPlayer = 0;
+    
 
         int numOfRobots_ = -1; // variable to assign number of robots
 
@@ -58,13 +59,15 @@ class Battlefield {
         int battlefieldRows() { return battlefieldRows_; }
         int turns() { return totalTurns_; }
         int numOfRobots() { return numOfRobots_; }
-        int currentTurn() { return currentTurn_; }
-        void nextTurn(){ currentTurn_++;}
+        int currentTurn(){ return currentTurn_; }
+        GenericRobot* getCurrentPlayer() { return waitingRobots_.front(); }
+        
         
         void readFile(string filename);
         void placeRobots();
         void displayBattlefield() const;
         void respawnRobot(int x);
+        void nextTurn();
 };
 
 /**********************************************************************
@@ -157,6 +160,7 @@ int GenericRobot::robotIncrement = 1;
 
 int main() {
     int option;
+    bool exitGame = false;
     Battlefield battlefield;
     GenericRobot* currentPlayer;
     battlefield.readFile("inputFile.txt");
@@ -171,24 +175,24 @@ int main() {
         cout << "2. Look (x,y)" << endl;
         cout << "3. Fire (x,y)" << endl;
         cout << "4. Move" << endl;
-        if (currentPlayer.getRobotType != -1){
-            if (currentPlayer.getRobotType() == SCOUT)
+        if (currentPlayer->getRobotType() != -1){
+            if (currentPlayer->getRobotType() == SCOUT)
                 cout << "5. Scout (see entire battlefield)" << endl;
-            else if (currentPlayer.getRobotType() == TRACK)
+            else if (currentPlayer->getRobotType() == TRACK)
                 cout << "5. Track (plant tracker on another robot)" << endl;
-            else if (currentPlayer.getRobotType() == LONGSHOT)
+            else if (currentPlayer->getRobotType() == LONGSHOT)
                 cout << "5. Fire a long shot (see entire battlefield)" << endl;
-            else if (currentPlayer.getRobotType() == SEMIAUTO)
+            else if (currentPlayer->getRobotType() == SEMIAUTO)
                 cout << "You have the SemiAuto upgrade! Each shot you fire shoots 3 consecutive shots." << endl;
-            else if (currentPlayer.getRobotType() == JUMP)
+            else if (currentPlayer->getRobotType() == JUMP)
                 cout << "5. Jump (x,y)" << endl;
-            else if (currentPlayer.getRobotType() == HIDE)
+            else if (currentPlayer->getRobotType() == HIDE)
                 cout << "5. Hide (can't be seen or shot at by other robots)" << endl;
-            else if (currentPlayer.getRobotType() == REFLECTSHOT)
+            else if (currentPlayer->getRobotType() == REFLECTSHOT)
                 cout << "You have the ReflectShot upgrade! If a robot shoots at you in the new few turns, it will be reflected back at them! >:) " << endl;
-            else if (currentPlayer.getRobotType() == HEAL)
-                cout << "You have the Heal upgrade! You have a total of " << currentPlayer.getLives() << " lives left." << endl;
-            else if (currentPlayer.getRobotType() == BOMB)
+            else if (currentPlayer->getRobotType() == HEAL)
+                cout << "You have the Heal upgrade! You have a total of " << currentPlayer->getLives() << " lives left." << endl;
+            else if (currentPlayer->getRobotType() == BOMB)
                 cout << "5. Bomb (shoot all 8 neighbouring locations)" << endl;
         }
         cout << "To quit the game enter any key other than the above options" << endl;
@@ -196,7 +200,7 @@ int main() {
         cin >> option;
 
         switch(option){
-            case 1:
+            case 1: 
                 break;
             case 2:
                 break;
@@ -205,17 +209,19 @@ int main() {
             case 4:
                 break;
             case 5:
-                if(currentPlayer->getRobotType() != -1){
+                if(currentPlayer->getRobotType() != -1){ 
+                }else{
+                    exitGame = true;
                 }
                 break;
             default: 
-                continue;
+                exitGame = true;
+                break;
         }
-
-    } while(battlefield.totalTurns_ > 0);
+        battlefield.nextTurn();
+    } while(!exitGame && (battlefield.currentTurn() < battlefield.turns()));
     
     
-
     return 0;
 }
 
@@ -294,7 +300,7 @@ void Battlefield::readFile(string filename) {
 void Battlefield::placeRobots(){
     for(int i=0;i<battlefield_.size(); i++){
         for (int j=0; j<battlefield_[i].size(); j++){
-battlefield_[i][j]="";
+            battlefield_[i][j]="";
         }
     }
 
@@ -303,14 +309,14 @@ battlefield_[i][j]="";
         int x = robots_[i]->getRobotX();
 
         if(y < battlefield_.size() && x < battlefield_[0].size()){
-battlefield_[y][x]= to_string(robots_[i]->getRobotID());
-        
+            battlefield_[y][x]= to_string(robots_[i]->getRobotID());
         } else {
-cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
-exit(1);
+            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
+            exit(1);
         }
-
-        if(!robots_[i]->isAlive()){respawnRobot(i);}
+        
+        waitingRobots_.push(robots_[i]);
+        // if(!robots_[i]->isAlive()){respawnRobot(i);}
     }
 };
 
@@ -377,6 +383,12 @@ battlefield_[newY][newX]=to_string(respawn->getRobotID());
 
 }
 
+void Battlefield::nextTurn(){
+    currentTurn_++;
+    GenericRobot* front = waitingRobots_.front();
+    waitingRobots_.pop();
+    waitingRobots_.push(front);
+}
 
 
 // class ScoutBot : public SeeingRobot {
