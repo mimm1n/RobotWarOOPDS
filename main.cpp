@@ -60,7 +60,7 @@ class Battlefield {
         int turns() { return totalTurns_; }
         int numOfRobots() { return numOfRobots_; }
         int currentTurn(){ return currentTurn_; }
-        GenericRobot* getCurrentPlayer() { return waitingRobots_.front(); }
+        GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
         
         
         void readFile(string filename);
@@ -219,15 +219,15 @@ int GenericRobot::robotIncrement = 1;
 int main() {
     int option;
     bool exitGame = false;
-    Battlefield battlefield;
+    Battlefield* battlefield;
     GenericRobot* currentPlayer;
-    battlefield.readFile("inputFile.txt");
-    battlefield.placeRobots();
+    battlefield->readFile("inputFile.txt");
+    battlefield->placeRobots();
 
     do {
-        currentPlayer = battlefield.getCurrentPlayer();
+        currentPlayer = battlefield->getCurrentPlayer();
 
-        battlefield.displayBattlefield();
+        battlefield->displayBattlefield();
         cout << "What would you like to do?" << endl;
         cout << "1. Think" << endl;
         cout << "2. Look (x,y)" << endl;
@@ -259,12 +259,16 @@ int main() {
 
         switch(option){
             case 1: 
+                currentPlayer->actionThink(battlefield);
                 break;
             case 2:
+                currentPlayer->actionLook(battlefield);
                 break;
             case 3:
+                currentPlayer->actionFire(battlefield);
                 break;
             case 4:
+             
                 break;
             case 5:
                 if(currentPlayer->getRobotType() != -1){ 
@@ -276,8 +280,8 @@ int main() {
                 exitGame = true;
                 break;
         }
-        battlefield.nextTurn();
-    } while(!exitGame && (battlefield.currentTurn() < battlefield.turns()));
+        battlefield->nextTurn();
+    } while(!exitGame && (battlefield->currentTurn() < battlefield->turns()));
     
     
     return 0;
@@ -397,15 +401,18 @@ cout << "+----";
         
 
         for (int j = 0;j <battlefield_[0].size(); j++){
-if(battlefield_[i][j] == ""){
-    cout << "|" << "    ";
-} else { //placesRobot
-     cout << "|" << "GR";
-     if(numOfRobots_<10)
-        cout << "0";   
-    cout << battlefield_[i][j];
-//    cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
-}
+            if(battlefield_[i][j] == ""){
+                cout << "|" << "    ";
+            } else { //placesRobot
+                if(battlefield_[i][j] == getCurrentPlayer()->getRobotID()){
+                    cout << "|" << "GR";
+
+                    if(numOfRobots_<10)
+                        cout << "0";   
+                    cout << battlefield_[i][j];
+                //    cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
+                }
+            }
         }
         cout << "|" << endl;
     }
