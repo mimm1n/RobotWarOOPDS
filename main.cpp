@@ -25,8 +25,9 @@
 #include "Robot.h"
 using namespace std;
 
-/* CLASS DEFINITIONS */
-// Robot Actions
+/**********************************************************************
+Class Definition 
+ *********************************************************************/
 class ThinkingRobot : virtual public Robot{
     public:
         ThinkingRobot(){}
@@ -60,6 +61,9 @@ class ShootingRobot : virtual public Robot{
         virtual void actionFire(Battlefield* battlefield) = 0;
 };
 
+/**********************************************************************
+Battlefield Class 
+ *********************************************************************/
 class Battlefield {
 private:
   int battlefieldCols_ = -1; // variable to assign number of columns
@@ -88,7 +92,9 @@ public:
   void displayBattlefield() const;
 };
 
-//GenericRobot
+/**********************************************************************
+Generic Robot Class 
+ *********************************************************************/
 class GenericRobot : public ShootingRobot, public MovingRobot, 
                     public SeeingRobot, public ThinkingRobot{
     private: 
@@ -130,6 +136,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 };
 
 
+/**********************************************************************
+Upgrades Robot Class 
+ *********************************************************************/
 class ScoutBot : public SeeingRobot {
 private:
     int lookCount = 0;
@@ -221,8 +230,9 @@ public:
     }
 };
 
-
-
+/**********************************************************************
+Main Function
+ *********************************************************************/
 int main() {
     cout << "Hello World!" << endl;
     Battlefield battlefield;
@@ -233,7 +243,9 @@ int main() {
     return 0;
 }
 
-/* FUNCTION DEFINITIONS */
+/**********************************************************************
+Function Definitions
+ *********************************************************************/
 void ThinkingRobot::setLocation(int x, int y){
     setRobotX(x);
     setRobotY(y);
@@ -262,6 +274,10 @@ int ShootingRobot::getShells() const{
     return shells;
 }
 
+
+/**********************************************************************
+Battlefield Functions
+ *********************************************************************/
 void Battlefield::readFile(string filename) {
 
   ifstream infile(filename);
