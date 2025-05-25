@@ -41,13 +41,14 @@ class Battlefield {
         int battlefieldRows_ = -1; // variable to assign number of rows
 
         int totalTurns_ = -1; // variable to assign total turns
-        int currentTurn_ = 0; //??
+        int currentTurn_ = 1; 
+        int nextTurn_;
 
         int numOfRobots_ = -1; // variable to assign number of robots
 
         vector<GenericRobot *> robots_; 
-        // queue<Robot *> destroyedRobots_;
-        // queue<Robot *> waitingRobots_;  
+        queue<GenericRobot *> destroyedRobots_;
+        queue<GenericRobot *> waitingRobots_;  
 
         vector<vector<string>> battlefield_;
 
@@ -55,13 +56,15 @@ class Battlefield {
         // Get function
         int battlefieldCols() { return battlefieldCols_; }
         int battlefieldRows() { return battlefieldRows_; }
-        int turn() { return totalTurns_; }
+        int turns() { return totalTurns_; }
         int numOfRobots() { return numOfRobots_; }
+        int currentTurn() { return currentTurn_; }
+        void nextTurn(){ currentTurn_++;}
         
         void readFile(string filename);
         void placeRobots();
         void displayBattlefield() const;
-        void respawnRobot();
+        void respawnRobot(int x);
 };
 
 /**********************************************************************
@@ -103,7 +106,7 @@ class ShootingRobot : virtual public Robot{
 Generic Robot Class 
 **********************************************************************/
 class GenericRobot : public ShootingRobot, public MovingRobot, 
-                    public SeeingRobot, public ThinkingRobot{
+        public SeeingRobot, public ThinkingRobot{
     private: 
         static int robotIncrement;
     public: 
@@ -123,7 +126,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int getRobotType() const override { return robotType; }
 
         virtual void actionFire(Battlefield* battlefield) override {
-            // ShootingRobot::actionShoot(battlefield); 
+// ShootingRobot::actionShoot(battlefield); 
         }
         virtual void actionMove(Battlefield* battlefield) override {}
         virtual void actionLook(Battlefield* battlefield) override {}
@@ -143,11 +146,11 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                 actionFire(battlefield); 
             }
 
-        else if(randomInt % 2 == 1){
+            else if(randomInt % 2 == 1){
             actionFire(battlefield);
             actionMove(battlefield); 
+            }
         }
-    }
 };
 
 int GenericRobot::robotIncrement = 1;
@@ -216,6 +219,13 @@ int main() {
     return 0;
 }
 
+// do{
+//     cout << endl << endl;
+//     battlefield.displayBattlefield();
+//     cout << "Turn " << battlefield.currentTurn() << ":" << endl;
+//     battlefield.nextTurn();
+
+// }while(battlefield.currentTurn() != battlefield.turns());
 
 
 /**********************************************************************
@@ -270,21 +280,21 @@ void Battlefield::readFile(string filename) {
         int x, y;
         robotLine >> name >> yStr >> xStr;
         if (xStr == "random" && yStr == "random"){
-            x = rand() % (battlefieldRows_);
-            y = rand() % (battlefieldCols_);
-            cout << x << y << endl;
-        } else {
-            x = stoi(xStr);
-            y = stoi(yStr);
-        }
-        robots_.push_back(new GenericRobot(name,x,y));
+        x = rand() % (battlefieldRows_);
+        y = rand() % (battlefieldCols_);
+        cout << x << y << endl;
+                } else {
+        x = stoi(xStr);
+        y = stoi(yStr);
+                }
+                robots_.push_back(new GenericRobot(name,x,y));
     }
 }
 
 void Battlefield::placeRobots(){
     for(int i=0;i<battlefield_.size(); i++){
         for (int j=0; j<battlefield_[i].size(); j++){
-            battlefield_[i][j]="";
+battlefield_[i][j]="";
         }
     }
 
@@ -293,12 +303,14 @@ void Battlefield::placeRobots(){
         int x = robots_[i]->getRobotX();
 
         if(y < battlefield_.size() && x < battlefield_[0].size()){
-            battlefield_[y][x]= to_string(robots_[i]->getRobotID());
-            cout << robots_[i]->getRobotID();
+battlefield_[y][x]= to_string(robots_[i]->getRobotID());
+        
         } else {
-            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
-            exit(1);
+cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
+exit(1);
         }
+
+        if(!robots_[i]->isAlive()){respawnRobot(i);}
     }
 };
 
@@ -315,21 +327,21 @@ void Battlefield::displayBattlefield() const{
         cout << "     ";
 
         for (int j = 0; j < battlefield_[i].size(); j++)
-            cout << "+----";
+cout << "+----";
         cout << "+" << endl;
         cout << "   " << right << setfill('0') << setw(2) << i;
         
 
         for (int j = 0;j <battlefield_[0].size(); j++){
-            if(battlefield_[i][j] == ""){
-                cout << "|" << "    ";
-            } else { //placesRobot
-                 cout << "|" << "GR";
-                 if(numOfRobots_<10)
-                    cout << "0";   
-                cout << battlefield_[i][j];
-            //    cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
-            }
+if(battlefield_[i][j] == ""){
+    cout << "|" << "    ";
+} else { //placesRobot
+     cout << "|" << "GR";
+     if(numOfRobots_<10)
+        cout << "0";   
+    cout << battlefield_[i][j];
+//    cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
+}
         }
         cout << "|" << endl;
     }
@@ -337,23 +349,35 @@ void Battlefield::displayBattlefield() const{
     for (int j = 0;j<battlefield_[0].size();j++)
         cout << "+----";
     cout << "+" << endl;
+
 }
 
-// void Battlefield::respawnRobot(){
+void Battlefield::respawnRobot(int index){
+GenericRobot* destroyed = robots_[index];
+destroyedRobots_.push(destroyed);
+int oldX = destroyed -> getRobotX();
+int oldY = destroyed -> getRobotY();
+battlefield_[oldY][oldX] = ""; //clear the field
 
-//     GenericRobot* current = new GenericRobot(name, x, y);
-//     if(current->getLives()<= 3 && current->getLives != 0)
-//     {
-//     destroyedRobots_.push_back(current);
-//     if(!GenericRobot){
-//     Robot* destroyed = destroyedRobots_.front(); // retrieve first element in destroyedRobots_ queue
-//     destroyedRobot_.pop_front(); // remove first element in destroyedRobot_ queue
-//     waitingRobots_.push_back(destroyed); //put the removed destroyedRobot_ in waitingRobots
-//     Robot* enter = waitingRobots_front();
-//     }
-//     } 
+GenericRobot* waiting = destroyedRobots_.front();
+waitingRobots_.push(waiting);
+destroyedRobots_.pop();
+if(!waitingRobots_.empty()){
+GenericRobot* respawn = waitingRobots_.front();
+waitingRobots_.pop();
 
-// }
+int newX = rand() % (battlefieldRows_);
+int newY = rand() % (battlefieldCols_);
+
+respawn->setRobotX(newX);
+respawn->setRobotY(newY);
+battlefield_[newY][newX]=to_string(respawn->getRobotID());
+
+}
+
+}
+
+
 
 // class ScoutBot : public SeeingRobot {
 // private:
@@ -363,9 +387,9 @@ void Battlefield::displayBattlefield() const{
 // public:
 //     void actionLook(Battlefield* battlefield) override {
 //         if (lookCount < maxLooks) {
-//             // Logic to scan the entire battlefield
-//             battlefield->scanEntireField(this);
-//             lookCount++;
+// // Logic to scan the entire battlefield
+// battlefield->scanEntireField(this);
+// lookCount++;
 //         }
 //     }
 // };
@@ -378,11 +402,11 @@ void Battlefield::displayBattlefield() const{
 // public:
 //     void actionLook(Battlefield* battlefield) override {
 //         if (trackersUsed < maxTrackers) {
-//             Robot* target = battlefield->selectEnemyToTrack();
-//             if (target) {
-//                 battlefield->trackEnemy(target, this);
-//                 trackersUsed++;
-//             }
+// Robot* target = battlefield->selectEnemyToTrack();
+// if (target) {
+//     battlefield->trackEnemy(target, this);
+//     trackersUsed++;
+// }
 //         }
 //     }
 // };
@@ -391,7 +415,7 @@ void Battlefield::displayBattlefield() const{
 //     void actionFire(Battlefield* battlefield) override {
 //         int targetX, targetY;
 //         if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
-//             battlefield->fireAt(targetX, targetY);
+// battlefield->fireAt(targetX, targetY);
 //         }
 //     }
 // };
@@ -400,9 +424,9 @@ void Battlefield::displayBattlefield() const{
 //     void actionFire(Battlefield* battlefield) override {
 //         int targetX, targetY;
 //         if (battlefield->getTarget(this, targetX, targetY)) {
-//             for (int i = 0; i < 3; ++i) {
-//                 battlefield->fireAt(targetX, targetY); // 3 shells
-//             }
+// for (int i = 0; i < 3; ++i) {
+//     battlefield->fireAt(targetX, targetY); // 3 shells
+// }
 //         }
 //     }
 // // };
@@ -424,9 +448,9 @@ void Battlefield::displayBattlefield() const{
 // // public:
 // //     void actionThink(Battlefield* battlefield) override {
 // //         if (hideTurnsUsed < maxHideTurns) {
-// //             isHidden = true;
-// //             hideTurnsUsed++;
-// //             battlefield->setHidden(this, true);
+// // isHidden = true;
+// // hideTurnsUsed++;
+// // battlefield->setHidden(this, true);
 // //         }
 // //     }
 // // };
@@ -438,10 +462,10 @@ void Battlefield::displayBattlefield() const{
 // // public:
 // //     void actionMove(Battlefield* battlefield) override {
 // //         if (jumpsUsed < maxJumps) {
-// //             int newX, newY;
-// //             battlefield->getRandomLocation(newX, newY);
-// //             setLocation(newX, newY);
-// //             jumpsUsed++;
+// // int newX, newY;
+// // battlefield->getRandomLocation(newX, newY);
+// // setLocation(newX, newY);
+// // jumpsUsed++;
 // //         }
 // //     }
 // // };
@@ -455,13 +479,13 @@ void Battlefield::displayBattlefield() const{
 //     void actionFire(Battlefield* battlefield) override {
 //         int tx, ty;
 //         if (battlefield->getTarget(this, tx, ty)) {
-//             bool destroyed = battlefield->fireAt(tx, ty); // returns true if a robot was destroyed
-//             if (destroyed && health < maxHealth) {
-//                 health++;
-//                 cout << "HealBot gained 1 health! Current health: " << health << endl;
-//             } else if (destroyed) {
-//                 cout << "HealBot destroyed a robot but is already at max health." << endl;
-//             }
+// bool destroyed = battlefield->fireAt(tx, ty); // returns true if a robot was destroyed
+// if (destroyed && health < maxHealth) {
+//     health++;
+//     cout << "HealBot gained 1 health! Current health: " << health << endl;
+// } else if (destroyed) {
+//     cout << "HealBot destroyed a robot but is already at max health." << endl;
+// }
 //         }
 //     }
 
@@ -475,8 +499,8 @@ void Battlefield::displayBattlefield() const{
 
 //     void onHit(Robot* attacker, Battlefield* battlefield) {
 //         if (attacker) {
-//             cout << "ReflectShotBot reflects the shot back to attacker!\n";
-//             battlefield->fireAt(attacker->getX(), attacker->getY());
+// cout << "ReflectShotBot reflects the shot back to attacker!\n";
+// battlefield->fireAt(attacker->getX(), attacker->getY());
 //         }
 //     }
 // };
@@ -487,12 +511,12 @@ void Battlefield::displayBattlefield() const{
 //         int cy = getY();
 
 //         for (int dx = -1; dx <= 1; ++dx) {
-//             for (int dy = -1; dy <= 1; ++dy) {
-//                 if (dx == 0 && dy == 0) continue; // Skip self
-//                 int tx = cx + dx;
-//                 int ty = cy + dy;
-//                 battlefield->fireAt(tx, ty);
-//             }
+// for (int dy = -1; dy <= 1; ++dy) {
+//     if (dx == 0 && dy == 0) continue; // Skip self
+//     int tx = cx + dx;
+//     int ty = cy + dy;
+//     battlefield->fireAt(tx, ty);
+// }
 //         }
 //         cout << "BombBot bombed surrounding squares!\n";
 //     }
