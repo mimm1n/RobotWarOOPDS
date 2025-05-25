@@ -26,6 +26,10 @@
 #include "Robot.h"
 using namespace std;
 
+/**********************************************************************
+CLASS DEFINTIONS
+**********************************************************************/
+
 class GenericRobot;
 
 /**********************************************************************
@@ -152,11 +156,65 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 int GenericRobot::robotIncrement = 1;
 
 int main() {
-    cout << "Hello World!" << endl;
+    int option;
     Battlefield battlefield;
+    GenericRobot* currentPlayer;
     battlefield.readFile("inputFile.txt");
     battlefield.placeRobots();
-    battlefield.displayBattlefield();
+
+    do {
+        currentPlayer = battlefield.getCurrentPlayer();
+
+        battlefield.displayBattlefield();
+        cout << "What would you like to do?" << endl;
+        cout << "1. Think" << endl;
+        cout << "2. Look (x,y)" << endl;
+        cout << "3. Fire (x,y)" << endl;
+        cout << "4. Move" << endl;
+        if (currentPlayer.getRobotType != -1){
+            if (currentPlayer.getRobotType() == SCOUT)
+                cout << "5. Scout (see entire battlefield)" << endl;
+            else if (currentPlayer.getRobotType() == TRACK)
+                cout << "5. Track (plant tracker on another robot)" << endl;
+            else if (currentPlayer.getRobotType() == LONGSHOT)
+                cout << "5. Fire a long shot (see entire battlefield)" << endl;
+            else if (currentPlayer.getRobotType() == SEMIAUTO)
+                cout << "You have the SemiAuto upgrade! Each shot you fire shoots 3 consecutive shots." << endl;
+            else if (currentPlayer.getRobotType() == JUMP)
+                cout << "5. Jump (x,y)" << endl;
+            else if (currentPlayer.getRobotType() == HIDE)
+                cout << "5. Hide (can't be seen or shot at by other robots)" << endl;
+            else if (currentPlayer.getRobotType() == REFLECTSHOT)
+                cout << "You have the ReflectShot upgrade! If a robot shoots at you in the new few turns, it will be reflected back at them! >:) " << endl;
+            else if (currentPlayer.getRobotType() == HEAL)
+                cout << "You have the Heal upgrade! You have a total of " << currentPlayer.getLives() << " lives left." << endl;
+            else if (currentPlayer.getRobotType() == BOMB)
+                cout << "5. Bomb (shoot all 8 neighbouring locations)" << endl;
+        }
+        cout << "To quit the game enter any key other than the above options" << endl;
+        cout << "Enter your next move option: ";
+        cin >> option;
+
+        switch(option){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                if(currentPlayer->getRobotType() != -1){
+                }
+                break;
+            default: 
+                continue;
+        }
+
+    } while(battlefield.totalTurns_ > 0);
+    
+    
 
     return 0;
 }
@@ -171,9 +229,8 @@ int main() {
 
 
 /**********************************************************************
-Function Definitions
+FUNCTION DEFINTIONS
 **********************************************************************/
-
 
 /**********************************************************************
 Battlefield Functions
