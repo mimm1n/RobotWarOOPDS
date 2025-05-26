@@ -135,3 +135,11 @@ void Robot::incrementKills(){
     killCount++;
 }
 
+/**********************************************************************
+ * getKills
+ * task: Increases the kill count by 1
+ * @return killCount - number of kills so far
+ *********************************************************************/
+int Robot::getKills() const{
+    return killCount;
+}
