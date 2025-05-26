@@ -273,6 +273,13 @@ actionMove()
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield, x, y);
+            //
+            //
+            //
+            //
+            //
+            //
+            //
         }
 
 /**********************************************************************
