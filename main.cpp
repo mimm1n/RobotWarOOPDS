@@ -222,7 +222,7 @@ ActionFire()
 
 
 
-            string targetRobot = battlefield->getPlayer(lookX, lookY);
+            string targetRobot = battlefield->battlefield_[lookY][lookX];
 
             HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
             if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
@@ -290,7 +290,7 @@ actionMove()
                     return; 
                 }
 
-                // if (battlefield->getPlayer(nextX, nextY) != ""){
+                // if (battlefield->battlefield_[nextY][nextX] != ""){
                 //     cout << "place taken" << endl;
                 //     return;
                 // } //not sure yet 
@@ -323,8 +323,8 @@ actionLook()
                     int lookY = currentY + dy;
 
                 
-                    if(battlefield->getPlayer(lookX, lookY) != ""){
-                        int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY)); // find the id of the robot currently in that position 
+                    if(battlefield->battlefield_[lookY][lookX]) != ""){
+                        int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
                         for (GenericRobot* robot : battlefield->robots_){
                             if (robot->getRobotID() == lookRobotId) {
