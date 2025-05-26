@@ -102,6 +102,44 @@ class ShootingRobot : virtual public Robot{
         virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
 };
 
+/**********************************************************************
+Upgraded Robot Classes 
+**********************************************************************/
+class ThirtyShotBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+    setShells(30); // Reload
+    }
+};
+
+class JumpBot : public MovingRobot {
+private:
+    int jumpsUsed = 0;
+    const int maxJumps = 3;
+
+public:
+    void actionMove(Battlefield* battlefield, int x, int y) override {
+        if (jumpsUsed < maxJumps) {
+               string targetPosition = battlefield->battlefield_[y][x];
+                if (targetPosition.empty()) { //check if theres any robots at the location
+                setRobotX(x);
+                setRobotY(y);
+                jumpUsed++;
+                }else{
+                    cout << "Invalid location! There might be a robot there." << endl;
+                }
+        }
+    }
+};
+
+class HealBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield, int x, int y) override {
+addLife();
+addLife();
+addLife();
+    }
+};
 
 /**********************************************************************
 Generic Robot Class 
@@ -687,22 +725,26 @@ class ScoutBot : public SeeingRobot {
         }
 };
 
-class TrackBot : public SeeingRobot {
-private:
-    int trackersUsed = 0;
-    const int maxTrackers = 3;
-    vector <Robot*> targets;
-public:
-    void actionLook(Battlefield* battlefield, int x, int y) override {
-        if (trackersUsed < maxTrackers) {
-Robot* target = battlefield->selectEnemyToTrack();
-if (target) {
-    battlefield->trackEnemy(target, this);
-    trackersUsed++;
-}
-        }
-    }
-};
+// class TrackBot : public SeeingRobot {
+// private:
+//     int trackersUsed = 0;
+//     const int maxTrackers = 3;
+//     vector <int> targets;
+// public:
+//     void actionLook(Battlefield* battlefield, int x, int y) override {
+//         if (trackersUsed < maxTrackers) {
+//                string target = battlefield->battlefield_[y][x];
+//                 if (!target.empty()) { //check if theres any robots at the location
+//                 setRobotX(x);
+//                 setRobotY(y);
+// // Robot* target = battlefield->selectEnemyToTrack();
+// // if (target) {
+// //     battlefield->trackEnemy(target, this);
+// //     trackersUsed++;
+// }
+//         }
+//     }
+// };
 
 class LongShotBot : public ShootingRobot {
 public:
@@ -725,13 +767,33 @@ for (int i = 0; i < 3; ++i) {
         }
     }
 };
+                // random_device rd;
+                // mt19937 gen(rd());
+                // uniform_int_distribution<> distr(1, 100); // 1 to 100 randomiser
 
-class ThirtyShotBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield) override {
-    setShells(30); // Reload
-    }
-};
+                // int hitChance = distr(gen); 
+                // if (hitChance <= 70) {  // 70% chance 
+                //     int targetRobotId = stoi(targetRobot);
+                //     GenericRobot* targetRobot = nullptr; 
+                    
+                //     for (GenericRobot* robot : battlefield->robots_){
+                //         if (robot->getRobotID() == targetRobotId) {
+                //             targetRobot = robot;
+                //             break;
+                //         }
+                //     }
+
+                //     if (targetRobot) {
+                //         targetRobot->reduceLife();
+                //         if(!targetRobot->isAlive()){
+                //             cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
+                //             incrementKills(); //increment kills for this robot 
+                //         }
+                            
+                //     }
+                // }
+
+
 
 // class HideBot : public ThinkingRobot {
 // private:
@@ -749,28 +811,6 @@ public:
 // //     }
 // // };
 
-class JumpBot : public MovingRobot {
-private:
-    int jumpsUsed = 0;
-    const int maxJumps = 3;
-
-public:
-    void actionMove(Battlefield* battlefield, int x, int y) override {
-        if (jumpsUsed < maxJumps) {
-setRobotX()
-jumpsUsed++;
-        }
-    }
-};
-
-class HealBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield, int x, int y) override {
-addLife();
-addLife();
-addLife();
-    }
-};
 
 // class ReflectShotBot : public ThinkingRobot {
 // public:
