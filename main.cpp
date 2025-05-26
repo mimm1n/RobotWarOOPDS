@@ -167,6 +167,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         //getter
         int getRobotType() const override { return robotType; }
 
+/**********************************************************************
+ActionFire()
+**********************************************************************/
         virtual void actionFire(Battlefield* battlefield, int x, int y) override {
             int currentX = getX();  // get current pos, center position like (0,0)
             int currentY = getY(); 
@@ -216,10 +219,18 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                 cout << "Cannot shoot at own position." << endl; 
             }
         }
+
+/**********************************************************************
+actionMove()
+**********************************************************************/
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield);
         }
+
+/**********************************************************************
+actionLook()
+**********************************************************************/
         virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionLook(battlefield, -10, -10,);
@@ -245,10 +256,10 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     }  
                 }
             }
-
-
-
         }
+/**********************************************************************
+actionThink()
+**********************************************************************/
         virtual void actionThink(Battlefield* battlefield)override {
             actionRand();
 
@@ -256,7 +267,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                 robotUpgraded->actionThink(battlefield);
         }
 
-        void upgradeRobot(int upgradeType, int x, int y){
+        void upgradeRobot(int upgradeType){
             if (upgradeCount >= MAX_UPGRADE) { 
                 cout << "Max upgrade reached." ; 
                 return; 
@@ -264,34 +275,34 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
             switch(upgradeType){
                 case 1:
-                    robotUpgraded = new ScoutBot(x, y);
+                    robotUpgraded = new ScoutBot();
                     break;
                 case 2:
-                    robotUpgraded = new TrackBot(x, y);
+                    robotUpgraded = new TrackBot();
                     break;
                 case 3:
-                    robotUpgraded = new LongShotBot(x, y);
+                    robotUpgraded = new LongShotBot();
                     break;
                 case 4:
-                    robotUpgraded = new SemiAutoBot(x, y);
+                    robotUpgraded = new SemiAutoBot();
                     break;
                 case 5:
-                    robotUpgraded = new ThirtyShotBot(x, y);
+                    robotUpgraded = new ThirtyShotBot();
                     break;
                 case 6:
-                    robotUpgraded = new JumpBot(x, y);
+                    robotUpgraded = new JumpBot();
                     break;
                 case 7:
-                    robotUpgraded = new HideBot(x, y);
+                    robotUpgraded = new HideBot();
                     break;
                 case 8:
-                    robotUpgraded = new ReflectShotBot(x, y);
+                    robotUpgraded = new ReflectShotBot();
                     break;
                 case 9:
-                    robotUpgraded = new HealBot(x, y);
+                    robotUpgraded = new HealBot();
                     break;
                 case 10:
-                    robotUpgraded = new BombBot(x, y);
+                    robotUpgraded = new BombBot();
                     break;
                 default: 
                     return;
