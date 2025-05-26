@@ -162,21 +162,21 @@ class ScoutBot : public SeeingRobot{
 };
 
 class HideBot : public MovingRobot{
-  private:
-    int hideTurnsUsed = 0;
-    const int maxHideTurns = 3;
-    bool isHidden_ = false;
+    private:
+        int hideTurnsUsed = 0;
+        const int maxHideTurns = 3;
+        bool isHidden_ = false;
 
- public:
-     void actionMove(Battlefield* battlefield, int x, int y) override {
-        if (hideTurnsUsed < maxHideTurns) {
-         isHidden_ = true;
-      hideTurnsUsed++;
+    public:
+        void actionMove(Battlefield* battlefield, int x, int y) override {
+            if (hideTurnsUsed < maxHideTurns) {
+            isHidden_ = true;
+            hideTurnsUsed++;
+            }
         }
-     }
-     bool isHidden() const{
-        return isHidden_;
-     }
+        bool isHidden() const{
+            return isHidden_;
+        }
 };
 
 /**********************************************************************
@@ -214,6 +214,11 @@ ActionFire()
 
             int lookX = currentX + x;
             int lookY = currentY + y;
+
+            if (robotUpgraded && dynamic_cast<HideBot*>(robotUpgraded) && static_cast<HideBot*>(robotUpgraded)->isHidden()){
+                cout << "Shot missed. Robot is hidden." << endl;
+                return;
+            }
 
             while (x != 0 || y!= 0){
                 if (lookX >= 0 && lookX < battlefield->battlefieldRows() &&  //check if its in bound 
