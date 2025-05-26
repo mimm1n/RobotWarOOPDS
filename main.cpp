@@ -252,7 +252,7 @@ ActionFire()
                     int targetRobotId = stoi(targetRobot);
                     GenericRobot* targetRobot = nullptr; 
                     
-                    for (GenericRobot* robot : battlefield->getAllRobots()){
+                    for (GenericRobot* robot : battlefield->robots_){
                         if (robot->getRobotID() == targetRobotId) {
                             targetRobot = robot;
                             break;
@@ -295,12 +295,15 @@ actionMove()
                 //     return;
                 // } //not sure yet 
 
+                battlefield->battlefield_[currentY][currentX] = "";
+
+                battlefield->battlefield_[nextY][nextX] = to_string(robotId);
+
                 // update positions
                 setRobotX(nextX); 
                 setRobotY(nextY);
 
-                battlefield->
-
+                cout << "Robot " getRobotID() << "move to position (" << nextX << ", " << nextY << ")" << endl;
             }
         }
 
@@ -323,7 +326,7 @@ actionLook()
                     if(battlefield->getPlayer(lookX, lookY) != ""){
                         int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY)); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
-                        for (GenericRobot* robot : battlefield->getAllRobots()){
+                        for (GenericRobot* robot : battlefield->robots_){
                             if (robot->getRobotID() == lookRobotId) {
                                 robotLooked = robot; 
                                 break;
