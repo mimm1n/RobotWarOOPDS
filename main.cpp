@@ -60,6 +60,7 @@ class Battlefield {
         int turns() { return totalTurns_; }
         int numOfRobots() { return numOfRobots_; }
         int currentTurn(){ return currentTurn_; }
+        string getPlayer(int x, int y){return battlefield_[y][x];}
         GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
         
         
@@ -107,9 +108,11 @@ Upgraded Robot Classes
 **********************************************************************/
 class ThirtyShotBot : public ShootingRobot {
 public:
-    void actionFire(Battlefield* battlefield) override {
+    void actionFire(Battlefield* battlefield, int x, int y) override {
     setShells(30); // Reload
     }
+            virtual void setRobotType(int type){robotType=THIRTYSHOT;}
+        virtual int getRobotType const{ return THIRTYSHOT;}
 };
 
 class JumpBot : public MovingRobot {
@@ -120,16 +123,18 @@ private:
 public:
     void actionMove(Battlefield* battlefield, int x, int y) override {
         if (jumpsUsed < maxJumps) {
-               string targetPosition = battlefield->battlefield_[y][x];
+               string targetPosition = battlefield->getPlayer(x, y);
                 if (targetPosition.empty()) { //check if theres any robots at the location
                 setRobotX(x);
                 setRobotY(y);
-                jumpUsed++;
+                jumpsUsed++;
                 }else{
                     cout << "Invalid location! There might be a robot there." << endl;
                 }
         }
     }
+         void setRobotType(int type){robotType=JUMP;}
+         int getRobotType const{ return JUMP;}
 };
 
 class HealBot : public ShootingRobot {
@@ -139,6 +144,25 @@ addLife();
 addLife();
 addLife();
     }
+        void setRobotType(int type){robotType=HEAL;}
+        int getRobotType const{ return HEAL;}
+};
+
+class ScoutBot : public SeeingRobot {
+    private:
+        int lookCount = 0;
+        const int maxLooks = 3;
+
+    public:
+        void actionLook(Battlefield* battlefield, int x, int y) override {
+            if (lookCount < maxLooks) {
+                // Logic to scan the entire battlefield
+                battlefield->displayBattlefield(-10, -10);
+                lookCount++;
+            }
+        }
+        void setRobotType(int type){robotType=SCOUT;}
+        int getRobotType const{ return SCOUT;}
 };
 
 /**********************************************************************
@@ -168,8 +192,8 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int getRobotType() const override { return robotType; }
 
         virtual void actionFire(Battlefield* battlefield, int x, int y) override {
-            int currentX = getX();  // get current pos, center position like (0,0)
-            int currentY = getY(); 
+            int currentX = getRobotX();  // get current pos, center position like (0,0)
+            int currentY = getRobotY(); 
 
             int lookX = currentX + x;
             int lookY = currentY + y;
@@ -181,7 +205,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     return;
                 }
 
-                string targetRobot = battlefield->battlefield_[lookY][lookX];
+                string targetRobot = battlefield->getPlayer(lookX, lookY);
                 if (targetRobot.empty()) { //check if theres any robots at the location
                     cout << "Missed!"; //no robot, miss
                     return;
@@ -218,14 +242,14 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
-                robotUpgraded->actionMove(battlefield);
+                robotUpgraded->actionMove(battlefield, x, y);
         }
         virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
-                robotUpgraded->actionLook(battlefield, -10, -10,);
+                robotUpgraded->actionLook(battlefield, -10, -10);
 
-            int currentX = getX();  // get current pos, center position like (0,0)
-            int currentY = getY(); 
+            int currentX = getRobotX();  // get current pos, center position like (0,0)
+            int currentY = getRobotY(); 
 
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
@@ -233,8 +257,8 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     int lookY = currentY + dy;
 
                 
-                    if(battlefield->battlefield_[lookY][lookX] != ""){
-                        int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
+                    if(battlefield->getPlayer(lookX, lookY) != ""){
+                        int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY)); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
                         for (GenericRobot* robot : battlefield->robots_){
                             if (robot->getRobotID() == lookRobotId) {
@@ -250,7 +274,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 
         }
         virtual void actionThink(Battlefield* battlefield)override {
-            actionRand();
+            actionRand(battlefield);
 
             if(robotUpgraded)
                 robotUpgraded->actionThink(battlefield);
@@ -489,13 +513,16 @@ int main() {
                         // how to deploy this?? 
                         currentPlayer->actionLook(battlefield, x, y);
                     } else if (currentPlayer->getRobotType() == LONGSHOT){
+                        bool tooLongShot;
                         do {
+                            cout << "LongShot Upgrade allows you to shoot up to three squares away from you !" << endl;
                             cout << "Enter the x and y coordinate of the location you want to shoot at: (separated by a space)" << endl;
                             cin >> x >> y;
                             invalidCoordinates = x < 0 || x >= battlefield->battlefieldCols() || y < 0 || y >= battlefield->battlefieldRows();
-                            if (invalidCoordinates)
+                            tooLongShot = x < (currentPlayer->getRobotX() - 4 ) || x > (currentPlayer->getRobotX() + 4 ) || y < (currentPlayer->getRobotY() - 4 ) || y > (currentPlayer->getRobotY() + 4);
+                            if (invalidCoordinates || tooLongShot)
                                 cout << "Invalid location entered!" << endl;
-                        } while (invalidCoordinates);
+                        } while (invalidCoordinates || tooLongShot);
                         currentPlayer->actionFire(battlefield, x, y);
                         battlefield->nextTurn();
                     } else if (currentPlayer->getRobotType() == JUMP){
@@ -710,20 +737,7 @@ void Battlefield::nextTurn(){
     waitingRobots_.push(front);
 }
 
-class ScoutBot : public SeeingRobot {
-    private:
-        int lookCount = 0;
-        const int maxLooks = 3;
 
-    public:
-        void actionLook(Battlefield* battlefield, int x, int y) override {
-            if (lookCount < maxLooks) {
-                // Logic to scan the entire battlefield
-                battlefield->displayBattlefield(-10, -10);
-                lookCount++;
-            }
-        }
-};
 
 // class TrackBot : public SeeingRobot {
 // private:
