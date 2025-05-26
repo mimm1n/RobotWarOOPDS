@@ -129,7 +129,54 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         //getter
         int getRobotType() const override { return robotType; }
 
-        virtual void actionFire(Battlefield* battlefield) override {
+        virtual void actionFire(Battlefield* battlefield, int x, int y) override {
+            int currentX = getX();  // get current pos, center position like (0,0)
+            int currentY = getY(); 
+
+            int lookX = currentX + x;
+            int lookY = currentY + y;
+
+            while (x != 0 || y!= 0){
+                if (lookX >= 0 && lookX < battlefield->battlefieldRows() &&  //check if its in bound 
+                lookY >= 0 && lookY < battlefield->battlefieldCols()) {
+                    cout << "Out of bounds";
+                    return;
+                }
+
+                string targetRobot = battlefield->battlefield_[lookY][lookX];
+                if (targetRobot.empty()) { //check if theres any robots at the location
+                    cout << "Missed!"; //no robot, miss
+                    return;
+                }
+
+                random_device rd;
+                mt19937 gen(rd());
+                uniform_int_distribution<> distr(1, 100); // 1 to 100 randomiser
+
+                int hitChance = distr(gen); 
+                if (hitChance <= 70) {  // 70% chance 
+                    int targetRobotId = stoi(targetRobot);
+                    GenericRobot* targetRobot = nullptr; 
+                    
+                    for (GenericRobot* robot : battlefield->robots_){
+                        if (robot->getRobotID() == targetRobotId) {
+                            targetRobot = robot;
+                            break;
+                        }
+                    }
+
+                    if (targetRobot) {
+                        targetRobot->reduceLife();
+                        if(!targetRobot->isAlive()){
+                            cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
+                            incrementKills(); //increment kills for this robot 
+                        }
+                            
+                    }
+                }
+
+                cout << "Cannot shoot at own position." << endl; 
+            }
         }
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
@@ -137,7 +184,32 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
         virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
-                robotUpgraded->actionLook(battlefield, -10, -10);
+                robotUpgraded->actionLook(battlefield, -10, -10,);
+
+            int currentX = getX();  // get current pos, center position like (0,0)
+            int currentY = getY(); 
+
+            for (int dx = -1; dx <= 1; ++dx) {
+                for (int dy = -1; dy <= 1; ++dy) {
+                    int lookX = currentX + dx;
+                    int lookY = currentY + dy;
+
+                
+                    if(battlefield->battlefield_[lookY][lookX] != ""){
+                        int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
+                        GenericRobot* robotLooked = nullptr;
+                        for (GenericRobot* robot : battlefield->robots_){
+                            if (robot->getRobotID() == lookRobotId) {
+                                robotLooked = robot; 
+                                break;
+                            }
+                        }
+                    }  
+                }
+            }
+
+
+
         }
         virtual void actionThink(Battlefield* battlefield)override {
             actionRand();
@@ -212,7 +284,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
 };
 
-int GenericRobot::robotIncrement = 1;
+int GenericRobot::robotIncrement = 0;
 
 int main() {
     int option, x, y, choice;
