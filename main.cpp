@@ -390,7 +390,7 @@ actionThink()
             upgradeCount++;
         }
 
-        void actionRand(Battlefield* battlefield){
+        void actionRand(Battlefield* battlefield, int x, int y){
             random_device rd; 
             mt19937 gen(rd()); 
             uniform_int_distribution<> distr(0, 10); // define range
