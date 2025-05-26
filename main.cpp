@@ -339,13 +339,16 @@ actionLook()
 /**********************************************************************
 actionThink()
 **********************************************************************/
-        virtual void actionThink(Battlefield* battlefield)override {
-            actionRand(battlefield);
+        virtual void actionThink(Battlefield* battlefield, int x, int y) override {
+            actionRand(battlefield, x, y);
 
             if(robotUpgraded)
                 robotUpgraded->actionThink(battlefield);
         }
 
+/**********************************************************************
+upgradeRobot()
+**********************************************************************/
         void upgradeRobot(int upgradeType){
             if (upgradeCount >= MAX_UPGRADE) { 
                 cout << "Max upgrade reached." ; 
@@ -390,6 +393,19 @@ actionThink()
             upgradeCount++;
         }
 
+        void downgradeToGeneric(int upgradeType) {
+            delete upgradedRobot;
+            upgradedRobot = nullptr;
+            robotType = GENERIC;
+        }
+
+        int getUpgradeCount() const {
+            return upgradeCount; 
+        }
+
+/**********************************************************************
+actionRand()
+**********************************************************************/
         void actionRand(Battlefield* battlefield, int x, int y){
 
             random_device rd; 
