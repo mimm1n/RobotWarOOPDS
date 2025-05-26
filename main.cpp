@@ -216,7 +216,10 @@ ActionFire()
             int lookX = currentX + x;
             int lookY = currentY + y;
 
-            if (robotUpgraded && dynamic_cast<HideBot*>(robotUpgraded) && static_cast<HideBot*>(robotUpgraded)->isHidden()){
+            string targetRobot = battlefield->getPlayer(lookX, lookY);
+
+            Hidebot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
+            if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
             }
@@ -228,7 +231,7 @@ ActionFire()
                     return;
                 }
 
-                string targetRobot = battlefield->getPlayer(lookX, lookY);
+                
                 if (targetRobot.empty()) { //check if theres any robots at the location
                     cout << "Missed!"; //no robot, miss
                     return;
