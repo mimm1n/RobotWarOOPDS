@@ -391,23 +391,47 @@ actionThink()
         }
 
         void actionRand(Battlefield* battlefield, int x, int y){
+
             random_device rd; 
             mt19937 gen(rd()); 
-            uniform_int_distribution<> distr(0, 10); // define range
+            uniform_int_distribution<> posDistr(0, 8);
+
+            int directionMove = posDistr(gen);
+
+            int currentX = getRobotX();
+            int currentY = getRobotY();
+
+            int moveX = 0, moveY = 0;
+
+            switch(direction){
+                case 0: moveX = -1; moveY = -1; break;  // topleft
+                case 1: moveX =  0; moveY = -1; break;  // top
+                case 2: moveX =  1; moveY = -1; break;  // topright
+                case 3: moveX = -1; moveY =  0; break;  // left
+                case 4: moveX =  1; moveY =  0; break;  // right
+                case 5: moveX = -1; moveY =  1; break;  // bottomleft
+                case 6: moveX =  0; moveY =  1; break;  // bottom
+                case 7: moveX =  1; moveY =  1; break;  // bottomright
+                case 8: moveX =  0; moveY =  0; break;  // stay in place
+            }
+
+            random_device rd2; 
+            mt19937 gen(rd2()); 
+            uniform_int_distribution<> actionDistr(0, 10); // define range
             
             actionThink(battlefield);
             actionLook(battlefield, 0, 0); 
 
-            int randomInt = distr(gen);
+            int randomInt = actionDistr(gen);
 
             if(randomInt % 2 == 0) { 
-                actionMove(battlefield, );
+                actionMove(battlefield, moveX, moveY);
                 actionFire(battlefield); 
             }
 
             else if(randomInt % 2 == 1){
             actionFire(battlefield);
-            actionMove(battlefield); 
+            actionMove(battlefield, moveX, moveY);
             }
         }
 };
