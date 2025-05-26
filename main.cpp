@@ -145,7 +145,7 @@ class HealBot : public ShootingRobot {
         int getRobotType() const override { return HEAL; }
 };
 
-class ScoutBot : public SeeingRobot {
+class ScoutBot : public SeeingRobot{
     private:
         int lookCount = 0;
         const int maxLooks = 3;
@@ -159,6 +159,24 @@ class ScoutBot : public SeeingRobot {
         }
         void setRobotType(int type) override { robotType=SCOUT; }
         int getRobotType() const override { return SCOUT; }
+};
+
+class HideBot : public MovingRobot{
+  private:
+    int hideTurnsUsed = 0;
+    const int maxHideTurns = 3;
+    bool isHidden_ = false;
+
+ public:
+     void actionMove(Battlefield* battlefield, int x, int y) override {
+        if (hideTurnsUsed < maxHideTurns) {
+         isHidden_ = true;
+      hideTurnsUsed++;
+        }
+     }
+     bool isHidden() const{
+        return isHidden_;
+     }
 };
 
 /**********************************************************************
@@ -815,22 +833,28 @@ for (int i = 0; i < 3; ++i) {
                 // }
 
 
+//       class BombBot : public ShootingRobot {
+// public:
+//     void actionFire(Battlefield* battlefield) override {
+//         int cx = getRobotX();
+//         int cy = getRobotY();
 
-// class HideBot : public ThinkingRobot {
-// private:
-//     int hideTurnsUsed = 0;
-//     const int maxHideTurns = 3;
-//     bool isHidden = false;
+//         cout << "BombBot bombed surrounding squares!\n";
 
-// // public:
-// //     void actionThink(Battlefield* battlefield) override {
-// //         if (hideTurnsUsed < maxHideTurns) {
-// // isHidden = true;
-// // hideTurnsUsed++;
-// // battlefield->setHidden(this, true);
-// //         }
-// //     }
-// // };
+//         for (int dx = -1; dx <= 1; ++dx) {
+//             for (int dy = -1; dy <= 1; ++dy) {
+//                 if (dx == 0 && dy == 0) continue; // Skip self
+//                 int tx = cx + dx;
+//                 int ty = cy + dy;
+
+//                 cout << "Explosion at (" << tx << ", " << ty << ")\n";
+                
+//             }
+//         }
+//     }
+// };
+
+
 
 
 // class ReflectShotBot : public ThinkingRobot {
@@ -847,22 +871,5 @@ for (int i = 0; i < 3; ++i) {
 //     }
 // };
 
-// class BombBot : public ShootingRobot {
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         int cx = getX();
-//         int cy = getY();
-
-//         for (int dx = -1; dx <= 1; ++dx) {
-// for (int dy = -1; dy <= 1; ++dy) {
-//     if (dx == 0 && dy == 0) continue; // Skip self
-//     int tx = cx + dx;
-//     int ty = cy + dy;
-//     battlefield->fireAt(tx, ty);
-// }
-//         }
-//         cout << "BombBot bombed surrounding squares!\n";
-//     }
-// };
 
 
