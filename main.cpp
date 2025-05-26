@@ -61,7 +61,7 @@ class Battlefield {
         int numOfRobots() { return numOfRobots_; }
         int currentTurn(){ return currentTurn_; }
         string getPlayer(int x, int y){return battlefield_[y][x];}
-        vector <GenericRobot *> getAllRobot() const {return robots_;}
+        vector <GenericRobot *> getAllRobots() const {return robots_;}
         GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
         
         
@@ -108,6 +108,7 @@ Upgraded Robot Classes
 **********************************************************************/
 class ThirtyShotBot : public ShootingRobot {
     public:
+        ThirtyShotBot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override { setShells(30); }
         void setRobotType(int type) override { robotType = THIRTYSHOT; }
         int getRobotType() const override { return THIRTYSHOT;}
@@ -119,6 +120,7 @@ class JumpBot : public MovingRobot {
         const int maxJumps = 3;
 
     public:
+        JumpBot(){}
         void actionMove(Battlefield* battlefield, int x, int y) override {
             if (jumpsUsed < maxJumps) {
                 string targetPosition = battlefield->getPlayer(x, y);
@@ -137,6 +139,7 @@ class JumpBot : public MovingRobot {
 
 class HealBot : public ShootingRobot {
     public:
+        HealBot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override {
             addLife();
             addLife();
@@ -152,6 +155,7 @@ class ScoutBot : public SeeingRobot{
         const int maxLooks = 3;
 
     public:
+        ScoutBot(){}
         void actionLook(Battlefield* battlefield, int x, int y) override {
             if (lookCount < maxLooks) {
                 battlefield->displayBattlefield(-10, -10);
@@ -169,6 +173,7 @@ class HideBot : public MovingRobot{
         bool isHidden_ = false;
 
     public:
+        HideBot(){}
         void actionMove(Battlefield* battlefield, int x, int y) override {
             if (hideTurnsUsed < maxHideTurns) {
             isHidden_ = true;
@@ -243,7 +248,7 @@ ActionFire()
                     int targetRobotId = stoi(targetRobot);
                     GenericRobot* targetRobot = nullptr; 
                     
-                    for (GenericRobot* robot : battlefield->robots_){
+                    for (GenericRobot* robot : battlefield->getAllRobots()){
                         if (robot->getRobotID() == targetRobotId) {
                             targetRobot = robot;
                             break;
@@ -291,7 +296,7 @@ actionLook()
                     if(battlefield->getPlayer(lookX, lookY) != ""){
                         int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY)); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
-                        for (GenericRobot* robot : battlefield->robots_){
+                        for (GenericRobot* robot : battlefield->getAllRobots()){
                             if (robot->getRobotID() == lookRobotId) {
                                 robotLooked = robot; 
                                 break;
