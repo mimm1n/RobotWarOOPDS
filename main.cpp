@@ -394,7 +394,7 @@ actionThink()
 int GenericRobot::robotIncrement = 0;
 
 int main() {
-    int option, x, y, choice;
+    int option, x, y, choice, numOfKills;
     bool exitGame = false, invalidCoordinates;
     Battlefield* battlefield;
     GenericRobot* currentPlayer;
@@ -511,7 +511,30 @@ int main() {
                         x = 0, y = 0;
                         break;
                 }
+                numOfKills = currentPlayer->getKills();
                 currentPlayer->actionFire(battlefield, x, y);
+                 if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
+                        cout << "Congratulations! You shoot a robot. Choose your upgrade: " << endl;
+                        cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3.
+                         JumpBot (x,y)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
+                        cin >> choice;
+                            switch(choice){
+                    case 1: 
+                            currentPlayer->upgradeRobot(SCOUT);
+                        break;
+                    case 2:
+                            currentPlayer->upgradeRobot(TRACK);
+                        break;
+                    case 3:
+                            currentPlayer->upgradeRobot(JUMP);
+                        break;
+                    case 4:
+                            currentPlayer->upgradeRobot(HIDE);
+                        break;
+                    default:
+                        break;
+                }
+                        }
                 battlefield->nextTurn();
                 break;
             case 4: // Move
@@ -568,7 +591,30 @@ int main() {
                             if (invalidCoordinates || tooLongShot)
                                 cout << "Invalid location entered!" << endl;
                         } while (invalidCoordinates || tooLongShot);
+                         numOfKills = currentPlayer->getKills();
                         currentPlayer->actionFire(battlefield, x, y);
+                         if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
+                        cout << "Congratulations! You bomb a robot. Choose your upgrade: " << endl;
+                        cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3.
+                         JumpBot (x,y)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
+                        cin >> choice;
+                            switch(choice){
+                    case 1: 
+                            currentPlayer->upgradeRobot(SCOUT);
+                        break;
+                    case 2:
+                            currentPlayer->upgradeRobot(TRACK);
+                        break;
+                    case 3:
+                            currentPlayer->upgradeRobot(JUMP);
+                        break;
+                    case 4:
+                            currentPlayer->upgradeRobot(HIDE);
+                        break;
+                    default:
+                        break;
+                }
+                        }
                         battlefield->nextTurn();
                     } else if (currentPlayer->getRobotType() == JUMP){
                         do {
@@ -585,7 +631,30 @@ int main() {
                         currentPlayer->actionMove(battlefield, x, y);
                         battlefield->nextTurn();
                     } else if (currentPlayer->getRobotType() == BOMB){
+                        numOfKills = currentPlayer->getKills();
                         currentPlayer->actionFire(battlefield, -5, -5);
+                        if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
+                        cout << "Congratulations! You bomb a robot. Choose your upgrade: " << endl;
+                        cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3.
+                         JumpBot (x,y)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
+                        cin >> choice;
+                            switch(choice){
+                    case 1: 
+                            currentPlayer->upgradeRobot(SCOUT);
+                        break;
+                    case 2:
+                            currentPlayer->upgradeRobot(TRACK);
+                        break;
+                    case 3:
+                            currentPlayer->upgradeRobot(JUMP);
+                        break;
+                    case 4:
+                            currentPlayer->upgradeRobot(HIDE);
+                        break;
+                    default:
+                        break;
+                }
+                        }
                         battlefield->nextTurn();
                     }
                 } else {
