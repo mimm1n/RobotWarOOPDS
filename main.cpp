@@ -807,35 +807,47 @@ void Battlefield::nextTurn(){
 // };
 
 class LongShotBot : public ShootingRobot {
+private:
+    int shotCount = 0;  // Track number of fired shots
+
 public:
     virtual void actionFire(Battlefield* battlefield, int x, int y) override {
+        // Enforce three-shot limit
+        if (shotCount >= 3) {
+            cout << "No more shots left! LongShotBot has fired its maximum shells.\n";
+            return;
+        }
+
         int currentX = getRobotX();
         int currentY = getRobotY();
 
-        // if within range
-        if (abs(x) + abs(y) > 3 || (x == 0 && y == 0)) {
-            cout << "Target out of range.\n";
+        // Strict dx/dy = 3 rule
+        if (!((abs(x) == 3 && abs(y) == 1) || (abs(x) == 1 && abs(y) == 3))) {
+            cout << "Target does not match the required dx/dy ratio of 3.\n";
             return;
         }
 
         int lookX = currentX + x;
         int lookY = currentY + y;
 
-        //  if the target is within battlefield bounds
+        // Check if within battlefield bounds
         if (lookX < 0 || lookX >= battlefield->battlefieldRows() ||
             lookY < 0 || lookY >= battlefield->battlefieldCols()) {
             cout << "Out of bounds.\n";
             return;
         }
 
-        //  if there's a robot at the target location
+        // Check for a robot at the target location
         string targetRobot = battlefield->getPlayer(lookX, lookY);
         if (targetRobot.empty()) {
             cout << "Missed! No robot at (" << lookX << ", " << lookY << ")\n";
         } else {
             cout << "LongShotBot hit robot " << targetRobot << " at (" << lookX << ", " << lookY << ")\n";
-    
+            // Optional: Implement damage mechanics like reduceLife()
         }
+
+        // Increment shot count
+        shotCount++;
     }
 };
 
