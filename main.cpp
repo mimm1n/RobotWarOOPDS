@@ -138,27 +138,46 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
             int lookX = currentX + x;
             int lookY = currentY + y;
 
-            while (x != 0 && y!= 0){
+            while (x != 0 || y!= 0){
                 if (lookX >= 0 && lookX < battlefield->battlefieldRows() &&  //check if its in bound 
                 lookY >= 0 && lookY < battlefield->battlefieldCols()) {
-                    string targetRobot = battlefield->battlefield_[lookY][lookX];
-                    if (targetRobot.empty()) { //check if theres any robots at the location
-                        cout << "Missed!"; //no robot, miss
-                        return;
+                    cout << "Out of bounds";
+                    return;
+                }
+
+                string targetRobot = battlefield->battlefield_[lookY][lookX];
+                if (targetRobot.empty()) { //check if theres any robots at the location
+                    cout << "Missed!"; //no robot, miss
+                    return;
+                }
+
+                random_device rd;
+                mt19937 gen(rd());
+                uniform_int_distribution<> distr(1, 100); // 1 to 100 randomiser
+
+                int hitChance = distr(gen); 
+                if (hitChance <= 70) {  // 70% chance 
+                    int targetRobotId = stoi(targetRobot);
+                    GenericRobot* targetRobot = nullptr; 
+                    
+                    for (GenericRobot* robot : battlefield->robots_){
+                        if (robot->getRobotID() == targetRobotId) {
+                            targetRobot = robot;
+                            break;
+                        }
                     }
 
-                    random_device rd;
-                    mt19937 gen(rd());
-                    uniform_int_distribution<> distr(1, 100);
-
-                    int hitChance = distr(gen); 
-                    if (hitChance <= 70) {
-                        int targetRobotId = stoi(targetRobot);
-                        GenericRobot* targetRobot = nullptr; 
-                        
-                        for (GenericRobot* robot : battlefield->robots_)
+                    if (targetRobot) {
+                        targetRobot->reduceLife();
+                        if(!targetRobot->isAlive()){
+                            cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
+                            incrementKills(); //increment kills for this robot 
+                        }
+                            
                     }
                 }
+
+                cout << "Cannot shoot at own position." << endl; 
             }
         }
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
@@ -181,7 +200,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     if(battlefield->battlefield_[lookY][lookX] != ""){
                         int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
-                        for (GenericRobot* robot : batthefield->robots_){
+                        for (GenericRobot* robot : battlefield->robots_){
                             if (robot->getRobotID() == lookRobotId) {
                                 robotLooked = robot; 
                                 break;
