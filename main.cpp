@@ -60,12 +60,12 @@ class Battlefield {
         int turns() { return totalTurns_; }
         int numOfRobots() { return numOfRobots_; }
         int currentTurn(){ return currentTurn_; }
-        GenericRobot* getCurrentPlayer() { return waitingRobots_.front(); }
+        GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
         
         
         void readFile(string filename);
         void placeRobots();
-        void displayBattlefield() const;
+        void displayBattlefield(int x, int y) const;
         void respawnRobot(int x);
         void nextTurn();
 };
@@ -83,14 +83,13 @@ class ThinkingRobot : virtual public Robot{
 class SeeingRobot : virtual public Robot{
     public:
         SeeingRobot(){}
-        virtual void actionLook(Battlefield* battlefield) = 0;
+        virtual void actionLook(Battlefield* battlefield,int x, int y) = 0;
 };
 
 class MovingRobot : virtual public Robot{
     public:
         MovingRobot(){}
-        // virtual void setLocation(int x, int y);
-        virtual void actionMove(Battlefield* battlefield) = 0;
+        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
 };
 
 class ShootingRobot : virtual public Robot{
@@ -100,8 +99,7 @@ class ShootingRobot : virtual public Robot{
         ShootingRobot(){}
         void setShells(int num) { shells = num; }
         int getShells() const { return shells; }
-        // virtual void setLocation(int x, int y);
-        virtual void actionFire(Battlefield* battlefield) = 0;
+        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
 };
 
 
@@ -186,7 +184,8 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
         virtual void actionLook(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
-                robotUpgraded->actionLook(battlefield, -1, -1);
+
+                robotUpgraded->actionLook(battlefield, -10, -10);
 
             int currentX = getX();  // get current pos, center position like (0,0)
             int currentY = getY(); 
@@ -209,6 +208,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     }  
                 }
             }
+
+
+
         }
         virtual void actionThink(Battlefield* battlefield)override {
             actionRand();
@@ -286,17 +288,18 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 int GenericRobot::robotIncrement = 0;
 
 int main() {
-    int option;
-    bool exitGame = false;
-    Battlefield battlefield;
+    int option, x, y, choice;
+    bool exitGame = false, invalidCoordinates;
+    Battlefield* battlefield;
     GenericRobot* currentPlayer;
-    battlefield.readFile("inputFile.txt");
-    battlefield.placeRobots();
+    battlefield->readFile("inputFile.txt");
+    battlefield->placeRobots();
 
     do {
-        currentPlayer = battlefield.getCurrentPlayer();
+        currentPlayer = battlefield->getCurrentPlayer();
 
-        battlefield.displayBattlefield();
+        battlefield->displayBattlefield(-5, -5);
+        cout << "Player: " << currentPlayer->getRobotName << endl; 
         cout << "What would you like to do?" << endl;
         cout << "1. Think" << endl;
         cout << "2. Look (x,y)" << endl;
@@ -327,27 +330,164 @@ int main() {
         cin >> option;
 
         switch(option){
-            case 1: 
+            case 1: // Think
+                currentPlayer->actionThink(battlefield);
+                battlefield->nextTurn();
                 break;
-            case 2:
+            case 2: // Look (x,y)
+                cout << "Choose where you want to look" << endl;
+                cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Center\n 6. Right\n 7. DownLeft\n 8. Down\n 9. DownRight" << endl;
+                cin  >> choice;
+                switch(choice){
+                    case 1: 
+                        x = -1, y = 1;
+                        break;
+                    case 2:
+                        x = 0, y = 1;
+                        break;
+                    case 3:
+                        x = 1, y = 1;
+                        break;
+                    case 4:
+                        x = -1, y = 0;
+                        break;
+                    case 5:
+                        x = 0, y = 0;
+                        break;
+                    case 6:
+                        x = 1, y = 0;
+                        break;
+                    case 7:
+                        x = -1, y = -1;
+                        break;
+                    case 8:
+                        x = 0, y = -1;
+                        break;
+                    case 9:
+                        x = 1, y = -1;
+                        break;
+                    default:
+                        x = 0, y = 0;
+                        break;
+                }
+                currentPlayer->actionLook(battlefield, x, y);
                 break;
-            case 3:
+            case 3: // Fire (x,y)
+                cout << "Choose where you want to shoot" << endl;
+                cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Right\n 6. DownLeft\n 7. Down\n 8. DownRight" << endl;
+                cin  >> choice;
+                switch(choice){
+                    case 1: 
+                        x = -1, y = 1;
+                        break;
+                    case 2:
+                        x = 0, y = 1;
+                        break;
+                    case 3:
+                        x = 1, y = 1;
+                        break;
+                    case 4:
+                        x = -1, y = 0;
+                        break;
+                    case 5:
+                        x = 1, y = 0;
+                        break;
+                    case 6:
+                        x = -1, y = -1;
+                        break;
+                    case 7:
+                        x = 0, y = -1;
+                        break;
+                    case 8:
+                        x = 1, y = -1;
+                        break;
+                    default:
+                        x = 0, y = 0;
+                        break;
+                }
+                currentPlayer->actionFire(battlefield, x, y);
+                battlefield->nextTurn();
                 break;
-            case 4:
+            case 4: // Move
+                cout << "Choose where you want to move" << endl;
+                cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Right\n 6. DownLeft\n 7. Down\n 8. DownRight" << endl;
+                cin  >> choice;
+                switch(choice){
+                    case 1: 
+                        x = -1, y = 1;
+                        break;
+                    case 2:
+                        x = 0, y = 1;
+                        break;
+                    case 3:
+                        x = 1, y = 1;
+                        break;
+                    case 4:
+                        x = -1, y = 0;
+                        break;
+                    case 5:
+                        x = 1, y = 0;
+                        break;
+                    case 6:
+                        x = -1, y = -1;
+                        break;
+                    case 7:
+                        x = 0, y = -1;
+                        break;
+                    case 8:
+                        x = 1, y = -1;
+                        break;
+                    default:
+                        x = 0, y = 0;
+                        break;
+                }
+                currentPlayer->actionMove(battlefield, x, y);
+                battlefield->nextTurn();
                 break;
-            case 5:
+            case 5: // Upgrades if upgraded robot, quit game if not 
                 if(currentPlayer->getRobotType() != -1){ 
-                }else{
+                    if (currentPlayer->getRobotType() == SCOUT){
+                        currentPlayer->actionLook(battlefield, -10, -10);
+                    } else if (currentPlayer->getRobotType() == TRACK){
+                        // how to deploy this?? 
+                        currentPlayer->actionLook(battlefield, x, y);
+                    } else if (currentPlayer->getRobotType() == LONGSHOT){
+                        do {
+                            cout << "Enter the x and y coordinate of the location you want to shoot at: (separated by a space)" << endl;
+                            cin >> x >> y;
+                            invalidCoordinates = x < 0 || x >= battlefield->battlefieldCols() || y < 0 || y >= battlefield->battlefieldRows();
+                            if (invalidCoordinates)
+                                cout << "Invalid location entered!" << endl;
+                        } while (invalidCoordinates);
+                        currentPlayer->actionFire(battlefield, x, y);
+                        battlefield->nextTurn();
+                    } else if (currentPlayer->getRobotType() == JUMP){
+                        do {
+                            cout << "Enter the x and y coordinate of the location you want to jump to: (separated by a space)" << endl;
+                            cin >> x >> y;
+                            invalidCoordinates = x < 0 || x >= battlefield->battlefieldCols() || y < 0 || y >= battlefield->battlefieldRows();
+                            if (invalidCoordinates)
+                                cout << "Invalid location entered!" << endl;
+                        } while (invalidCoordinates);
+                        currentPlayer->actionMove(battlefield, x, y);
+                        battlefield->nextTurn();
+                    } else if (currentPlayer->getRobotType() == HIDE){
+                        // how to deploy this?? 
+                        currentPlayer->actionMove(battlefield, x, y);
+                        battlefield->nextTurn();
+                    } else if (currentPlayer->getRobotType() == BOMB){
+                        currentPlayer->actionFire(battlefield, -5, -5);
+                        battlefield->nextTurn();
+                    }
+                } else {
                     exitGame = true;
                 }
                 break;
-            default: 
+            default: // Quit game
                 exitGame = true;
                 break;
         }
-        battlefield.nextTurn();
-    } while(!exitGame && (battlefield.currentTurn() < battlefield.turns()));
-    
+    } while(!exitGame && (battlefield->currentTurn() < battlefield->turns()));
     
     return 0;
 }
@@ -413,14 +553,14 @@ void Battlefield::readFile(string filename) {
         int x, y;
         robotLine >> name >> yStr >> xStr;
         if (xStr == "random" && yStr == "random"){
-        x = rand() % (battlefieldRows_);
-        y = rand() % (battlefieldCols_);
-        cout << x << y << endl;
-                } else {
-        x = stoi(xStr);
-        y = stoi(yStr);
-                }
-                robots_.push_back(new GenericRobot(name,x,y));
+            x = rand() % (battlefieldRows_);
+            y = rand() % (battlefieldCols_);
+            cout << x << y << endl;
+        } else {
+            x = stoi(xStr);
+            y = stoi(yStr);
+        }
+        robots_.push_back(new GenericRobot(name,x,y));
     }
 }
 
@@ -447,34 +587,52 @@ void Battlefield::placeRobots(){
     }
 };
 
-void Battlefield::displayBattlefield() const{
+/**********************************************************************
+ * displayBattlefield
+ * task: Displays the battlefield and any needed players
+ * x and y are the center of the nine square grid when looking
+ * when x = -10 and y = -10, all robots displayed on field (scoutBot)
+ * when x = -5 and y = -5 only current player's position displayed
+ * @param x - the x coordinate of the nine square
+ *        y - the y coordinate of the nine square
+ *********************************************************************/
+void Battlefield::displayBattlefield(int x, int y) const{
     cout << "Display Battlefield";
     cout << endl << "    ";
 
     for (int j=0; j< battlefield_[0].size();j++)
         cout << "   " << right << setfill('0') << setw(2) << j << "";
-
     cout << endl;
 
     for (int i=0; i< battlefield_.size();i++){
         cout << "     ";
-
         for (int j = 0; j < battlefield_[i].size(); j++)
-cout << "+----";
+            cout << "+----";
         cout << "+" << endl;
         cout << "   " << right << setfill('0') << setw(2) << i;
-        
 
         for (int j = 0;j <battlefield_[0].size(); j++){
-if(battlefield_[i][j] == ""){
-    cout << "|" << "    ";
-} else { //placesRobot
-     cout << "|" << "GR";
-     if(numOfRobots_<10)
-        cout << "0";   
-    cout << battlefield_[i][j];
-//    cout << "|" << left << setfill(' ') << setw(10) << battlefield_[i][j];
-}
+            if(battlefield_[i][j] == ""){
+                cout << "|" << "    ";
+            } else { //placesRobot
+                if(x == -10  && y == -10){ //scout  
+                    cout << "|" << "GR";
+                    cout << "0";   
+                    cout << battlefield_[i][j];
+                }else {
+                    if (battlefield_[i][j] == getCurrentPlayer()->getRobotID()){ //general
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
+
+                    if(y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
+                }
+            }
         }
         cout << "|" << endl;
     }
@@ -486,28 +644,26 @@ if(battlefield_[i][j] == ""){
 }
 
 void Battlefield::respawnRobot(int index){
-GenericRobot* destroyed = robots_[index];
-destroyedRobots_.push(destroyed);
-int oldX = destroyed -> getRobotX();
-int oldY = destroyed -> getRobotY();
-battlefield_[oldY][oldX] = ""; //clear the field
+    GenericRobot* destroyed = robots_[index];
+    destroyedRobots_.push(destroyed);
+    int oldX = destroyed -> getRobotX();
+    int oldY = destroyed -> getRobotY();
+    battlefield_[oldY][oldX] = ""; //clear the field
 
-GenericRobot* waiting = destroyedRobots_.front();
-waitingRobots_.push(waiting);
-destroyedRobots_.pop();
-if(!waitingRobots_.empty()){
-GenericRobot* respawn = waitingRobots_.front();
-waitingRobots_.pop();
+    GenericRobot* waiting = destroyedRobots_.front();
+    waitingRobots_.push(waiting);
+    destroyedRobots_.pop();
+    if(!waitingRobots_.empty()){
+        GenericRobot* respawn = waitingRobots_.front();
+        waitingRobots_.pop();
 
-int newX = rand() % (battlefieldRows_);
-int newY = rand() % (battlefieldCols_);
+        int newX = rand() % (battlefieldRows_);
+        int newY = rand() % (battlefieldCols_);
 
-respawn->setRobotX(newX);
-respawn->setRobotY(newY);
-battlefield_[newY][newX]=to_string(respawn->getRobotID());
-
-}
-
+        respawn->setRobotX(newX);
+        respawn->setRobotY(newY);
+        battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    }
 }
 
 void Battlefield::nextTurn(){
@@ -517,20 +673,20 @@ void Battlefield::nextTurn(){
     waitingRobots_.push(front);
 }
 
-// class ScoutBot : public SeeingRobot {
-// private:
-//     int lookCount = 0;
-//     const int maxLooks = 3;
+class ScoutBot : public SeeingRobot {
+    private:
+        int lookCount = 0;
+        const int maxLooks = 3;
 
-// public:
-//     void actionLook(Battlefield* battlefield) override {
-//         if (lookCount < maxLooks) {
-// // Logic to scan the entire battlefield
-// battlefield->scanEntireField(this);
-// lookCount++;
-//         }
-//     }
-// };
+    public:
+        void actionLook(Battlefield* battlefield, int x, int y) override {
+            if (lookCount < maxLooks) {
+                // Logic to scan the entire battlefield
+                battlefield->displayBattlefield(-10, -10);
+                lookCount++;
+            }
+        }
+};
 
 // class TrackBot : public SeeingRobot {
 // private:
