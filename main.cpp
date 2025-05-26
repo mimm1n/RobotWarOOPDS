@@ -514,6 +514,15 @@ void Battlefield::placeRobots(){
     }
 };
 
+/**********************************************************************
+ * displayBattlefield
+ * task: Displays the battlefield and any needed players
+ * x and y are the center of the nine square grid when looking
+ * when x = -10 and y = -10, all robots displayed on field (scoutBot)
+ * when x = -5 and y = -5 only current player's position displayed
+ * @param x - the x coordinate of the nine square
+ *        y - the y coordinate of the nine square
+ *********************************************************************/
 void Battlefield::displayBattlefield(int x, int y) const{
     cout << "Display Battlefield";
     cout << endl << "    ";
@@ -572,18 +581,16 @@ void Battlefield::respawnRobot(int index){
     waitingRobots_.push(waiting);
     destroyedRobots_.pop();
     if(!waitingRobots_.empty()){
-    GenericRobot* respawn = waitingRobots_.front();
-    waitingRobots_.pop();
+        GenericRobot* respawn = waitingRobots_.front();
+        waitingRobots_.pop();
 
-    int newX = rand() % (battlefieldRows_);
-    int newY = rand() % (battlefieldCols_);
+        int newX = rand() % (battlefieldRows_);
+        int newY = rand() % (battlefieldCols_);
 
-    respawn->setRobotX(newX);
-    respawn->setRobotY(newY);
-    battlefield_[newY][newX]=to_string(respawn->getRobotID());
-
-}
-
+        respawn->setRobotX(newX);
+        respawn->setRobotY(newY);
+        battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    }
 }
 
 void Battlefield::nextTurn(){
@@ -602,7 +609,7 @@ class ScoutBot : public SeeingRobot {
         void actionLook(Battlefield* battlefield, int x, int y) override {
             if (lookCount < maxLooks) {
                 // Logic to scan the entire battlefield
-                battlefield->displayBattlefield(x, y); // x = -10, y = -10
+                battlefield->displayBattlefield(-10, -10);
                 lookCount++;
             }
         }
