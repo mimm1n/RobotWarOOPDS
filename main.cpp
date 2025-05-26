@@ -61,6 +61,7 @@ class Battlefield {
         int numOfRobots() { return numOfRobots_; }
         int currentTurn(){ return currentTurn_; }
         string getPlayer(int x, int y){return battlefield_[y][x];}
+        vector <GenericRobot *> getAllRobot() const {return robots_;}
         GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
         
         
@@ -838,26 +839,35 @@ for (int i = 0; i < 3; ++i) {
                 // }
 
 
-//       class BombBot : public ShootingRobot {
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         int cx = getRobotX();
-//         int cy = getRobotY();
+      class BombBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield, int x, int y) override {
 
-//         cout << "BombBot bombed surrounding squares!\n";
+        int cx = battlefield->getCurrentPlayer()->getRobotX();
+        int cy = battlefield->getCurrentPlayer()->getRobotY();
+        int tx, ty;
+        bool invalidCoordinates;
+        string target;
+        cout << "BombBot bombed surrounding squares!\n";
 
-//         for (int dx = -1; dx <= 1; ++dx) {
-//             for (int dy = -1; dy <= 1; ++dy) {
-//                 if (dx == 0 && dy == 0) continue; // Skip self
-//                 int tx = cx + dx;
-//                 int ty = cy + dy;
-
-//                 cout << "Explosion at (" << tx << ", " << ty << ")\n";
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip self
+                tx = cx + dx; 
+                ty = cy + dy;
+                invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
+                cout << "Explosion at (" << tx << ", " << ty << ")\n";
+                if(!invalidCoordinates){
+                   target = battlefield->getPlayer(tx, ty);
+                   if (!target.empty()) { //check if theres any robots at the location
                 
-//             }
-//         }
-//     }
-// };
+                } 
+                }
+                
+            }
+        }
+    }
+};
 
 
 
