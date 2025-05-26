@@ -805,21 +805,41 @@ for (int i = 0; i < 3; ++i) {
 
 
 
-// class HideBot : public ThinkingRobot {
-// private:
-//     int hideTurnsUsed = 0;
-//     const int maxHideTurns = 3;
-//     bool isHidden = false;
+hidebot 
+class HideBot : public ThinkingRobot {
+  private:
+    int hideTurnsUsed = 0;
+    const int maxHideTurns = 3;
+    bool isHidden = false;
 
-// // public:
-// //     void actionThink(Battlefield* battlefield) override {
-// //         if (hideTurnsUsed < maxHideTurns) {
-// // isHidden = true;
-// // hideTurnsUsed++;
-// // battlefield->setHidden(this, true);
-// //         }
-// //     }
-// // };
+ public:
+     void actionThink(Battlefield* battlefield, int x, int y) override {
+        if (hideTurnsUsed < maxHideTurns) {
+         isHidden = true;
+      hideTurnsUsed++;
+      
+      class BombBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int cx = getRobotX();
+        int cy = getRobotY();
+
+        cout << "BombBot bombed surrounding squares!\n";
+
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip self
+                int tx = cx + dx;
+                int ty = cy + dy;
+
+                cout << "Explosion at (" << tx << ", " << ty << ")\n";
+                
+            }
+        }
+    }
+};
+
+
 
 
 // class ReflectShotBot : public ThinkingRobot {
@@ -836,22 +856,5 @@ for (int i = 0; i < 3; ++i) {
 //     }
 // };
 
-// class BombBot : public ShootingRobot {
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         int cx = getX();
-//         int cy = getY();
-
-//         for (int dx = -1; dx <= 1; ++dx) {
-// for (int dy = -1; dy <= 1; ++dy) {
-//     if (dx == 0 && dy == 0) continue; // Skip self
-//     int tx = cx + dx;
-//     int ty = cy + dy;
-//     battlefield->fireAt(tx, ty);
-// }
-//         }
-//         cout << "BombBot bombed surrounding squares!\n";
-//     }
-// };
 
 
