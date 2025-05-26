@@ -615,50 +615,52 @@ class ScoutBot : public SeeingRobot {
         }
 };
 
-// class TrackBot : public SeeingRobot {
-// private:
-//     int trackersUsed = 0;
-//     const int maxTrackers = 3;
-// public:
-//     void actionLook(Battlefield* battlefield) override {
-//         if (trackersUsed < maxTrackers) {
-// Robot* target = battlefield->selectEnemyToTrack();
-// if (target) {
-//     battlefield->trackEnemy(target, this);
-//     trackersUsed++;
-// }
-//         }
-//     }
-// };
-// class LongShotBot : public ShootingRobot {
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         int targetX, targetY;
-//         if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
-// battlefield->fireAt(targetX, targetY);
-//         }
-//     }
-// };
-// class SemiAutoBot : public ShootingRobot {
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         int targetX, targetY;
-//         if (battlefield->getTarget(this, targetX, targetY)) {
-// for (int i = 0; i < 3; ++i) {
-//     battlefield->fireAt(targetX, targetY); // 3 shells
-// }
-//         }
-//     }
-// // };
-// // class ThirtyShotBot : public ShootingRobot {
-// // private:
-// //     int ammo = 0;
+class TrackBot : public SeeingRobot {
+private:
+    int trackersUsed = 0;
+    const int maxTrackers = 3;
+    vector <Robot*> targets;
+public:
+    void actionLook(Battlefield* battlefield, int x, int y) override {
+        if (trackersUsed < maxTrackers) {
+Robot* target = battlefield->selectEnemyToTrack();
+if (target) {
+    battlefield->trackEnemy(target, this);
+    trackersUsed++;
+}
+        }
+    }
+};
 
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         ammo = 30; // Reload
-//     }
-// };
+class LongShotBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int targetX, targetY;
+        if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
+battlefield->fireAt(targetX, targetY);
+        }
+    }
+};
+
+class SemiAutoBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+        int targetX, targetY;
+        if (battlefield->getTarget(this, targetX, targetY)) {
+for (int i = 0; i < 3; ++i) {
+    battlefield->fireAt(targetX, targetY); // 3 shells
+}
+        }
+    }
+};
+
+class ThirtyShotBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield) override {
+    setShells(30); // Reload
+    }
+};
+
 // class HideBot : public ThinkingRobot {
 // private:
 //     int hideTurnsUsed = 0;
@@ -674,41 +676,30 @@ class ScoutBot : public SeeingRobot {
 // //         }
 // //     }
 // // };
-// // class JumpBot : public MovingRobot {
-// // private:
-// //     int jumpsUsed = 0;
-// //     const int maxJumps = 3;
 
-// // public:
-// //     void actionMove(Battlefield* battlefield) override {
-// //         if (jumpsUsed < maxJumps) {
-// // int newX, newY;
-// // battlefield->getRandomLocation(newX, newY);
-// // setLocation(newX, newY);
-// // jumpsUsed++;
-// //         }
-// //     }
-// // };
+class JumpBot : public MovingRobot {
+private:
+    int jumpsUsed = 0;
+    const int maxJumps = 3;
 
-// class HealBot : public ShootingRobot {
-// private:
-//     int health = 3;
-//     const int maxHealth = 3;
-// public:
-//     void actionFire(Battlefield* battlefield) override {
-//         int tx, ty;
-//         if (battlefield->getTarget(this, tx, ty)) {
-// bool destroyed = battlefield->fireAt(tx, ty); // returns true if a robot was destroyed
-// if (destroyed && health < maxHealth) {
-//     health++;
-//     cout << "HealBot gained 1 health! Current health: " << health << endl;
-// } else if (destroyed) {
-//     cout << "HealBot destroyed a robot but is already at max health." << endl;
-// }
-//         }
-//     }
-//     int getHealth() const { return health; }
-// };
+public:
+    void actionMove(Battlefield* battlefield, int x, int y) override {
+        if (jumpsUsed < maxJumps) {
+setRobotX()
+jumpsUsed++;
+        }
+    }
+};
+
+class HealBot : public ShootingRobot {
+public:
+    void actionFire(Battlefield* battlefield, int x, int y) override {
+addLife();
+addLife();
+addLife();
+    }
+};
+
 // class ReflectShotBot : public ThinkingRobot {
 // public:
 //     void actionThink(Battlefield* battlefield) override {
@@ -722,6 +713,7 @@ class ScoutBot : public SeeingRobot {
 //         }
 //     }
 // };
+
 // class BombBot : public ShootingRobot {
 // public:
 //     void actionFire(Battlefield* battlefield) override {
