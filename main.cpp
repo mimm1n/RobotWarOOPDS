@@ -78,7 +78,6 @@ class ThinkingRobot : virtual public Robot{
     public:
         ThinkingRobot(){}
         virtual void actionThink(Battlefield* battlefield) = 0;
-        
 };
 
 class SeeingRobot : virtual public Robot{
@@ -107,45 +106,43 @@ class ShootingRobot : virtual public Robot{
 Upgraded Robot Classes 
 **********************************************************************/
 class ThirtyShotBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield, int x, int y) override {
-    setShells(30); // Reload
-    }
-            virtual void setRobotType(int type){robotType=THIRTYSHOT;}
-        virtual int getRobotType const{ return THIRTYSHOT;}
+    public:
+        void actionFire(Battlefield* battlefield, int x, int y) override { setShells(30); }
+        void setRobotType(int type) override { robotType = THIRTYSHOT; }
+        int getRobotType() const override { return THIRTYSHOT;}
 };
 
 class JumpBot : public MovingRobot {
-private:
-    int jumpsUsed = 0;
-    const int maxJumps = 3;
+    private:
+        int jumpsUsed = 0;
+        const int maxJumps = 3;
 
-public:
-    void actionMove(Battlefield* battlefield, int x, int y) override {
-        if (jumpsUsed < maxJumps) {
-               string targetPosition = battlefield->getPlayer(x, y);
+    public:
+        void actionMove(Battlefield* battlefield, int x, int y) override {
+            if (jumpsUsed < maxJumps) {
+                string targetPosition = battlefield->getPlayer(x, y);
                 if (targetPosition.empty()) { //check if theres any robots at the location
-                setRobotX(x);
-                setRobotY(y);
-                jumpsUsed++;
-                }else{
+                    setRobotX(x);
+                    setRobotY(y);
+                    jumpsUsed++;
+                } else {
                     cout << "Invalid location! There might be a robot there." << endl;
                 }
+            }
         }
-    }
-         void setRobotType(int type){robotType=JUMP;}
-         int getRobotType const{ return JUMP;}
+        void setRobotType(int type) override { robotType = JUMP; }
+        int getRobotType() const override { return JUMP; }
 };
 
 class HealBot : public ShootingRobot {
-public:
-    void actionFire(Battlefield* battlefield, int x, int y) override {
-addLife();
-addLife();
-addLife();
-    }
-        void setRobotType(int type){robotType=HEAL;}
-        int getRobotType const{ return HEAL;}
+    public:
+        void actionFire(Battlefield* battlefield, int x, int y) override {
+            addLife();
+            addLife();
+            addLife();
+        }
+        void setRobotType(int type) override { robotType = HEAL; }
+        int getRobotType() const override { return HEAL; }
 };
 
 class ScoutBot : public SeeingRobot {
@@ -156,13 +153,12 @@ class ScoutBot : public SeeingRobot {
     public:
         void actionLook(Battlefield* battlefield, int x, int y) override {
             if (lookCount < maxLooks) {
-                // Logic to scan the entire battlefield
                 battlefield->displayBattlefield(-10, -10);
                 lookCount++;
             }
         }
-        void setRobotType(int type){robotType=SCOUT;}
-        int getRobotType const{ return SCOUT;}
+        void setRobotType(int type) override { robotType=SCOUT; }
+        int getRobotType() const override { return SCOUT; }
 };
 
 /**********************************************************************
