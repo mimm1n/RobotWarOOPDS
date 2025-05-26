@@ -184,6 +184,79 @@ class HideBot : public MovingRobot{
         }
 };
 
+class BombBot : public ShootingRobot {
+private:
+int bombs = 1;
+public:
+    void actionFire(Battlefield* battlefield, int x, int y) override {
+if(bombs){
+        int cx = battlefield->getCurrentPlayer()->getRobotX();
+        int cy = battlefield->getCurrentPlayer()->getRobotY();
+        int tx, ty, targetRobotId;
+        bool invalidCoordinates;
+        string targetPosition;
+        cout << "BombBot bombed surrounding squares!\n";
+
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip self
+                tx = cx + dx; 
+                ty = cy + dy;
+                invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
+                cout << "Explosion at (" << tx << ", " << ty << ")\n";
+                if(!invalidCoordinates){
+                   targetPosition = battlefield->getPlayer(tx, ty);
+                   if (!targetPosition.empty()) { //check if theres any robots at the location
+                    targetRobotId = stoi(targetPosition);
+                    GenericRobot* target = nullptr; 
+                    
+                    for (GenericRobot* robot : battlefield->getAllRobots()){
+                        if (robot->getRobotID() == targetRobotId) {
+                            target = robot;
+                            break;
+                        }
+                    }
+
+                    if (target) {
+                        target->reduceLife();
+                        if(!target->isAlive()){
+                            cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
+                           
+                        }
+                        incrementKills(); //increment kills for this robot 
+                    }
+                } 
+              }
+                
+            }
+        }
+    }
+    bombs--;
+    }
+};
+
+class ReflectShotBot : public ShootingRobot {
+private:
+int reflect = 1;
+bool isReflect_ = false;
+public:
+void actionFire(Battlefield* battlefield, int x, int y) override {
+if(reflect>0){
+    isReflect_ = true;
+}
+    }
+
+bool isReflecting() {
+    bool name = isReflect_;
+    isReflect_ = false;
+    reflect--;
+    return name;
+
+}
+ 
+};
+
+
 /**********************************************************************
 Generic Robot Class 
 **********************************************************************/
@@ -914,73 +987,7 @@ for (int i = 0; i < 3; ++i) {
                 // }
 
 
-class BombBot : public ShootingRobot {
-private:
-int bombs = 1;
-public:
-    void actionFire(Battlefield* battlefield, int x, int y) override {
-if(bombs){
-        int cx = battlefield->getCurrentPlayer()->getRobotX();
-        int cy = battlefield->getCurrentPlayer()->getRobotY();
-        int tx, ty, targetRobotId;
-        bool invalidCoordinates;
-        string targetPosition;
-        cout << "BombBot bombed surrounding squares!\n";
 
-        for (int dx = -1; dx <= 1; ++dx) {
-            for (int dy = -1; dy <= 1; ++dy) {
-                if (dx == 0 && dy == 0) continue; // Skip self
-                tx = cx + dx; 
-                ty = cy + dy;
-                invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
-                cout << "Explosion at (" << tx << ", " << ty << ")\n";
-                if(!invalidCoordinates){
-                   targetPosition = battlefield->getPlayer(tx, ty);
-                   if (!targetPosition.empty()) { //check if theres any robots at the location
-                    targetRobotId = stoi(targetPosition);
-                    GenericRobot* target = nullptr; 
-                    
-                    for (GenericRobot* robot : battlefield->getAllRobots()){
-                        if (robot->getRobotID() == targetRobotId) {
-                            target = robot;
-                            break;
-                        }
-                    }
-
-                    if (target) {
-                        target->reduceLife();
-                        if(!target->isAlive()){
-                            cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
-                           
-                        }
-                        incrementKills(); //increment kills for this robot 
-                    }
-                } 
-              }
-                
-            }
-        }
-    }
-    bombs--;
-    }
-};
-
-
-
-
-// class ReflectShotBot : public ThinkingRobot {
-// public:
-//     void actionThink(Battlefield* battlefield) override {
-//         // Passive ability: no action needed unless attacked
-//     }
-
-//     void onHit(Robot* attacker, Battlefield* battlefield) {
-//         if (attacker) {
-// cout << "ReflectShotBot reflects the shot back to attacker!\n";
-// battlefield->fireAt(attacker->getX(), attacker->getY());
-//         }
-//     }
-// };
 
 
 
