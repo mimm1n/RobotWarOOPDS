@@ -226,6 +226,7 @@ int main() {
         currentPlayer = battlefield->getCurrentPlayer();
 
         battlefield->displayBattlefield(-5, -5);
+        cout << "Player: " << currentPlayer->getRobotName << endl; 
         cout << "What would you like to do?" << endl;
         cout << "1. Think" << endl;
         cout << "2. Look (x,y)" << endl;
