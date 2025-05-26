@@ -221,6 +221,8 @@ ActionFire()
             int lookX = currentX + x;
             int lookY = currentY + y;
 
+
+
             string targetRobot = battlefield->getPlayer(lookX, lookY);
 
             HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
@@ -262,9 +264,8 @@ ActionFire()
                         targetRobot->reduceLife();
                         if(!targetRobot->isAlive()){
                             cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
-                            incrementKills(); //increment kills for this robot 
                         }
-                            
+                        incrementKills(); //increment kills for this robot 
                     }
                 }
 
@@ -278,13 +279,30 @@ actionMove()
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield, x, y);
-            //
-            //
-            //
-            //
-            //
-            //
-            //
+            else {
+                int currentX = getRobotX();
+                int currentY = getRobotY();
+
+                int nextX = currentX + x;
+                int nextY = currentY + y;
+
+                if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
+                    cout << "Out of bounds." << endl; // check for bounds
+                    return; 
+                }
+
+                // if (battlefield->getPlayer(nextX, nextY) != ""){
+                //     cout << "place taken" << endl;
+                //     return;
+                // } //not sure yet 
+
+                // update positions
+                setRobotX(nextX); 
+                setRobotY(nextY);
+
+                battlefield->
+
+            }
         }
 
 /**********************************************************************
