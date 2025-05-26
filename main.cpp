@@ -207,6 +207,9 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                     }  
                 }
             }
+
+
+
         }
         virtual void actionThink(Battlefield* battlefield)override {
             actionRand();
