@@ -131,7 +131,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         //getter
         int getRobotType() const override { return robotType; }
 
-        virtual void actionFire(Battlefield* battlefield) override {
+        virtual void actionFire(Battlefield* battlefield, int x, int y) override {
         }
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
@@ -152,9 +152,15 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
                 if (targetX >= 0 && targetX < battlefield->battlefieldRows() &&  //check if its in bound 
                 targetY >= 0 && targetY < battlefield->battlefieldCols()) {
                     if(battlefield->battlefield_[lookY][lookX] != ""){
-                        int 
-                    }
-                    
+                        int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
+                        GenericRobot* robotLooked = nullptr;
+                        for (GenericRobot* robot : batthefield->robots_){
+                            if (robot->getRobotID() == lookRobotId) {
+                                robotLooked = robot; 
+                                break;
+                            }
+                        }
+                    }  
                 }
             }
         }
