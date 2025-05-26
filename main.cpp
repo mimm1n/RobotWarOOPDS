@@ -223,7 +223,7 @@ ActionFire()
 
             string targetRobot = battlefield->getPlayer(lookX, lookY);
 
-            Hidebot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
+            HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
             if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
