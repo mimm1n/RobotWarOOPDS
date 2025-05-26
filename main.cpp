@@ -226,11 +226,7 @@ ActionFire()
 
             string targetRobot = battlefield->getPlayer(lookX, lookY);
 
-<<<<<<< HEAD
             Hidebot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
-=======
-            HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
->>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
             if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
@@ -820,7 +816,7 @@ public:
         int currentX = getRobotX();
         int currentY = getRobotY();
 
-        // Strict dx/dy = 3 rule
+        // Validate the target coordinates
         if (!((abs(x) == 3 && abs(y) == 1) || (abs(x) == 1 && abs(y) == 3))) {
             cout << "Target does not match the required dx/dy ratio of 3.\n";
             return;
@@ -829,7 +825,7 @@ public:
         int lookX = currentX + x;
         int lookY = currentY + y;
 
-        // Check if within battlefield bounds
+     // Check if the target coordinates 
         if (lookX < 0 || lookX >= battlefield->battlefieldRows() ||
             lookY < 0 || lookY >= battlefield->battlefieldCols()) {
             cout << "Out of bounds.\n";
@@ -842,10 +838,10 @@ public:
             cout << "Missed! No robot at (" << lookX << ", " << lookY << ")\n";
         } else {
             cout << "LongShotBot hit robot " << targetRobot << " at (" << lookX << ", " << lookY << ")\n";
-            // Optional: Implement damage mechanics like reduceLife()
+        
         }
 
-        // Increment shot count
+    
         shotCount++;
     }
 };
@@ -889,7 +885,6 @@ for (int i = 0; i < 3; ++i) {
                 // }
 
 
-<<<<<<< HEAD
       class BombBot : public ShootingRobot {
 public:
     void actionFire(Battlefield* battlefield, int x, int y) override {
@@ -899,7 +894,6 @@ public:
         int tx, ty;
         bool invalidCoordinates;
         string target;
-=======
 class BombBot : public ShootingRobot {
 private:
 int bombs = 1;
@@ -911,7 +905,6 @@ if(bombs){
         int tx, ty, targetRobotId;
         bool invalidCoordinates;
         string targetPosition;
->>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
         cout << "BombBot bombed surrounding squares!\n";
 
         for (int dx = -1; dx <= 1; ++dx) {
@@ -922,13 +915,11 @@ if(bombs){
                 invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
                 cout << "Explosion at (" << tx << ", " << ty << ")\n";
                 if(!invalidCoordinates){
-<<<<<<< HEAD
                    target = battlefield->getPlayer(tx, ty);
                    if (!target.empty()) { //check if theres any robots at the location
                 
                 } 
                 }
-=======
                    targetPosition = battlefield->getPlayer(tx, ty);
                    if (!targetPosition.empty()) { //check if theres any robots at the location
                     targetRobotId = stoi(targetPosition);
@@ -951,7 +942,6 @@ if(bombs){
                     }
                 } 
               }
->>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
                 
             }
         }
