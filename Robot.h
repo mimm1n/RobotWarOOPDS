@@ -59,13 +59,8 @@ class Robot{
 
         void incrementKills(); // Adds 1 to the kill count
 
-        // // For child classes to rewrite and set new x and y coordinates
-        // void setLocation(int x, int y); 
-
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
         virtual int getRobotType() const = 0;
-
-        //virtual void actions(Battlefield* battlefield) = 0;
 };
 #endif

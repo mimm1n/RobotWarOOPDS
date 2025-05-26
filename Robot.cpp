@@ -132,6 +132,6 @@ bool Robot::isAlive() const{
  * @return killCount - number of kills so far
  *********************************************************************/
 void Robot::incrementKills(){
-killCount++;
+    killCount++;
 }
 
