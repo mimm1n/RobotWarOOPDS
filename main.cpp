@@ -50,9 +50,8 @@ class Battlefield {
         vector<GenericRobot *> robots_; 
         queue<GenericRobot *> destroyedRobots_;
         queue<GenericRobot *> waitingRobots_;  
-
         vector<vector<string>> battlefield_;
-
+        friend class GenericRobot;
     public:
         // Get function
         int battlefieldCols() { return battlefieldCols_; }
@@ -120,7 +119,11 @@ class JumpBot : public MovingRobot {
         const int maxJumps = 3;
 
     public:
+<<<<<<< HEAD
         JumpBot(){}
+=======
+        JumpBot():Robot(){}
+>>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
         void actionMove(Battlefield* battlefield, int x, int y) override {
             if (jumpsUsed < maxJumps) {
                 string targetPosition = battlefield->getPlayer(x, y);
@@ -223,7 +226,11 @@ ActionFire()
 
             string targetRobot = battlefield->getPlayer(lookX, lookY);
 
+<<<<<<< HEAD
             Hidebot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
+=======
+            HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
+>>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
             if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
@@ -374,14 +381,14 @@ actionThink()
             random_device rd; 
             mt19937 gen(rd()); 
             uniform_int_distribution<> distr(0, 10); // define range
-
+            
             actionThink(battlefield);
-            actionLook(battlefield); 
+            actionLook(battlefield, 0, 0); 
 
             int randomInt = distr(gen);
 
             if(randomInt % 2 == 0) { 
-                actionMove(battlefield);
+                actionMove(battlefield, );
                 actionFire(battlefield); 
             }
 
@@ -601,14 +608,6 @@ int main() {
     
     return 0;
 }
-
-// do{
-//     cout << endl << endl;
-//     battlefield.displayBattlefield();
-//     cout << "Turn " << battlefield.currentTurn() << ":" << endl;
-//     battlefield.nextTurn();
-
-// }while(battlefield.currentTurn() != battlefield.turns());
 
 
 /**********************************************************************
@@ -890,6 +889,7 @@ for (int i = 0; i < 3; ++i) {
                 // }
 
 
+<<<<<<< HEAD
       class BombBot : public ShootingRobot {
 public:
     void actionFire(Battlefield* battlefield, int x, int y) override {
@@ -899,6 +899,19 @@ public:
         int tx, ty;
         bool invalidCoordinates;
         string target;
+=======
+class BombBot : public ShootingRobot {
+private:
+int bombs = 1;
+public:
+    void actionFire(Battlefield* battlefield, int x, int y) override {
+if(bombs){
+        int cx = battlefield->getCurrentPlayer()->getRobotX();
+        int cy = battlefield->getCurrentPlayer()->getRobotY();
+        int tx, ty, targetRobotId;
+        bool invalidCoordinates;
+        string targetPosition;
+>>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
         cout << "BombBot bombed surrounding squares!\n";
 
         for (int dx = -1; dx <= 1; ++dx) {
@@ -909,14 +922,41 @@ public:
                 invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
                 cout << "Explosion at (" << tx << ", " << ty << ")\n";
                 if(!invalidCoordinates){
+<<<<<<< HEAD
                    target = battlefield->getPlayer(tx, ty);
                    if (!target.empty()) { //check if theres any robots at the location
                 
                 } 
                 }
+=======
+                   targetPosition = battlefield->getPlayer(tx, ty);
+                   if (!targetPosition.empty()) { //check if theres any robots at the location
+                    targetRobotId = stoi(targetPosition);
+                    GenericRobot* target = nullptr; 
+                    
+                    for (GenericRobot* robot : battlefield->getAllRobots()){
+                        if (robot->getRobotID() == targetRobotId) {
+                            target = robot;
+                            break;
+                        }
+                    }
+
+                    if (target) {
+                        target->reduceLife();
+                        if(!target->isAlive()){
+                            cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
+                           
+                        }
+                        incrementKills(); //increment kills for this robot 
+                    }
+                } 
+              }
+>>>>>>> 14d686825a82ce008228535daf1a6b1c9b451a57
                 
             }
         }
+    }
+    bombs--;
     }
 };
 
