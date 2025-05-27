@@ -190,6 +190,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int upgradeCount = 0; 
         const int MAX_UPGRADE = 3; 
         Robot* robotUpgraded = nullptr; 
+        bool update = false;
     public: 
         GenericRobot(string name, int x, int y) : Robot(x, y, name){
             robotId = robotIncrement; 
@@ -204,18 +205,40 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 ActionFire()
 **********************************************************************/
         virtual void actionFire(Battlefield* battlefield, int x, int y) override {
+            
+            //use get
+            if(getShells() <= 0){
+                cout << "Out of shells!" << endl;
+                return;
+            }
+
+            //set
+            setShells(getShells() - 1);
+            
             int currentX = getRobotX();  // get current pos, center position like (0,0)
             int currentY = getRobotY(); 
 
             int lookX = currentX + x;
             int lookY = currentY + y;
 
-            string targetRobot = battlefield->getPlayer(lookX, lookY);
+
+
+            string targetRobot = battlefield->battlefield_[lookY][lookX];
 
             HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
             if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
+            }
+
+            ReflectShotBot* reflectBot = dynamic_cast<ReflectShotBot*>(targetRobot);
+            if (reflectBot && reflectBot->isReflecting()) {
+                cout << "Shot reflected." << endl;
+                this->reduceLife(); // damage shooter
+
+                if (!this->isAlive()){
+                    cout << "Robot" << this->getRobotID() << " has been destroyed." << endl;
+            }   
             }
 
             while (x != 0 || y!= 0){
@@ -240,7 +263,7 @@ ActionFire()
                     int targetRobotId = stoi(targetRobot);
                     GenericRobot* targetRobot = nullptr; 
                     
-                    for (GenericRobot* robot : battlefield->getAllRobots()){
+                    for (GenericRobot* robot : battlefield->robots_){
                         if (robot->getRobotID() == targetRobotId) {
                             targetRobot = robot;
                             break;
@@ -251,9 +274,18 @@ ActionFire()
                         targetRobot->reduceLife();
                         if(!targetRobot->isAlive()){
                             cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
-                            incrementKills(); //increment kills for this robot 
                         }
-                            
+                        
+                        incrementKills(); //increment kills for this robot
+                        upgrade = true;
+                        
+                        if (getUpgradeCount() < MAX_UPGRADE){
+                            int chosenUpgrade = getRobotType();
+                            upgradeRobot(chosenUpgrade);
+                        } else {
+                            cout << "Max upgrade reached." << endl;
+                        }
+
                     }
                 }
 
@@ -267,13 +299,33 @@ actionMove()
         virtual void actionMove(Battlefield* battlefield, int x, int y) override {
             if(robotUpgraded)
                 robotUpgraded->actionMove(battlefield, x, y);
-            //
-            //
-            //
-            //
-            //
-            //
-            //
+            else {
+                int currentX = getRobotX();
+                int currentY = getRobotY();
+
+                int nextX = currentX + x;
+                int nextY = currentY + y;
+
+                if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
+                    cout << "Out of bounds." << endl; // check for bounds
+                    return; 
+                }
+
+                // if (battlefield->battlefield_[nextY][nextX] != ""){ //checks if position is taken 
+                //     cout << "place taken" << endl;
+                //     return;
+                // }
+
+                battlefield->battlefield_[currentY][currentX] = "";
+
+                battlefield->battlefield_[nextY][nextX] = to_string(robotId);
+
+                // update positions
+                setRobotX(nextX); 
+                setRobotY(nextY);
+
+                cout << "Robot " getRobotID() << "move to position (" << nextX << ", " << nextY << ")" << endl;
+            }
         }
 
 /**********************************************************************
@@ -292,10 +344,10 @@ actionLook()
                     int lookY = currentY + dy;
 
                 
-                    if(battlefield->getPlayer(lookX, lookY) != ""){
-                        int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY)); // find the id of the robot currently in that position 
+                    if((battlefield->battlefield_[lookY][lookX]) != ""){
+                        int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
-                        for (GenericRobot* robot : battlefield->getAllRobots()){
+                        for (GenericRobot* robot : battlefield->robots_){
                             if (robot->getRobotID() == lookRobotId) {
                                 robotLooked = robot; 
                                 break;
@@ -308,13 +360,16 @@ actionLook()
 /**********************************************************************
 actionThink()
 **********************************************************************/
-        virtual void actionThink(Battlefield* battlefield)override {
-            actionRand(battlefield);
+        virtual void actionThink(Battlefield* battlefield, int x, int y) override {
+            actionRand(battlefield, x, y);
 
             if(robotUpgraded)
                 robotUpgraded->actionThink(battlefield);
         }
 
+/**********************************************************************
+upgradeRobot()
+**********************************************************************/
         void upgradeRobot(int upgradeType){
             if (upgradeCount >= MAX_UPGRADE) { 
                 cout << "Max upgrade reached." ; 
@@ -357,26 +412,68 @@ actionThink()
             }
 
             upgradeCount++;
+            upgrade = false;
         }
 
-        void actionRand(Battlefield* battlefield){
+        bool toUpgrade() const {
+            return upgradeCount < MAX_UPGRADE && upgrade; 
+        }
+
+        void ToGeneric(int upgradeType) {
+            delete robotUpgraded;
+            robotUpgraded = nullptr;
+            robotType = GENERIC;
+        }
+
+        int getUpgradeCount() const {
+            return upgradeCount; 
+        }
+
+/**********************************************************************
+actionRand()
+**********************************************************************/
+        void actionRand(Battlefield* battlefield, int x, int y){
+
             random_device rd; 
             mt19937 gen(rd()); 
-            uniform_int_distribution<> distr(0, 10); // define range
+            uniform_int_distribution<> posDistr(0, 8);
+
+            int directionMove = posDistr(gen);
+
+            int currentX = getRobotX();
+            int currentY = getRobotY();
+
+            int moveX = 0, moveY = 0;
+
+            switch(directionMove){
+                case 0: moveX = -1; moveY = -1; break;  // topleft
+                case 1: moveX =  0; moveY = -1; break;  // top
+                case 2: moveX =  1; moveY = -1; break;  // topright
+                case 3: moveX = -1; moveY =  0; break;  // left
+                case 4: moveX =  1; moveY =  0; break;  // right
+                case 5: moveX = -1; moveY =  1; break;  // bottomleft
+                case 6: moveX =  0; moveY =  1; break;  // bottom
+                case 7: moveX =  1; moveY =  1; break;  // bottomright
+                case 8: moveX =  0; moveY =  0; break;  // stay in place
+            }
+
+            random_device rd2; 
+            mt19937 gen(rd2()); 
+            uniform_int_distribution<> actionDistr(0, 10); // define range
             
             actionThink(battlefield);
             actionLook(battlefield, 0, 0); 
 
-            int randomInt = distr(gen);
+            int randomInt = actionDistr(gen);
 
             if(randomInt % 2 == 0) { 
-                actionMove(battlefield, );
+                actionMove(battlefield, moveX, moveY);
                 actionFire(battlefield); 
             }
 
             else if(randomInt % 2 == 1){
             actionFire(battlefield);
-            actionMove(battlefield); 
+            actionMove(battlefield, moveX, moveY);
             }
         }
 };
