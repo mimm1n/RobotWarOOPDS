@@ -214,6 +214,16 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
 ActionFire()
 **********************************************************************/
         virtual void actionFire(Battlefield* battlefield, int x, int y) override {
+            
+            //use get
+            if(getShells() <= 0){
+                cout << "Out of shells!" << endl;
+                return;
+            }
+
+            //set
+            setShells(getShells() - 1);
+            
             int currentX = getRobotX();  // get current pos, center position like (0,0)
             int currentY = getRobotY(); 
 
@@ -264,7 +274,10 @@ ActionFire()
                         if(!targetRobot->isAlive()){
                             cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
                         }
+                        
                         incrementKills(); //increment kills for this robot 
+                        upgradeRobot(XXXXX);
+
                     }
                 }
 
@@ -290,10 +303,10 @@ actionMove()
                     return; 
                 }
 
-                // if (battlefield->battlefield_[nextY][nextX] != ""){
+                // if (battlefield->battlefield_[nextY][nextX] != ""){ //checks if position is taken 
                 //     cout << "place taken" << endl;
                 //     return;
-                // } //not sure yet 
+                // }
 
                 battlefield->battlefield_[currentY][currentX] = "";
 
