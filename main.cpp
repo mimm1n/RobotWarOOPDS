@@ -276,7 +276,13 @@ ActionFire()
                         }
                         
                         incrementKills(); //increment kills for this robot 
-                        upgradeRobot(XXXXX);
+                        
+                        if (getUpgradeCount() < MAX_UPGRADE){
+                            int chosenUpgrade = getRobotType();
+                            upgradeRobot(chosenUpgrade);
+                        } else {
+                            cout << "Max upgrade reached." << endl;
+                        }
 
                     }
                 }
@@ -406,9 +412,13 @@ upgradeRobot()
             upgradeCount++;
         }
 
-        void downgradeToGeneric(int upgradeType) {
-            delete upgradedRobot;
-            upgradedRobot = nullptr;
+        bool toUpgrade() const {
+            return upgradeCount < MAX_UPGRADE && 
+        }
+
+        void ToGeneric(int upgradeType) {
+            delete robotUpgraded;
+            robotUpgraded = nullptr;
             robotType = GENERIC;
         }
 
