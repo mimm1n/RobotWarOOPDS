@@ -194,6 +194,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int upgradeCount = 0; 
         const int MAX_UPGRADE = 3; 
         Robot* robotUpgraded = nullptr; 
+        update = false;
     public: 
         GenericRobot(string name, int x, int y) : Robot(x, y, name){
             robotId = robotIncrement; 
@@ -275,7 +276,8 @@ ActionFire()
                             cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
                         }
                         
-                        incrementKills(); //increment kills for this robot 
+                        incrementKills(); //increment kills for this robot
+                        upgrade = true;
                         
                         if (getUpgradeCount() < MAX_UPGRADE){
                             int chosenUpgrade = getRobotType();
@@ -410,10 +412,11 @@ upgradeRobot()
             }
 
             upgradeCount++;
+            upgrade = false;
         }
 
         bool toUpgrade() const {
-            return upgradeCount < MAX_UPGRADE && 
+            return upgradeCount < MAX_UPGRADE && upgrade; 
         }
 
         void ToGeneric(int upgradeType) {
