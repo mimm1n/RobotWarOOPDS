@@ -947,48 +947,152 @@ bool ReflectShotBot::isReflecting() {
 }
 
 
-// class TrackBot : public SeeingRobot {
-// private:
-//     int trackersUsed = 0;
-//     const int maxTrackers = 3;
-//     vector <int> targets;
-// public:
-//     void actionLook(Battlefield* battlefield, int x, int y) override {
-//         if (trackersUsed < maxTrackers) {
-//                string target = battlefield->battlefield_[y][x];
-//                 if (!target.empty()) { //check if theres any robots at the location
-//                 setRobotX(x);
-//                 setRobotY(y);
-// // Robot* target = battlefield->selectEnemyToTrack();
-// // if (target) {
-// //     battlefield->trackEnemy(target, this);
-// //     trackersUsed++;
-// }
-//         }
-//     }
-// };
+class TrackBot : public SeeingRobot {
+private:
+    int trackersUsed = 0;
+    const int maxTrackers = 3;
+    vector<int> targets;
 
-class LongShotBot : public ShootingRobot {
 public:
-    void actionFire(Battlefield* battlefield) override {
-        int targetX, targetY;
-        if (battlefield->getTargetWithinRange(this, 3, targetX, targetY)) {
-battlefield->fireAt(targetX, targetY);
+    void actionLook(Battlefield* battlefield, int x, int y) override {
+        if (robotUpgraded)
+            robotUpgraded->actionLook(battlefield, -10, -10);
+
+        int currentX = getRobotX();
+        int currentY = getRobotY();
+
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                int lookX = currentX + dx;
+                int lookY = currentY + dy;
+
+                if (lookX < 0 || lookX >= battlefield->battlefieldCols() || 
+                    lookY < 0 || lookY >= battlefield->battlefieldRows()) {
+                    continue; // skip invalid 
+                }
+
+                string idStr = battlefield->getPlayer(lookX, lookY);
+                if (!idStr.empty()) {
+                    int robotId = stoi(idStr);
+
+                    if (find(targets.begin(), targets.end(), robotId) == targets.end()) {
+                        // Find robot object
+                        for (GenericRobot* robot : battlefield->getAllRobots()) {
+                            if (robot->getRobotID() == robotId) {
+                                targets.push_back(robotId);
+                                trackersUsed++;
+                                cout << "TrackBot is now tracking robot ID: " << robotId << endl;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (trackersUsed >= maxTrackers)
+                        return;
+                }
+            }
         }
     }
 };
-
 class SemiAutoBot : public ShootingRobot {
 public:
-    void actionFire(Battlefield* battlefield) override {
-        int targetX, targetY;
-        if (battlefield->getTarget(this, targetX, targetY)) {
-for (int i = 0; i < 3; ++i) {
-    battlefield->fireAt(targetX, targetY); // 3 shells
-}
+    void actionFire(Battlefield* battlefield, int x, int y) override {
+        int currentX = getRobotX();
+        int currentY = getRobotY();
+
+        int targetX = currentX + x;
+        int targetY = currentY + y;
+
+        // Bounds check
+        if (targetX < 0 || targetX >= battlefield->battlefieldCols() ||
+            targetY < 0 || targetY >= battlefield->battlefieldRows()) {
+            cout << "Out of bounds.\n";
+            return;
+        }
+
+        string targetStr = battlefield->getPlayer(targetX, targetY);
+
+        if (targetStr.empty()) {
+            cout << "Missed! No robot at (" << targetX << ", " << targetY << ")\n";
+            return;
+        }
+
+        int targetID = stoi(targetStr);
+        GenericRobot* target = nullptr;
+
+        for (GenericRobot* robot : battlefield->getAllRobots()) {
+            if (robot->getRobotID() == targetID) {
+                target = robot;
+                break;
+            }
+        }
+
+        if (!target) {
+            cout << "Target robot not found.\n";
+            return;
+        }
+
+        // Fire 3 guaranteed hits
+        for (int i = 0; i < 3; ++i) {
+            target->reduceLife();
+            cout << "Shot #" << (i + 1) << ": Hit! Robot " << target->getRobotID() << " took damage.\n";
+
+            if (!target->isAlive()) {
+                cout << "Robot " << target->getRobotID() << " has been destroyed.\n";
+                incrementKills();
+                break; // Stop firing if destroyed
+            }
         }
     }
+
+    void setRobotType(int type) override { robotType = SEMIAUTO; }
+    int getRobotType() const override { return SEMIAUTO; }
 };
+class LongShotBot : public ShootingRobot {
+private:
+    int shotCount = 0;  // Track number of fired shots
+
+public:
+    virtual void actionFire(Battlefield* battlefield, int x, int y) override {
+        // Enforce three-shot limit
+        if (shotCount >= 3) {
+            cout << "No more shots left! LongShotBot has fired its maximum shells.\n";
+            return;
+        }
+
+        int currentX = getRobotX();
+        int currentY = getRobotY();
+
+        // Validate the target coordinates
+        if (!((abs(x) == 3 && abs(y) == 1) || (abs(x) == 1 && abs(y) == 3))) {
+            cout << "Target does not match the required dx/dy ratio of 3.\n";
+            return;
+        }
+
+        int lookX = currentX + x;
+        int lookY = currentY + y;
+
+     // Check if the target coordinates 
+        if (lookX < 0 || lookX >= battlefield->battlefieldRows() ||
+            lookY < 0 || lookY >= battlefield->battlefieldCols()) {
+            cout << "Out of bounds.\n";
+            return;
+        }
+
+        // Check for a robot at the target location
+        string targetRobot = battlefield->getPlayer(lookX, lookY);
+        if (targetRobot.empty()) {
+            cout << "Missed! No robot at (" << lookX << ", " << lookY << ")\n";
+        } else {
+            cout << "LongShotBot hit robot " << targetRobot << " at (" << lookX << ", " << lookY << ")\n";
+        
+        }
+
+    
+        shotCount++;
+    }
+};
+
                 // random_device rd;
                 // mt19937 gen(rd());
                 // uniform_int_distribution<> distr(1, 100); // 1 to 100 randomiser
@@ -1018,5 +1122,5 @@ for (int i = 0; i < 3; ++i) {
 
 
 
-
+// t
 
