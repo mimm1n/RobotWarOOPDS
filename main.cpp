@@ -445,7 +445,7 @@ actionRand()
 
             int moveX = 0, moveY = 0;
 
-            switch(direction){
+            switch(directionMove){
                 case 0: moveX = -1; moveY = -1; break;  // topleft
                 case 1: moveX =  0; moveY = -1; break;  // top
                 case 2: moveX =  1; moveY = -1; break;  // topright
