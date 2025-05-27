@@ -24,7 +24,7 @@
 #include <string>
 using namespace std;
 
-enum RobotType {SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+enum RobotType {GENERIC, SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
 
 class Robot{
     private:
@@ -35,7 +35,7 @@ class Robot{
         int killCount = 0; // Number of robots this robot managed to destroy/kill
         int lives = 3; // Number of lives of this robot (initial is 3)
         int robotId = -1; // The ID of this robot
-        int robotType = -1; // This robot's type; Jump, Hide, etc.
+        int robotType = GENERIC; // This robot's type; Jump, Hide, etc.
 
     public:
         Robot(int x, int y, string name); // Constructor
