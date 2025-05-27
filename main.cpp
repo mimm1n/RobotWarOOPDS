@@ -111,7 +111,7 @@ class ScoutBot : public SeeingRobot{
         const int maxLooks = 3;
 
     public:
-        ScoutBot(){}
+        ScoutBot(int x, int y, string name):Robot( x, y, name){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void setRobotType(int type) override { robotType = SCOUT; }
         int getRobotType() const override { return SCOUT; }
@@ -124,7 +124,7 @@ class HideBot : public MovingRobot{
         bool isHidden_ = false;
 
     public:
-        HideBot(){}
+        HideBot(int x, int y, string name):Robot( x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         bool isHidden() const { return isHidden_; }
         void setRobotType(int type) override { robotType = HIDE; }
@@ -137,7 +137,7 @@ class JumpBot : public MovingRobot {
         const int maxJumps = 3;
 
     public:
-        JumpBot():Robot(){}
+        JumpBot(int x, int y, string name):Robot( x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void setRobotType(int type) override { robotType = JUMP; }
         int getRobotType() const override { return JUMP; }
@@ -145,7 +145,7 @@ class JumpBot : public MovingRobot {
 
 class ThirtyShotBot : public ShootingRobot {
     public:
-        ThirtyShotBot(){}
+        ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override { setShells(30); }
         void setRobotType(int type) override { robotType = THIRTYSHOT; }
         int getRobotType() const override { return THIRTYSHOT;}
@@ -153,7 +153,7 @@ class ThirtyShotBot : public ShootingRobot {
 
 class HealBot : public ShootingRobot {
     public:
-        HealBot(){}
+        HealBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void setRobotType(int type) override { robotType = HEAL; }
         int getRobotType() const override { return HEAL; }
@@ -163,6 +163,7 @@ class BombBot : public ShootingRobot {
     private:
         int bombs = 1;
     public:
+        BombBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void setRobotType(int type) override { robotType = BOMB; }
         int getRobotType() const override { return BOMB; }
@@ -173,6 +174,7 @@ class ReflectShotBot : public ShootingRobot {
         int reflect = 1;
         bool isReflect_ = false;
     public:
+        ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         bool isReflecting();
         void setRobotType(int type) override { robotType = REFLECTSHOT; }
@@ -190,7 +192,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int upgradeCount = 0; 
         const int MAX_UPGRADE = 3; 
         Robot* robotUpgraded = nullptr; 
-        bool update = false;
+        bool upgrade = false;
     public: 
         GenericRobot(string name, int x, int y) : Robot(x, y, name){
             robotId = robotIncrement; 
@@ -223,10 +225,17 @@ ActionFire()
 
 
 
-            string targetRobot = battlefield->battlefield_[lookY][lookX];
+            string targetRobotId = stoi(battlefield->battlefield_[lookY][lookX]);
+
+            for (GenericRobot* robot : battlefield->robots_){
+                        if (robot->getRobotID() == targetRobotId) {
+                            targetRobotId = robot;
+                            break;
+                        }
+            }
 
             HideBot* hiddenRobot = dynamic_cast<HideBot*>(targetRobot);
-            if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
+            if (hiddenRobot != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
             }
@@ -324,7 +333,7 @@ actionMove()
                 setRobotX(nextX); 
                 setRobotY(nextY);
 
-                cout << "Robot " getRobotID() << "move to position (" << nextX << ", " << nextY << ")" << endl;
+                cout << "Robot " << getRobotID() << "move to position (" << nextX << ", " << nextY << ")" << endl;
             }
         }
 
@@ -360,7 +369,7 @@ actionLook()
 /**********************************************************************
 actionThink()
 **********************************************************************/
-        virtual void actionThink(Battlefield* battlefield, int x, int y) override {
+        virtual void actionThink(Battlefield* battlefield) override {
             actionRand(battlefield, x, y);
 
             if(robotUpgraded)
@@ -375,37 +384,39 @@ upgradeRobot()
                 cout << "Max upgrade reached." ; 
                 return; 
             }
-
+            int x = getCurrentPlayer()->getRobotX();
+            int y = getCurrentPlayer()->getRobotY();
+            string name = getCurrentPlayer()->getRobotName();
             switch(upgradeType){
                 case 1:
-                    robotUpgraded = new ScoutBot();
+                    robotUpgraded = new ScoutBot(x, y, name);
                     break;
                 case 2:
-                    robotUpgraded = new TrackBot();
+                    robotUpgraded = new TrackBot(x, y, name);
                     break;
                 case 3:
-                    robotUpgraded = new LongShotBot();
+                    robotUpgraded = new LongShotBot(x, y, name);
                     break;
                 case 4:
-                    robotUpgraded = new SemiAutoBot();
+                    robotUpgraded = new SemiAutoBot(x, y, name);
                     break;
                 case 5:
-                    robotUpgraded = new ThirtyShotBot();
+                    robotUpgraded = new ThirtyShotBot(x, y, name);
                     break;
                 case 6:
-                    robotUpgraded = new JumpBot();
+                    robotUpgraded = new JumpBot(x, y, name);
                     break;
                 case 7:
-                    robotUpgraded = new HideBot();
+                    robotUpgraded = new HideBot(x, y, name);
                     break;
                 case 8:
-                    robotUpgraded = new ReflectShotBot();
+                    robotUpgraded = new ReflectShotBot(x, y, name);
                     break;
                 case 9:
-                    robotUpgraded = new HealBot();
+                    robotUpgraded = new HealBot(x, y, name);
                     break;
                 case 10:
-                    robotUpgraded = new BombBot();
+                    robotUpgraded = new BombBot(x, y, name);
                     break;
                 default: 
                     return;
@@ -492,7 +503,7 @@ int main() {
         currentPlayer = battlefield->getCurrentPlayer();
 
         battlefield->displayBattlefield(-5, -5);
-        cout << "Player: " << currentPlayer->getRobotName << endl; 
+        cout << "Player: " << currentPlayer()->getRobotName() << endl; 
         cout << "What would you like to do?" << endl;
         cout << "1. Think" << endl;
         cout << "2. Look (x,y)" << endl;
