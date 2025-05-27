@@ -105,49 +105,6 @@ class ShootingRobot : virtual public Robot{
 /**********************************************************************
 Upgraded Robot Classes 
 **********************************************************************/
-class ThirtyShotBot : public ShootingRobot {
-    public:
-        ThirtyShotBot(){}
-        void actionFire(Battlefield* battlefield, int x, int y) override { setShells(30); }
-        void setRobotType(int type) override { robotType = THIRTYSHOT; }
-        int getRobotType() const override { return THIRTYSHOT;}
-};
-
-class JumpBot : public MovingRobot {
-    private:
-        int jumpsUsed = 0;
-        const int maxJumps = 3;
-
-    public:
-        JumpBot():Robot(){}
-        void actionMove(Battlefield* battlefield, int x, int y) override {
-            if (jumpsUsed < maxJumps) {
-                string targetPosition = battlefield->getPlayer(x, y);
-                if (targetPosition.empty()) { //check if theres any robots at the location
-                    setRobotX(x);
-                    setRobotY(y);
-                    jumpsUsed++;
-                } else {
-                    cout << "Invalid location! There might be a robot there." << endl;
-                }
-            }
-        }
-        void setRobotType(int type) override { robotType = JUMP; }
-        int getRobotType() const override { return JUMP; }
-};
-
-class HealBot : public ShootingRobot {
-    public:
-        HealBot(){}
-        void actionFire(Battlefield* battlefield, int x, int y) override {
-            addLife();
-            addLife();
-            addLife();
-        }
-        void setRobotType(int type) override { robotType = HEAL; }
-        int getRobotType() const override { return HEAL; }
-};
-
 class ScoutBot : public SeeingRobot{
     private:
         int lookCount = 0;
@@ -155,13 +112,8 @@ class ScoutBot : public SeeingRobot{
 
     public:
         ScoutBot(){}
-        void actionLook(Battlefield* battlefield, int x, int y) override {
-            if (lookCount < maxLooks) {
-                battlefield->displayBattlefield(-10, -10);
-                lookCount++;
-            }
-        }
-        void setRobotType(int type) override { robotType=SCOUT; }
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void setRobotType(int type) override { robotType = SCOUT; }
         int getRobotType() const override { return SCOUT; }
 };
 
@@ -173,89 +125,60 @@ class HideBot : public MovingRobot{
 
     public:
         HideBot(){}
-        void actionMove(Battlefield* battlefield, int x, int y) override {
-            if (hideTurnsUsed < maxHideTurns) {
-            isHidden_ = true;
-            hideTurnsUsed++;
-            }
-        }
-        bool isHidden() const{
-            return isHidden_;
-        }
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        bool isHidden() const { return isHidden_; }
+        void setRobotType(int type) override { robotType = HIDE; }
+        int getRobotType() const override { return HIDE; }
+};
+
+class JumpBot : public MovingRobot {
+    private:
+        int jumpsUsed = 0;
+        const int maxJumps = 3;
+
+    public:
+        JumpBot():Robot(){}
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void setRobotType(int type) override { robotType = JUMP; }
+        int getRobotType() const override { return JUMP; }
+};
+
+class ThirtyShotBot : public ShootingRobot {
+    public:
+        ThirtyShotBot(){}
+        void actionFire(Battlefield* battlefield, int x, int y) override { setShells(30); }
+        void setRobotType(int type) override { robotType = THIRTYSHOT; }
+        int getRobotType() const override { return THIRTYSHOT;}
+};
+
+class HealBot : public ShootingRobot {
+    public:
+        HealBot(){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void setRobotType(int type) override { robotType = HEAL; }
+        int getRobotType() const override { return HEAL; }
 };
 
 class BombBot : public ShootingRobot {
-private:
-int bombs = 1;
-public:
-    void actionFire(Battlefield* battlefield, int x, int y) override {
-if(bombs){
-        int cx = battlefield->getCurrentPlayer()->getRobotX();
-        int cy = battlefield->getCurrentPlayer()->getRobotY();
-        int tx, ty, targetRobotId;
-        bool invalidCoordinates;
-        string targetPosition;
-        cout << "BombBot bombed surrounding squares!\n";
-
-        for (int dx = -1; dx <= 1; ++dx) {
-            for (int dy = -1; dy <= 1; ++dy) {
-                if (dx == 0 && dy == 0) continue; // Skip self
-                tx = cx + dx; 
-                ty = cy + dy;
-                invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
-                cout << "Explosion at (" << tx << ", " << ty << ")\n";
-                if(!invalidCoordinates){
-                   targetPosition = battlefield->getPlayer(tx, ty);
-                   if (!targetPosition.empty()) { //check if theres any robots at the location
-                    targetRobotId = stoi(targetPosition);
-                    GenericRobot* target = nullptr; 
-                    
-                    for (GenericRobot* robot : battlefield->getAllRobots()){
-                        if (robot->getRobotID() == targetRobotId) {
-                            target = robot;
-                            break;
-                        }
-                    }
-
-                    if (target) {
-                        target->reduceLife();
-                        if(!target->isAlive()){
-                            cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
-                           
-                        }
-                        incrementKills(); //increment kills for this robot 
-                    }
-                } 
-              }
-                
-            }
-        }
-    }
-    bombs--;
-    }
+    private:
+        int bombs = 1;
+    public:
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void setRobotType(int type) override { robotType = BOMB; }
+        int getRobotType() const override { return BOMB; }
 };
 
 class ReflectShotBot : public ShootingRobot {
-private:
-int reflect = 1;
-bool isReflect_ = false;
-public:
-void actionFire(Battlefield* battlefield, int x, int y) override {
-if(reflect>0){
-    isReflect_ = true;
-}
-    }
-
-bool isReflecting() {
-    bool name = isReflect_;
-    isReflect_ = false;
-    reflect--;
-    return name;
-
-}
+    private:
+        int reflect = 1;
+        bool isReflect_ = false;
+    public:
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        bool isReflecting();
+        void setRobotType(int type) override { robotType = REFLECTSHOT; }
+        int getRobotType() const override { return REFLECTSHOT; }
  
 };
-
 
 /**********************************************************************
 Generic Robot Class 
@@ -274,14 +197,8 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         }
 
         int getRobotID() const { return robotId; }
-
-        //setter
-        void setRobotType(int type) override {
-            robotType = type;
-        }
-
-        //getter
-        int getRobotType() const override { return robotType; }
+        void setRobotType(int type) override { robotType = type; } //setter
+        int getRobotType() const override { return robotType; } //getter
 
 /**********************************************************************
 ActionFire()
@@ -464,7 +381,7 @@ actionThink()
         }
 };
 
-int GenericRobot::robotIncrement = 0;
+int GenericRobot::robotIncrement = 1;
 
 int main() {
     int option, x, y, choice, numOfKills;
@@ -490,7 +407,7 @@ int main() {
             else if (currentPlayer->getRobotType() == TRACK)
                 cout << "5. Track (plant tracker on another robot)" << endl;
             else if (currentPlayer->getRobotType() == LONGSHOT)
-                cout << "5. Fire a long shot (see entire battlefield)" << endl;
+                cout << "5. Fire a long shot (shoot up to 3 squares away from you)" << endl;
             else if (currentPlayer->getRobotType() == SEMIAUTO)
                 cout << "You have the SemiAuto upgrade! Each shot you fire shoots 3 consecutive shots." << endl;
             else if (currentPlayer->getRobotType() == JUMP)
@@ -586,28 +503,47 @@ int main() {
                 }
                 numOfKills = currentPlayer->getKills();
                 currentPlayer->actionFire(battlefield, x, y);
-                 if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
-                        cout << "Congratulations! You shoot a robot. Choose your upgrade: " << endl;
-                        cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3.
-                         JumpBot (x,y)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
-                        cin >> choice;
-                            switch(choice){
+                if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
+                    cout << "Congratulations! You shoot a robot. Choose your upgrade: " << endl;
+                    cout << "1. Scout Bot (see entire battlefield)\n2. Track Bot (plant tracker on another robot) \n3. ";
+                    cout << "Long Shot Bot (shoot up to 3 squares away from you)\n4. Semi Auto Bot (each shot you fire shoots 3 consecutive shots)\n";
+                    cout << "5. Thirty Shot Bot (get 30 shells but replaces old shells)\n6. Jump Bot (jump to anywhere on battlefield)\n";
+                    cout << "7. Hide Bot (can't be seen or shot at by other robots)\n8. Reflect Shot Bot (if a robot shoots at you it will be reflected back at them)\n";
+                    cout << "9. Heal Bot (gain 3 more lives)\n8. Bomb Bot (shoot all 8 neighbouring locations)\n";
+                    cin >> choice;
+                    switch(choice){
                     case 1: 
-                            currentPlayer->upgradeRobot(SCOUT);
+                        currentPlayer->upgradeRobot(SCOUT);
                         break;
                     case 2:
-                            currentPlayer->upgradeRobot(TRACK);
+                        currentPlayer->upgradeRobot(TRACK);
                         break;
                     case 3:
-                            currentPlayer->upgradeRobot(JUMP);
+                        currentPlayer->upgradeRobot(LONGSHOT);
                         break;
                     case 4:
-                            currentPlayer->upgradeRobot(HIDE);
+                        currentPlayer->upgradeRobot(SEMIAUTO);
                         break;
-                    default:
+                    case 5:
+                        currentPlayer->upgradeRobot(THIRTYSHOT);
                         break;
+                    case 6:
+                        currentPlayer->upgradeRobot(JUMP);
+                        break;
+                    case 7: 
+                        currentPlayer->upgradeRobot(HIDE);
+                        break;
+                    case 8:
+                        currentPlayer->upgradeRobot(REFLECTSHOT);
+                        break;
+                    case 9:
+                        currentPlayer->upgradeRobot(HEAL);
+                        break;
+                    case 10:
+                        currentPlayer->upgradeRobot(BOMB);
+                        break;
+                    }
                 }
-                        }
                 battlefield->nextTurn();
                 break;
             case 4: // Move
@@ -664,29 +600,27 @@ int main() {
                             if (invalidCoordinates || tooLongShot)
                                 cout << "Invalid location entered!" << endl;
                         } while (invalidCoordinates || tooLongShot);
-                         numOfKills = currentPlayer->getKills();
+                        numOfKills = currentPlayer->getKills();
                         currentPlayer->actionFire(battlefield, x, y);
-                         if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
-                        cout << "Congratulations! You bomb a robot. Choose your upgrade: " << endl;
-                        cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3.
-                         JumpBot (x,y)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
-                        cin >> choice;
+                        if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
+                            cout << "Congratulations! You bomb a robot. Choose your upgrade: " << endl;
+                            cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3. ";
+                            cout << "JumpBot (jump to anywhere on battlefield)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
+                            cin >> choice;
                             switch(choice){
-                    case 1: 
-                            currentPlayer->upgradeRobot(SCOUT);
-                        break;
-                    case 2:
-                            currentPlayer->upgradeRobot(TRACK);
-                        break;
-                    case 3:
-                            currentPlayer->upgradeRobot(JUMP);
-                        break;
-                    case 4:
-                            currentPlayer->upgradeRobot(HIDE);
-                        break;
-                    default:
-                        break;
-                }
+                                case 1: 
+                                    currentPlayer->upgradeRobot(SCOUT);
+                                    break;
+                                case 2:
+                                    currentPlayer->upgradeRobot(TRACK);
+                                    break;
+                                case 3:
+                                    currentPlayer->upgradeRobot(JUMP);
+                                    break;
+                                case 4:
+                                    currentPlayer->upgradeRobot(HIDE);
+                                    break;
+                            }
                         }
                         battlefield->nextTurn();
                     } else if (currentPlayer->getRobotType() == JUMP){
@@ -707,26 +641,24 @@ int main() {
                         numOfKills = currentPlayer->getKills();
                         currentPlayer->actionFire(battlefield, -5, -5);
                         if(numOfKills<currentPlayer->getKills() && currentPlayer->toUpgrade()){
-                        cout << "Congratulations! You bomb a robot. Choose your upgrade: " << endl;
-                        cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3.
-                         JumpBot (x,y)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
-                        cin >> choice;
+                            cout << "Congratulations! You bomb a robot. Choose your upgrade: " << endl;
+                            cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3. ";
+                            cout << "JumpBot (jump to anywhere on battlefield)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
+                            cin >> choice;
                             switch(choice){
-                    case 1: 
-                            currentPlayer->upgradeRobot(SCOUT);
-                        break;
-                    case 2:
-                            currentPlayer->upgradeRobot(TRACK);
-                        break;
-                    case 3:
-                            currentPlayer->upgradeRobot(JUMP);
-                        break;
-                    case 4:
-                            currentPlayer->upgradeRobot(HIDE);
-                        break;
-                    default:
-                        break;
-                }
+                                case 1: 
+                                    currentPlayer->upgradeRobot(SCOUT);
+                                    break;
+                                case 2:
+                                    currentPlayer->upgradeRobot(TRACK);
+                                    break;
+                                case 3:
+                                    currentPlayer->upgradeRobot(JUMP);
+                                    break;
+                                case 4:
+                                    currentPlayer->upgradeRobot(HIDE);
+                                    break;
+                            }
                         }
                         battlefield->nextTurn();
                     }
@@ -916,6 +848,98 @@ void Battlefield::nextTurn(){
     waitingRobots_.push(front);
 }
 
+
+/**********************************************************************
+Upgraded Robot Functions
+**********************************************************************/
+void ScoutBot::actionLook(Battlefield* battlefield, int x, int y){
+    if (lookCount < maxLooks) {
+        battlefield->displayBattlefield(-10, -10);
+        lookCount++;
+    }
+}
+
+void HideBot::actionMove(Battlefield* battlefield, int x, int y){
+    if (hideTurnsUsed < maxHideTurns) {
+        isHidden_ = true;
+        hideTurnsUsed++;
+    }
+}
+
+void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
+    if (jumpsUsed < maxJumps) {
+        string targetPosition = battlefield->getPlayer(x, y);
+        if (targetPosition.empty()) { //check if theres any robots at the location
+            setRobotX(x);
+            setRobotY(y);
+            jumpsUsed++;
+        } else {
+            cout << "Invalid location! There might be a robot there." << endl;
+        }
+    }
+}
+
+void HealBot::actionFire(Battlefield* battlefield, int x, int y){
+    addLife();
+    addLife();
+    addLife();
+}
+
+void BombBot::actionFire(Battlefield* battlefield, int x, int y){
+    if(bombs){
+        int cx = battlefield->getCurrentPlayer()->getRobotX();
+        int cy = battlefield->getCurrentPlayer()->getRobotY();
+        int tx, ty, targetRobotId;
+        bool invalidCoordinates;
+        string targetPosition;
+        cout << "BombBot bombed surrounding squares!\n";
+
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip self
+                tx = cx + dx; 
+                ty = cy + dy;
+                invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
+                cout << "Explosion at (" << tx << ", " << ty << ")\n";
+                if(!invalidCoordinates){
+                    targetPosition = battlefield->getPlayer(tx, ty);
+                    if (!targetPosition.empty()) { //check if theres any robots at the location
+                        targetRobotId = stoi(targetPosition);
+                        GenericRobot* target = nullptr; 
+                        
+                        for (GenericRobot* robot : battlefield->getAllRobots()){
+                            if (robot->getRobotID() == targetRobotId) {
+                                target = robot;
+                                break;
+                            }
+                        }
+
+                        if (target) {
+                            target->reduceLife();
+                            if(!target->isAlive()){
+                                cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
+                            }
+                            incrementKills(); //increment kills for this robot 
+                        }
+                    }                
+                }
+            }
+        }
+    }
+    bombs--;
+}
+
+void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y){
+    if(reflect>0)
+        isReflect_ = true;
+}
+
+bool ReflectShotBot::isReflecting() {
+    bool name = isReflect_;
+    isReflect_ = false;
+    reflect--;
+    return name;
+}
 
 
 // class TrackBot : public SeeingRobot {
