@@ -267,7 +267,7 @@ class GenericRobot : public ShootingRobot, public MovingRobot,
         int upgradeCount = 0; 
         const int MAX_UPGRADE = 3; 
         Robot* robotUpgraded = nullptr; 
-        update = false;
+        bool update = false;
     public: 
         GenericRobot(string name, int x, int y) : Robot(x, y, name){
             robotId = robotIncrement; 
@@ -312,6 +312,16 @@ ActionFire()
             if (hiddenTarget != nullptr && hiddenRobot->isHidden()){
                 cout << "Shot missed. Robot is hidden." << endl;
                 return;
+            }
+
+            ReflectShotBot* reflectBot = dynamic_cast<ReflectShotBot*>(targetRobot);
+            if (reflectBot && reflectBot->isReflecting()) {
+                cout << "Shot reflected." << endl;
+                this->reduceLife(); // damage shooter
+
+                if (!this->isAlive()){
+                    cout << "Robot" << this->getRobotID() << " has been destroyed." << endl;
+            }   
             }
 
             while (x != 0 || y!= 0){
@@ -417,7 +427,7 @@ actionLook()
                     int lookY = currentY + dy;
 
                 
-                    if(battlefield->battlefield_[lookY][lookX]) != ""){
+                    if((battlefield->battlefield_[lookY][lookX]) != ""){
                         int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]); // find the id of the robot currently in that position 
                         GenericRobot* robotLooked = nullptr;
                         for (GenericRobot* robot : battlefield->robots_){
