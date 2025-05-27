@@ -127,19 +127,19 @@ bool Robot::isAlive() const{
 }
 
 /**********************************************************************
+ * getKills
+ * task: gets the number of kills the robot has
+ * @return killCount - number of kills so far
+ *********************************************************************/
+int Robot::getKills() const{
+    return killCount;
+}
+
+/**********************************************************************
  * incrementKills
  * task: Increases the kill count by 1
  * @return killCount - number of kills so far
  *********************************************************************/
 void Robot::incrementKills(){
     killCount++;
-}
-
-/**********************************************************************
- * getKills
- * task: Increases the kill count by 1
- * @return killCount - number of kills so far
- *********************************************************************/
-int Robot::getKills() const{
-    return killCount;
 }
