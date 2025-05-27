@@ -532,36 +532,16 @@ int main() {
                 cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Center\n 6. Right\n 7. DownLeft\n 8. Down\n 9. DownRight" << endl;
                 cin  >> choice;
                 switch(choice){
-                    case 1: 
-                        x = -1, y = 1;
-                        break;
-                    case 2:
-                        x = 0, y = 1;
-                        break;
-                    case 3:
-                        x = 1, y = 1;
-                        break;
-                    case 4:
-                        x = -1, y = 0;
-                        break;
-                    case 5:
-                        x = 0, y = 0;
-                        break;
-                    case 6:
-                        x = 1, y = 0;
-                        break;
-                    case 7:
-                        x = -1, y = -1;
-                        break;
-                    case 8:
-                        x = 0, y = -1;
-                        break;
-                    case 9:
-                        x = 1, y = -1;
-                        break;
-                    default:
-                        x = 0, y = 0;
-                        break;
+                    case 1: x = -1; y = 1; break;
+                    case 2: x = 0; y = 1; break;
+                    case 3: x = 1; y = 1; break;
+                    case 4: x = -1; y = 0; break;
+                    case 5: x = 0; y = 0; break;
+                    case 6: x = 1; y = 0; break;
+                    case 7: x = -1; y = -1; break;
+                    case 8: x = 0; y = -1; break;
+                    case 9: x = 1; y = -1; break;
+                    default: x = 0; y = 0; break;
                 }
                 currentPlayer->actionLook(battlefield, x, y);
                 break;
@@ -570,33 +550,15 @@ int main() {
                 cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Right\n 6. DownLeft\n 7. Down\n 8. DownRight" << endl;
                 cin  >> choice;
                 switch(choice){
-                    case 1: 
-                        x = -1, y = 1;
-                        break;
-                    case 2:
-                        x = 0, y = 1;
-                        break;
-                    case 3:
-                        x = 1, y = 1;
-                        break;
-                    case 4:
-                        x = -1, y = 0;
-                        break;
-                    case 5:
-                        x = 1, y = 0;
-                        break;
-                    case 6:
-                        x = -1, y = -1;
-                        break;
-                    case 7:
-                        x = 0, y = -1;
-                        break;
-                    case 8:
-                        x = 1, y = -1;
-                        break;
-                    default:
-                        x = 0, y = 0;
-                        break;
+                    case 1: x = -1; y = 1; break;
+                    case 2: x = 0; y = 1; break;
+                    case 3: x = 1; y = 1; break;
+                    case 4: x = -1; y = 0; break;
+                    case 5: x = 1; y = 0; break;
+                    case 6: x = -1; y = -1; break;
+                    case 7: x = 0; y = -1; break;
+                    case 8: x = 1; y = -1; break;
+                    default: x = 0; y = 0; break;
                 }
                 numOfKills = currentPlayer->getKills();
                 currentPlayer->actionFire(battlefield, x, y);
@@ -609,36 +571,16 @@ int main() {
                     cout << "9. Heal Bot (gain 3 more lives)\n8. Bomb Bot (shoot all 8 neighbouring locations)\n";
                     cin >> choice;
                     switch(choice){
-                    case 1: 
-                        currentPlayer->upgradeRobot(SCOUT);
-                        break;
-                    case 2:
-                        currentPlayer->upgradeRobot(TRACK);
-                        break;
-                    case 3:
-                        currentPlayer->upgradeRobot(LONGSHOT);
-                        break;
-                    case 4:
-                        currentPlayer->upgradeRobot(SEMIAUTO);
-                        break;
-                    case 5:
-                        currentPlayer->upgradeRobot(THIRTYSHOT);
-                        break;
-                    case 6:
-                        currentPlayer->upgradeRobot(JUMP);
-                        break;
-                    case 7: 
-                        currentPlayer->upgradeRobot(HIDE);
-                        break;
-                    case 8:
-                        currentPlayer->upgradeRobot(REFLECTSHOT);
-                        break;
-                    case 9:
-                        currentPlayer->upgradeRobot(HEAL);
-                        break;
-                    case 10:
-                        currentPlayer->upgradeRobot(BOMB);
-                        break;
+                        case 1: currentPlayer->upgradeRobot(SCOUT); break;
+                        case 2: currentPlayer->upgradeRobot(TRACK); break;
+                        case 3: currentPlayer->upgradeRobot(LONGSHOT); break;
+                        case 4: currentPlayer->upgradeRobot(SEMIAUTO); break;
+                        case 5: currentPlayer->upgradeRobot(THIRTYSHOT); break;
+                        case 6: currentPlayer->upgradeRobot(JUMP); break;
+                        case 7: currentPlayer->upgradeRobot(HIDE); break;
+                        case 8: currentPlayer->upgradeRobot(REFLECTSHOT); break;
+                        case 9: currentPlayer->upgradeRobot(HEAL); break;
+                        case 10: currentPlayer->upgradeRobot(BOMB); break;
                     }
                 }
                 battlefield->nextTurn();
@@ -648,33 +590,15 @@ int main() {
                 cout << "1. UpLeft\n2. Up\n3. UpRight\n4. Left\n5. Right\n 6. DownLeft\n 7. Down\n 8. DownRight" << endl;
                 cin  >> choice;
                 switch(choice){
-                    case 1: 
-                        x = -1, y = 1;
-                        break;
-                    case 2:
-                        x = 0, y = 1;
-                        break;
-                    case 3:
-                        x = 1, y = 1;
-                        break;
-                    case 4:
-                        x = -1, y = 0;
-                        break;
-                    case 5:
-                        x = 1, y = 0;
-                        break;
-                    case 6:
-                        x = -1, y = -1;
-                        break;
-                    case 7:
-                        x = 0, y = -1;
-                        break;
-                    case 8:
-                        x = 1, y = -1;
-                        break;
-                    default:
-                        x = 0, y = 0;
-                        break;
+                    case 1: x = -1; y = 1; break;
+                    case 2: x = 0; y = 1; break;
+                    case 3: x = 1; y = 1; break;
+                    case 4: x = -1; y = 0; break;
+                    case 5: x = 1; y = 0; break;
+                    case 6: x = -1; y = -1; break;
+                    case 7: x = 0; y = -1; break;
+                    case 8: x = 1; y = -1; break;
+                    default: x = 0; y = 0; break;
                 }
                 currentPlayer->actionMove(battlefield, x, y);
                 battlefield->nextTurn();
@@ -705,18 +629,10 @@ int main() {
                             cout << "JumpBot (jump to anywhere on battlefield)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
                             cin >> choice;
                             switch(choice){
-                                case 1: 
-                                    currentPlayer->upgradeRobot(SCOUT);
-                                    break;
-                                case 2:
-                                    currentPlayer->upgradeRobot(TRACK);
-                                    break;
-                                case 3:
-                                    currentPlayer->upgradeRobot(JUMP);
-                                    break;
-                                case 4:
-                                    currentPlayer->upgradeRobot(HIDE);
-                                    break;
+                                case 1: currentPlayer->upgradeRobot(SCOUT); break;
+                                case 2: currentPlayer->upgradeRobot(TRACK); break;
+                                case 3: currentPlayer->upgradeRobot(JUMP); break;
+                                case 4: currentPlayer->upgradeRobot(HIDE); break;
                             }
                         }
                         battlefield->nextTurn();
@@ -743,18 +659,10 @@ int main() {
                             cout << "JumpBot (jump to anywhere on battlefield)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
                             cin >> choice;
                             switch(choice){
-                                case 1: 
-                                    currentPlayer->upgradeRobot(SCOUT);
-                                    break;
-                                case 2:
-                                    currentPlayer->upgradeRobot(TRACK);
-                                    break;
-                                case 3:
-                                    currentPlayer->upgradeRobot(JUMP);
-                                    break;
-                                case 4:
-                                    currentPlayer->upgradeRobot(HIDE);
-                                    break;
+                                case 1: currentPlayer->upgradeRobot(SCOUT); break;
+                                case 2: currentPlayer->upgradeRobot(TRACK); break;
+                                case 3: currentPlayer->upgradeRobot(JUMP); break;
+                                case 4: currentPlayer->upgradeRobot(HIDE); break;
                             }
                         }
                         battlefield->nextTurn();
