@@ -56,7 +56,8 @@ class Robot{
         bool reduceLife(); // Reduces the lives count by 1
         int getLives() const; // Get this robot's lives count
         bool isAlive() const; // Checks if this robot's lives count is more than 0
-
+        
+        int getKills() const;
         void incrementKills(); // Adds 1 to the kill count
 
         // Set and get the robot's type
