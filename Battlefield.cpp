@@ -1,0 +1,209 @@
+//*********************************************************   
+// Program: Battlefield.cpp   
+// Course: CCP6124 OOPDS  
+// Lecture Class: TC2L 
+// Tutorial Class: TT7L 
+// Trimester: 2510 
+// Member_1: 243UC24665 | NOR ALIYAH SYAHIRAH BINTI MUHD HASSANAL | NOR.ALIYAH.SYAHIRAH@student.mmu.edu.my | 0146202605 
+// Member_2: 243UC246KQ | KHAYRIN SOFIYA BINTI JAMEL | KHAYRIN.SOFIYA.JAMEL@student.mmu.edu.my | 0193320041 
+// Member_3: 243UC247CJ | AIMI BINTI MOHD FAIZAL | AIMI.MOHD.FAIZAL@student.mmu.edu.my | 0139071648 
+// Member_4: 241UC24199 | AMIRUL IHTISYAM BIN IDRUS | AMIRUL.IHTISYAM.IDRUS@student.mmu.edu.my | 0194090095	  
+//********************************************************* 
+// Task Distribution 
+// Member_1:   
+// Member_2:   
+// Member_3:   
+// Member_4: 
+// ******************************************************** 
+
+#include "Battlefield.h"
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include "GenericRobot.h"
+using namespace std;
+
+/**********************************************************************
+ * readFile
+ * task: 
+ * @param filename - 
+ *********************************************************************/
+void Battlefield::readFile(string filename) {
+
+    ifstream infile(filename);
+    string line;
+
+    //find matrix
+    getline(infile, line); //read first line
+    size_t pos1 = line.find(":");
+    if (pos1 != string::npos){
+        string numStr = line.substr(pos1+2);
+        stringstream ss(numStr);
+        string colstr, rowstr;
+        ss >> rowstr >> colstr;
+        battlefieldRows_ = stoi(rowstr);
+        battlefieldCols_ = stoi(colstr);
+    }
+
+    battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
+
+    //find total turn
+    getline(infile, line); //read second line
+    size_t pos2 = line.find(":");
+    if (pos2 != string::npos){
+        string numStr2 = line.substr(pos2+2);
+        totalTurns_ = stoi(numStr2);
+    }
+    
+    //find total robot
+    getline(infile, line);// read the third line
+    size_t pos3 = line.find(":");
+    if (pos3 != string::npos){
+        string numStr3 = line.substr(pos3+2);
+        numOfRobots_ = stoi(numStr3);
+    }
+
+    cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
+
+    //find robot name and position
+    for (int i = 0; i < numOfRobots_; i++) {
+        getline(infile, line);
+        istringstream robotLine(line);
+        string name, xStr, yStr;
+        int x, y;
+        robotLine >> name >> yStr >> xStr;
+        if (xStr == "random" && yStr == "random"){
+            x = rand() % (battlefieldRows_);
+            y = rand() % (battlefieldCols_);
+            cout << x << y << endl;
+        } else {
+            x = stoi(xStr);
+            y = stoi(yStr);
+        }
+        robots_.push_back(new GenericRobot(name,x,y));
+    }
+}
+
+/**********************************************************************
+ * placeRobots
+ * task: 
+ *********************************************************************/
+void Battlefield::placeRobots(){
+    for(int i=0;i<battlefield_.size(); i++){
+        for (int j=0; j<battlefield_[i].size(); j++){
+            battlefield_[i][j]="";
+        }
+    }
+
+    for (int i=0;i<robots_.size(); i++){
+        int y = robots_[i]->getRobotY();
+        int x = robots_[i]->getRobotX();
+
+        if(y < battlefield_.size() && x < battlefield_[0].size()){
+            battlefield_[y][x]= to_string(robots_[i]->getRobotID());
+        } else {
+            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
+            exit(1);
+        }
+        
+        waitingRobots_.push(robots_[i]);
+        allRobotId.push_back(robots_[i]->getRobotID());
+        // if(!robots_[i]->isAlive()){respawnRobot(i);}
+    }
+
+};
+
+/**********************************************************************
+ * displayBattlefield
+ * task: Displays the battlefield and any needed players
+ * x and y are the center of the nine square grid when looking
+ * when x = -10 and y = -10, all robots displayed on field (scoutBot)
+ * when x = -5 and y = -5 only current player's position displayed
+ * @param x - the x coordinate of the nine square
+ *        y - the y coordinate of the nine square
+ *********************************************************************/
+void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
+    cout << "Display Battlefield";
+    cout << endl << "    ";
+
+    for (int j=0; j< battlefield_[0].size();j++)
+        cout << "   " << right << setfill('0') << setw(2) << j << "";
+    cout << endl;
+
+    for (int i=0; i< battlefield_.size();i++){
+        cout << "     ";
+        for (int j = 0; j < battlefield_[i].size(); j++)
+            cout << "+----";
+        cout << "+" << endl;
+        cout << "   " << right << setfill('0') << setw(2) << i;
+
+        for (int j = 0;j <battlefield_[0].size(); j++){
+            if(battlefield_[i][j] == ""){
+                cout << "|" << "    ";
+            } else { //placesRobot
+                if(x == -10  && y == -10){ //scout  
+                    cout << "|" << "GR";
+                    cout << "0";   
+                    cout << battlefield_[i][j];
+                }else {
+                    if (stoi(battlefield_[i][j]) == getCurrentPlayer()->getRobotID()){ //general
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
+
+                    if(y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
+                }
+            }
+        }
+        cout << "|" << endl;
+    }
+    cout << "     ";
+    for (int j = 0;j<battlefield_[0].size();j++)
+        cout << "+----";
+    cout << "+" << endl;
+
+}
+
+/**********************************************************************
+ * respawnRobot
+ * task: 
+ * @param index - 
+ *********************************************************************/
+void Battlefield::respawnRobot(int index){
+    GenericRobot* destroyed = robots_[index];
+    destroyedRobots_.push(destroyed);
+    int oldX = destroyed -> getRobotX();
+    int oldY = destroyed -> getRobotY();
+    battlefield_[oldY][oldX] = ""; //clear the field
+
+    GenericRobot* waiting = destroyedRobots_.front();
+    waitingRobots_.push(waiting);
+    destroyedRobots_.pop();
+    if(!waitingRobots_.empty()){
+        GenericRobot* respawn = waitingRobots_.front();
+        waitingRobots_.pop();
+
+        int newX = rand() % (battlefieldRows_);
+        int newY = rand() % (battlefieldCols_);
+
+        respawn->setRobotX(newX);
+        respawn->setRobotY(newY);
+        battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    }
+}
+
+/**********************************************************************
+ * nextTurn
+ * task: 
+ *********************************************************************/
+void Battlefield::nextTurn(){
+    currentTurn_++;
+    GenericRobot* front = waitingRobots_.front();
+    waitingRobots_.pop();
+    waitingRobots_.push(front);
+}

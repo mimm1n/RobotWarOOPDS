@@ -24,85 +24,16 @@
 #include <vector>
 #include <random>
 #include "Robot.h"
+#include "Battlefield.h"
+#include "Thinking.h"
+#include "Seeing.h"
+#include "Moving.h"
+#include "Shooting.h"
 using namespace std;
 
 /**********************************************************************
 CLASS DEFINTIONS
 **********************************************************************/
-
-class GenericRobot;
-
-/**********************************************************************
-Battlefield Class 
-**********************************************************************/
-class Battlefield {
-    private:
-        int battlefieldCols_ = -1; // variable to assign number of columns
-        int battlefieldRows_ = -1; // variable to assign number of rows
-
-        int totalTurns_ = -1; // variable to assign total turns
-        int currentTurn_ = 1; 
-        int currentPlayer = 0;
-    
-
-        int numOfRobots_ = -1; // variable to assign number of robots
-
-        vector<GenericRobot *> robots_; 
-        queue<GenericRobot *> destroyedRobots_;
-        queue<GenericRobot *> waitingRobots_;  
-        vector<vector<string>> battlefield_;
-        vector <int> allRobotId;
-        friend class GenericRobot;
-    public:
-        // Get function
-        int battlefieldCols() { return battlefieldCols_; }
-        int battlefieldRows() { return battlefieldRows_; }
-        int turns() { return totalTurns_; }
-        int numOfRobots() { return numOfRobots_; }
-        int currentTurn(){ return currentTurn_; }
-        string getPlayer(int x, int y){return battlefield_[y][x];}
-        vector <GenericRobot *> getAllRobots() const {return robots_;}
-        vector <int> getAllRobotId() const {return allRobotId;}
-        GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
-        
-        
-        void readFile(string filename);
-        void placeRobots();
-        void displayBattlefield(int x, int y, vector<int> targets = {}) const;
-        void respawnRobot(int x);
-        void nextTurn();
-};
-
-/**********************************************************************
-Robot Action Classes 
-**********************************************************************/
-class ThinkingRobot : virtual public Robot{
-    public:
-        ThinkingRobot(){}
-        virtual void actionThink(Battlefield* battlefield) = 0;
-};
-
-class SeeingRobot : virtual public Robot{
-    public:
-        SeeingRobot(){}
-        virtual void actionLook(Battlefield* battlefield,int x, int y) = 0;
-};
-
-class MovingRobot : virtual public Robot{
-    public:
-        MovingRobot(){}
-        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
-};
-
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
-    public:
-        ShootingRobot(){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
-};
 
 /**********************************************************************
 Upgraded Robot Classes 
@@ -667,18 +598,18 @@ int main() {
                     cout << "7. Hide Bot (can't be seen or shot at by other robots)\n8. Reflect Shot Bot (if a robot shoots at you it will be reflected back at them)\n";
                     cout << "9. Heal Bot (gain 3 more lives)\n8. Bomb Bot (shoot all 8 neighbouring locations)\n";
                     cin >> choice;
-                    switch(choice){
-                        case 1: currentPlayer->upgradeRobot(battlefield, SCOUT); break;
-                        case 2: currentPlayer->upgradeRobot(battlefield, TRACK); break;
-                        case 3: currentPlayer->upgradeRobot(battlefield, LONGSHOT); break;
-                        case 4: currentPlayer->upgradeRobot(battlefield, SEMIAUTO); break;
-                        case 5: currentPlayer->upgradeRobot(battlefield, THIRTYSHOT); break;
-                        case 6: currentPlayer->upgradeRobot(battlefield, JUMP); break;
-                        case 7: currentPlayer->upgradeRobot(battlefield, HIDE); break;
-                        case 8: currentPlayer->upgradeRobot(battlefield, REFLECTSHOT); break;
-                        case 9: currentPlayer->upgradeRobot(battlefield, HEAL); break;
-                        case 10: currentPlayer->upgradeRobot(battlefield, BOMB); break;
-                    }
+                    // switch(choice){
+                    //     case 1: currentPlayer->upgradeRobot(battlefield, SCOUT); break;
+                    //     case 2: currentPlayer->upgradeRobot(battlefield, TRACK); break;
+                    //     case 3: currentPlayer->upgradeRobot(battlefield, LONGSHOT); break;
+                    //     case 4: currentPlayer->upgradeRobot(battlefield, SEMIAUTO); break;
+                    //     case 5: currentPlayer->upgradeRobot(battlefield, THIRTYSHOT); break;
+                    //     case 6: currentPlayer->upgradeRobot(battlefield, JUMP); break;
+                    //     case 7: currentPlayer->upgradeRobot(battlefield, HIDE); break;
+                    //     case 8: currentPlayer->upgradeRobot(battlefield, REFLECTSHOT); break;
+                    //     case 9: currentPlayer->upgradeRobot(battlefield, HEAL); break;
+                    //     case 10: currentPlayer->upgradeRobot(battlefield, BOMB); break;
+                    // }
                 }
                 battlefield->nextTurn();
                 break;
@@ -755,12 +686,12 @@ int main() {
                             cout << "1. ScoutBot (see entire battlefield)\n2. TrackBot (plant tracker on another robot) \n3. ";
                             cout << "JumpBot (jump to anywhere on battlefield)\n4. Hide (can't be seen or shot at by other robots)\n" << endl;
                             cin >> choice;
-                            switch(choice){
-                                case 1: currentPlayer->upgradeRobot(battlefield, SCOUT); break;
-                                case 2: currentPlayer->upgradeRobot(battlefield, TRACK); break;
-                                case 3: currentPlayer->upgradeRobot(battlefield, JUMP); break;
-                                case 4: currentPlayer->upgradeRobot(battlefield, HIDE); break;
-                            }
+                            // switch(choice){
+                            //     case 1: currentPlayer->upgradeRobot(battlefield, SCOUT); break;
+                            //     case 2: currentPlayer->upgradeRobot(battlefield, TRACK); break;
+                            //     case 3: currentPlayer->upgradeRobot(battlefield, JUMP); break;
+                            //     case 4: currentPlayer->upgradeRobot(battlefield, HIDE); break;
+                            // }
                         }
                         battlefield->nextTurn();
                     }
@@ -781,177 +712,6 @@ int main() {
 /**********************************************************************
 FUNCTION DEFINTIONS
 **********************************************************************/
-
-/**********************************************************************
-Battlefield Functions
-**********************************************************************/
-void Battlefield::readFile(string filename) {
-
-    ifstream infile(filename);
-    string line;
-
-    //find matrix
-    getline(infile, line); //read first line
-    size_t pos1 = line.find(":");
-    if (pos1 != string::npos){
-        string numStr = line.substr(pos1+2);
-        stringstream ss(numStr);
-        string colstr, rowstr;
-        ss >> rowstr >> colstr;
-        battlefieldRows_ = stoi(rowstr);
-        battlefieldCols_ = stoi(colstr);
-    }
-
-    battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
-
-    //find total turn
-    getline(infile, line); //read second line
-    size_t pos2 = line.find(":");
-    if (pos2 != string::npos){
-        string numStr2 = line.substr(pos2+2);
-        totalTurns_ = stoi(numStr2);
-    }
-    
-    //find total robot
-    getline(infile, line);// read the third line
-    size_t pos3 = line.find(":");
-    if (pos3 != string::npos){
-        string numStr3 = line.substr(pos3+2);
-        numOfRobots_ = stoi(numStr3);
-    }
-
-    cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
-
-    //find robot name and position
-    for (int i = 0; i < numOfRobots_; i++) {
-        getline(infile, line);
-        istringstream robotLine(line);
-        string name, xStr, yStr;
-        int x, y;
-        robotLine >> name >> yStr >> xStr;
-        if (xStr == "random" && yStr == "random"){
-            x = rand() % (battlefieldRows_);
-            y = rand() % (battlefieldCols_);
-            cout << x << y << endl;
-        } else {
-            x = stoi(xStr);
-            y = stoi(yStr);
-        }
-        robots_.push_back(new GenericRobot(name,x,y));
-    }
-}
-
-void Battlefield::placeRobots(){
-    for(int i=0;i<battlefield_.size(); i++){
-        for (int j=0; j<battlefield_[i].size(); j++){
-            battlefield_[i][j]="";
-        }
-    }
-
-    for (int i=0;i<robots_.size(); i++){
-        int y = robots_[i]->getRobotY();
-        int x = robots_[i]->getRobotX();
-
-        if(y < battlefield_.size() && x < battlefield_[0].size()){
-            battlefield_[y][x]= to_string(robots_[i]->getRobotID());
-        } else {
-            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
-            exit(1);
-        }
-        
-        waitingRobots_.push(robots_[i]);
-        allRobotId.push_back(robots_[i]->getRobotID());
-        // if(!robots_[i]->isAlive()){respawnRobot(i);}
-    }
-
-};
-
-/**********************************************************************
- * displayBattlefield
- * task: Displays the battlefield and any needed players
- * x and y are the center of the nine square grid when looking
- * when x = -10 and y = -10, all robots displayed on field (scoutBot)
- * when x = -5 and y = -5 only current player's position displayed
- * @param x - the x coordinate of the nine square
- *        y - the y coordinate of the nine square
- *********************************************************************/
-void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
-    cout << "Display Battlefield";
-    cout << endl << "    ";
-
-    for (int j=0; j< battlefield_[0].size();j++)
-        cout << "   " << right << setfill('0') << setw(2) << j << "";
-    cout << endl;
-
-    for (int i=0; i< battlefield_.size();i++){
-        cout << "     ";
-        for (int j = 0; j < battlefield_[i].size(); j++)
-            cout << "+----";
-        cout << "+" << endl;
-        cout << "   " << right << setfill('0') << setw(2) << i;
-
-        for (int j = 0;j <battlefield_[0].size(); j++){
-            if(battlefield_[i][j] == ""){
-                cout << "|" << "    ";
-            } else { //placesRobot
-                if(x == -10  && y == -10){ //scout  
-                    cout << "|" << "GR";
-                    cout << "0";   
-                    cout << battlefield_[i][j];
-                }else {
-                    if (stoi(battlefield_[i][j]) == getCurrentPlayer()->getRobotID()){ //general
-                        cout << "|" << "GR";
-                        cout << "0";   
-                        cout << battlefield_[i][j];
-                    }
-
-                    if(y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
-                        cout << "|" << "GR";
-                        cout << "0";   
-                        cout << battlefield_[i][j];
-                    }
-                }
-            }
-        }
-        cout << "|" << endl;
-    }
-    cout << "     ";
-    for (int j = 0;j<battlefield_[0].size();j++)
-        cout << "+----";
-    cout << "+" << endl;
-
-}
-
-void Battlefield::respawnRobot(int index){
-    GenericRobot* destroyed = robots_[index];
-    destroyedRobots_.push(destroyed);
-    int oldX = destroyed -> getRobotX();
-    int oldY = destroyed -> getRobotY();
-    battlefield_[oldY][oldX] = ""; //clear the field
-
-    GenericRobot* waiting = destroyedRobots_.front();
-    waitingRobots_.push(waiting);
-    destroyedRobots_.pop();
-    if(!waitingRobots_.empty()){
-        GenericRobot* respawn = waitingRobots_.front();
-        waitingRobots_.pop();
-
-        int newX = rand() % (battlefieldRows_);
-        int newY = rand() % (battlefieldCols_);
-
-        respawn->setRobotX(newX);
-        respawn->setRobotY(newY);
-        battlefield_[newY][newX]=to_string(respawn->getRobotID());
-    }
-}
-
-void Battlefield::nextTurn(){
-    currentTurn_++;
-    GenericRobot* front = waitingRobots_.front();
-    waitingRobots_.pop();
-    waitingRobots_.push(front);
-}
-
 
 /**********************************************************************
 Upgraded Robot Functions
