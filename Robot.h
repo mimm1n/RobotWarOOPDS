@@ -52,7 +52,7 @@ class Robot{
         // Get the name of this robot(fixed so can't set)
         string getRobotName() const;
 
-        int addLife(); // Adds 1 life to the lives count 
+        void addLife(); // Adds 1 life to the lives count 
         bool reduceLife(); // Reduces the lives count by 1
         int getLives() const; // Get this robot's lives count
         bool isAlive() const; // Checks if this robot's lives count is more than 0
