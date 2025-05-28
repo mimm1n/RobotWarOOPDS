@@ -23,7 +23,10 @@
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
+#include "Battlefield.h"
 using namespace std;
+
+class Battlefield;
 
 class ThinkingRobot : virtual public Robot{
     public:
