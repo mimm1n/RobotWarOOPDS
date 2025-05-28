@@ -25,6 +25,8 @@
 #include "GenericRobot.h"
 using namespace std;
 
+class GenericRobot;
+
 class Battlefield {
     private:
         int battlefieldCols_ = -1; // variable to assign number of columns

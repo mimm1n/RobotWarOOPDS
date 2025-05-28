@@ -74,7 +74,7 @@ class HideBot : public MovingRobot{
     public:
         HideBot(int x, int y, string name):Robot( x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
-        bool isHidden() const;
+        bool isHidden();
         void setRobotType(int type) override { robotType = HIDE; }
         int getRobotType() const override { return HIDE; }
 };
@@ -386,7 +386,7 @@ void HideBot::actionMove(Battlefield* battlefield, int x, int y){
     }
 }
 
-bool HideBot::isHidden() const{
+bool HideBot::isHidden(){
     if (hideTurnsUsed >= MAX_HIDE_TURNS)
         isHidden_ = false;
     return isHidden_;
@@ -424,7 +424,7 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
             int targetRobotId = stoi(battlefield->getPlayer(x, y));
             GenericRobot* targetRobot = nullptr; 
             
-            for (GenericRobot* robot : battlefield->robots_){
+            for (GenericRobot* robot : battlefield->getAllRobots()){
                 if (robot->getRobotID() == targetRobotId) {
                     targetRobot = robot;
                     break;
@@ -466,7 +466,7 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
 
             targetRobotId = stoi(battlefield->getPlayer(targetX, targetY)); 
             
-            for (GenericRobot* robot : battlefield->robots_){
+            for (GenericRobot* robot : battlefield->getAllRobots()){
                 if (robot->getRobotID() == targetRobotId) {
                     targetRobot = robot;
                     break;

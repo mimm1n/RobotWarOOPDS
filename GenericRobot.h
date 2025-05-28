@@ -25,8 +25,9 @@
 #include <random>
 #include "Moving.h"
 #include "Shooting.h"
-#include "Looking.h"
+#include "Thinking.h"
 #include "Seeing.h"
+#include "Battlefield.h"
 #include "Robot.h"
 using namespace std;
 

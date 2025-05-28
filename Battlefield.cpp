@@ -18,6 +18,9 @@
 
 #include "Battlefield.h"
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
 #include <cstdlib>
 #include <string>
 #include "GenericRobot.h"

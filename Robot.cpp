@@ -86,7 +86,7 @@ string Robot::getRobotName() const{
  * task: Increases the lives count by 1
  *********************************************************************/
 void Robot::addLife(){
-    return lives++;
+    lives++;
 }
 
 /**********************************************************************
