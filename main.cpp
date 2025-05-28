@@ -828,6 +828,8 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
             } else if (targetRobot->getRobotType() != REFLECTSHOT){
                 reduceLife(); //??
             }
+            delete targetRobot;
+            targetRobot = nullptr;
         }
     }
 }
@@ -878,6 +880,8 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
         setShells(getShells()-1);
     }
     shotsFired = 1;
+    delete targetRobot;
+    targetRobot = nullptr;
 }
 
 void HealBot::actionFire(Battlefield* battlefield, int x, int y){
@@ -893,8 +897,9 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
         int tx, ty, targetRobotId;
         bool invalidCoordinates;
         string targetPosition;
+        GenericRobot* target = nullptr;        
         cout << "BombBot bombed surrounding squares!\n";
-
+        
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
                 if (dx == 0 && dy == 0) continue; // Skip self
@@ -905,8 +910,7 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
                 if(!invalidCoordinates){
                     targetPosition = battlefield->getPlayer(tx, ty);
                     if (!targetPosition.empty()) { //check if theres any robots at the location
-                        targetRobotId = stoi(targetPosition);
-                        GenericRobot* target = nullptr; 
+                        targetRobotId = stoi(targetPosition); 
                         
                         for (GenericRobot* robot : battlefield->getAllRobots()){
                             if (robot->getRobotID() == targetRobotId) {
@@ -925,6 +929,8 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
                 }
             }
         }
+        delete target;
+        target = nullptr;
     }
     bombs--;
 }
