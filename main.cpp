@@ -438,9 +438,9 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
                 }
                 incrementKills(); //increment kills for this robot    
             } else if (targetRobot->getRobotType() == HIDE){
-                targetRobot->reduceLife(); //??
+                targetRobot->reduceLife(); //can ignore this
             } else if (targetRobot->getRobotType() != REFLECTSHOT){
-                reduceLife(); //??
+                reduceLife(); // can ignore this 
             }
             delete targetRobot;
             targetRobot = nullptr;
@@ -484,9 +484,9 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
                         return;
                     }
                 } else if (targetRobot->getRobotType() == HIDE){
-                    targetRobot->reduceLife(); //??
+                    targetRobot->reduceLife(); // just ignore this
                 } else if (targetRobot->getRobotType() != REFLECTSHOT){
-                    reduceLife(); //??
+                    reduceLife(); //just ignore this
                 }
             }
         }
