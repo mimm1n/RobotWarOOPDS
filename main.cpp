@@ -29,6 +29,7 @@
 #include "Seeing.h"
 #include "Moving.h"
 #include "Shooting.h"
+#include "GenericRobot.h"
 using namespace std;
 
 /**********************************************************************
