@@ -917,9 +917,8 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
 
                         if (target) {
                             target->reduceLife();
-                            if(!target->isAlive()){
+                            if(!target->isAlive())
                                 cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
-                            }
                             incrementKills(); //increment kills for this robot 
                         }
                     }                
