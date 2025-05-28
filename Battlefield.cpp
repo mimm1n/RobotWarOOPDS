@@ -24,6 +24,89 @@
 using namespace std;
 
 /**********************************************************************
+ * battlefieldCols
+ * task: 
+ * @return battlefieldCols_ - 
+ *********************************************************************/
+int Battlefield::battlefieldCols(){ 
+    return battlefieldCols_; 
+}
+
+/**********************************************************************
+ * battlefieldRows
+ * task: 
+ * @return battlefieldRows_ - 
+ *********************************************************************/
+int Battlefield::battlefieldRows(){
+    return battlefieldRows_;
+}
+
+/**********************************************************************
+ * turns
+ * task: 
+ * @return totalTurns_ - 
+ *********************************************************************/
+int Battlefield::turns(){
+    return totalTurns_;
+}
+
+/**********************************************************************
+ * numOfRobots
+ * task: 
+ * @return numOfRobots_ - 
+ *********************************************************************/
+int Battlefield::numOfRobots(){
+    return numOfRobots_; 
+}
+
+/**********************************************************************
+ * currentTurn
+ * task: 
+ * @return currentTurn_ - 
+ *********************************************************************/
+int Battlefield::currentTurn(){
+    return currentTurn_; 
+}
+
+/**********************************************************************
+ * getPlayer
+ * task: 
+ * @param x -
+ *        y -
+ * @return  
+ *********************************************************************/
+string Battlefield::getPlayer(int x, int y){
+    return battlefield_[y][x];
+}
+
+/**********************************************************************
+ * getAllRobots
+ * task: 
+ * @return robots_ - 
+ *********************************************************************/
+vector <GenericRobot *> Battlefield::getAllRobots() const {
+    return robots_;
+}
+
+/**********************************************************************
+ * getAllRobotId
+ * task: 
+ * @return allRobotId - 
+ *********************************************************************/
+vector <int> Battlefield::getAllRobotId() const {
+    return allRobotId;
+}
+
+/**********************************************************************
+ * getCurrentPlayer
+ * task: 
+ * @return 
+ *********************************************************************/
+GenericRobot* Battlefield::getCurrentPlayer() const {
+    return waitingRobots_.front();
+}
+
+/**********************************************************************
  * readFile
  * task: 
  * @param filename - 
