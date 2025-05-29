@@ -136,7 +136,7 @@ class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRo
 };
 
 
-class HealBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
+class HealBot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
     public:
         HealBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
@@ -148,7 +148,7 @@ class HealBot : public ShootingRobot public MovingRobot, public SeeingRobot, pub
         int getRobotType() const override { return HEAL; }
 };
 
-class BombBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
+class BombBot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
     private:
         int bombs = 1;
     public:
