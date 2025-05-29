@@ -56,7 +56,11 @@ int main() {
     do {
         currentPlayer = battlefield->getCurrentPlayer();
         battlefield->displayBattlefield(-5,-5);
-        outFile << battlefield->displayBattlefield(-5,-5);
+        //outFile << battlefield->displayBattlefield(-5,-5);
+        cout << setw(22) << "Action Log" << endl;
+        cout << "----------------------------------" << endl;
+        outFile << setw(22) << "Action Log" << endl;
+        outFile << "----------------------------------" << endl;
 
         random_device rd;
         mt19937 gen(rd()), gen2(rd()), gen3(rd()), gen4(rd());
@@ -71,15 +75,26 @@ int main() {
         switch(move){
             case 1: // Think
                 currentPlayer->actionThink(battlefield);
+                cout << currentPlayer->getRobotName() << " is thinking" << endl;
+                outFile << currentPlayer->getRobotName() << " is thinking" << endl;
                 break;
             case 2: // Look
                 currentPlayer->actionLook(battlefield, x, y);
+                cout << currentPlayer->getRobotName() << " is looking" << endl;
+                outFile << currentPlayer->getRobotName() << " is looking" << endl;
                 break;
             case 3: // Fire
                 kills = currentPlayer->getKills();
                 currentPlayer->actionFire(battlefield, x, y);
+                cout << currentPlayer->getRobotName() << " is shooting..." << endl;
+                outFile << currentPlayer->getRobotName() << " is shooting..." << endl;
 
                 if (kills < currentPlayer->getKills()){ // upgrade 
+                    cout << currentPlayer->getRobotName() << " killed "; 
+                    cout << battlefield->getPlayer(currentPlayer->getRobotX()+x,currentPlayer->getRobotY()+y) << "!" << endl;
+                    outFile << currentPlayer->getRobotName() << " killed "; 
+                    outFile << battlefield->getPlayer(currentPlayer->getRobotX()+x,currentPlayer->getRobotY()+y) << "!" << endl;
+
                     if (!currentPlayer->canUpgrade()) continue;
 
                     currentPlayerType = currentPlayer->getRobotType();
@@ -138,11 +153,14 @@ int main() {
                             case 4: upgradedRobot = new HideBot(x, y, name); break;
                         }
                     }
-                    upgradedRobot->addUpgrade(currentPlayer->upgradeCount);
+                    upgradedRobot->addUpgrade(currentPlayer->getUpgradeCount());
                     upgradedRobot->setLives(currentPlayer->getLives());
                     upgradedRobot->setKills(currentPlayer->getKills());
                     upgradedRobot->setShells(currentPlayer->getShells());
                     // need to update in Battlefield the robot type
+
+                    cout << currentPlayer->getRobotName() << " upgraded!" << endl;
+                    outFile << currentPlayer->getRobotName() << " upgraded!" << endl;
                     delete upgradedRobot;
                     upgradedRobot = nullptr; 
                 }
