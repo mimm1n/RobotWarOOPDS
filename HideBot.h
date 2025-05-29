@@ -36,6 +36,7 @@ class HideBot : public MovingRobot{
         HideBot(int x, int y, string name):Robot( x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         bool isHidden();
+        int hidesLeft() const;
         void setRobotType(int type) override { robotType = HIDE; }
         int getRobotType() const override { return HIDE; }
 };

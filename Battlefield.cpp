@@ -195,7 +195,7 @@ void Battlefield::placeRobots(){
         
         waitingRobots_.push(robots_[i]);
         allRobotId.push_back(robots_[i]->getRobotID());
-        // if(!robots_[i]->isAlive()){respawnRobot(i);}
+        //if(!robots_[i]->isAlive()){respawnRobot(i);}
     }
 
 };
