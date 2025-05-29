@@ -28,13 +28,17 @@
 #include "Robot.h"
 using namespace std;
 
-class SemiAutoBot : public ShootingRobot {
+class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
     private:
         int shotsFired = 0;
         const int MAX_SHOTS_FIRED = 3;
     public:
         SemiAutoBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         void setRobotType(int type) override { robotType = SEMIAUTO; }
         int getRobotType() const override { return SEMIAUTO; }
 };

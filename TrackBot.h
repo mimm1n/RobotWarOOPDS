@@ -27,7 +27,7 @@
 #include "Robot.h"
 using namespace std;
 
-class TrackBot : public SeeingRobot {
+class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot, public ThinkingRobot {
     private:
         int trackersUsed = 0;
         const int MAX_TRACKERS = 3;
@@ -36,6 +36,10 @@ class TrackBot : public SeeingRobot {
     public:
         TrackBot(int x, int y, string name):Robot(x, y, name){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* Battlefield);
         vector<int> getTrackedTargets() { return targets; }
         void setRobotType(int type) override { robotType = TRACK; }
         int getRobotType() const override { return TRACK; }

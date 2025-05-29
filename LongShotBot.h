@@ -28,10 +28,14 @@
 #include "Robot.h"
 using namespace std;
 
-class LongShotBot : public ShootingRobot {
+class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
     public:
         LongShotBot(int x, int y, string name):Robot( x, y, name){}
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         void setRobotType(int type) override { robotType = LONGSHOT; }
         int getRobotType() const override { return LONGSHOT;}
 };

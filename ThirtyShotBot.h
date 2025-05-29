@@ -27,10 +27,14 @@
 #include "Robot.h"
 using namespace std;
 
-class ThirtyShotBot : public ShootingRobot {
+class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
     public:
         ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         void setRobotType(int type) override { robotType = THIRTYSHOT; }
         int getRobotType() const override { return THIRTYSHOT;}
 };
