@@ -32,17 +32,189 @@
 
 using namespace std;
 
-class GenericRobot;
-class HideBot;
-class JumpBot;
-class LongShotBot;
-class SemiAutoBot;
-class ThirtyShotBot;
-class HealBot;
-class BombBot;
-class ReflectShotBot;
-class ScoutBot;
-class TrackBot;
+class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
+private:
+    static int robotIncrement;
+    int robotId;
+    int upgradeCount = 0;
+    const int MAX_UPGRADE = 3;
+    Robot* robotUpgraded = nullptr;
+    bool upgrade = false;
+
+public:
+    GenericRobot(std::string name, int x, int y);
+
+    int getRobotID() const;
+    void setRobotType(int type) override;
+    int getRobotType() const override;
+
+    virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+    virtual void actionMove(Battlefield* battlefield, int x, int y) override;
+    virtual void actionLook(Battlefield* battlefield, int x, int y) override;
+    virtual void actionThink(Battlefield* battlefield) override;
+    void actionRand(Battlefield* battlefield);
+
+    void upgradeRobot(Battlefield* battlefield, int upgradeType);
+    bool toUpgrade() const;
+    void ToGeneric(int upgradeType);
+    int getUpgradeCount() const;
+};
+
+class HideBot : public MovingRobot, public ShootingRobot, public SeeingRobot, public ThinkingRobot{
+    private:
+        int hideTurnsUsed = 0;
+        const int MAX_HIDE_TURNS = 3;
+        bool isHidden_ = false;
+
+    public:
+        HideBot(int x, int y, string name):Robot(x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        bool isHidden();
+        int hidesLeft() const;
+        void setRobotType(int type) override { robotType = HIDE; }
+        int getRobotType() const override { return HIDE; }
+};
+
+class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, public ThinkingRobot {
+    private:
+        int jumpsUsed = 0;
+        const int MAX_JUMPS = 3;
+
+    public:
+        JumpBot(int x, int y, string name):Robot(x, y, name){}
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = JUMP; }
+        int getRobotType() const override { return JUMP; }
+};
+
+
+class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
+    public:
+        LongShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = LONGSHOT; }
+        int getRobotType() const override { return LONGSHOT;}
+};
+
+class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    private:
+        int shotsFired = 0;
+        const int MAX_SHOTS_FIRED = 3;
+    public:
+        SemiAutoBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = SEMIAUTO; }
+        int getRobotType() const override { return SEMIAUTO; }
+};
+
+class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    public:
+        ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = THIRTYSHOT; }
+        int getRobotType() const override { return THIRTYSHOT;}
+};
+
+
+class HealBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    public:
+        HealBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand (Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = HEAL; }
+        int getRobotType() const override { return HEAL; }
+};
+
+class BombBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    private:
+        int bombs = 1;
+    public:
+        BombBot(int x, int y, string name):Robot(x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = BOMB; }
+        int getRobotType() const override { return BOMB; }
+};
+
+class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
+    private:
+        int reflect = 1;
+        bool isReflect_ = false;
+    public:
+        ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        bool isReflecting();
+        void setRobotType(int type) override { robotType = REFLECTSHOT; }
+        int getRobotType() const override { return REFLECTSHOT; }
+ 
+};
+
+
+class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, public ThinkingRobot{
+    private:
+        int lookCount = 0;
+        const int MAX_LOOKS = 3;
+
+    public:
+        ScoutBot(int x, int y, string name):Robot( x, y, name){}
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = SCOUT; }
+        int getRobotType() const override { return SCOUT; }
+};
+
+class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot, public ThinkingRobot {
+    private:
+        int trackersUsed = 0;
+        const int MAX_TRACKERS = 3;
+        vector<int> targets {};
+
+    public:
+        TrackBot(int x, int y, string name):Robot(x, y, name){}
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* Battlefield);
+        vector<int> getTrackedTargets() { return targets; }
+        void setRobotType(int type) override { robotType = TRACK; }
+        int getRobotType() const override { return TRACK; }
+};
+
+
+int GenericRobot::robotIncrement = 0;
 
 int main() {
     ofstream outFile;
@@ -179,35 +351,6 @@ int main() {
     return 0;
 }
 
-class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
-private:
-    static int robotIncrement;
-    int robotId;
-    int upgradeCount = 0;
-    const int MAX_UPGRADE = 3;
-    Robot* robotUpgraded = nullptr;
-    bool upgrade = false;
-
-public:
-    GenericRobot(std::string name, int x, int y);
-
-    int getRobotID() const;
-    void setRobotType(int type) override;
-    int getRobotType() const override;
-
-    void actionFire(Battlefield* battlefield, int x, int y) override;
-    void actionMove(Battlefield* battlefield, int x, int y) override;
-    void actionLook(Battlefield* battlefield, int x, int y) override;
-    void actionThink(Battlefield* battlefield) override;
-    void actionRand(Battlefield* battlefield);
-
-    void upgradeRobot(Battlefield* battlefield, int upgradeType);
-    bool toUpgrade() const;
-    void ToGeneric(int upgradeType);
-    int getUpgradeCount() const;
-};
-
-int GenericRobot::robotIncrement = 0;
 
 GenericRobot::GenericRobot(string name, int x, int y) : Robot(x, y, name) {
     robotId = robotIncrement;
@@ -218,7 +361,7 @@ int GenericRobot::getRobotID() const { return robotId; }
 void GenericRobot::setRobotType(int type) { robotType = type; }
 int GenericRobot::getRobotType() const { return robotType; }
 
-void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
+virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
     if (getShells() <= 0) {
         cout << "Out of shells!" << endl;
         return;
@@ -311,7 +454,7 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
     }
 }
 
-void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
+virtual void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -332,7 +475,7 @@ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
     cout << "Robot " << getRobotID() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
+virtual void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -365,7 +508,7 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
     }
 }
 
-void GenericRobot::actionThink(Battlefield* battlefield) {
+virtual void GenericRobot::actionThink(Battlefield* battlefield) {
     actionRand(battlefield);
 }
 
@@ -444,50 +587,6 @@ void GenericRobot::actionRand(Battlefield* battlefield) {
         actionMove(battlefield, moveX, moveY);
     }
 }
-
-class HideBot : public ShootingRobot, public MovingRobot{
-    private:
-        int hideTurnsUsed = 0;
-        const int MAX_HIDE_TURNS = 3;
-        bool isHidden_ = false;
-
-    public:
-        HideBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield) override;
-        void actionRand(Battlefield* battlefield);
-        bool isHidden();
-        int hidesLeft() const;
-        void setRobotType(int type) override { robotType = HIDE; }
-        int getRobotType() const override { return HIDE; }
-};
-
-//*********************************************************   
-// Program: HideBot.cpp   
-// Course: CCP6124 OOPDS  
-// Lecture Class: TC2L 
-// Tutorial Class: TT7L 
-// Trimester: 2510 
-// Member_1: 243UC24665 | NOR ALIYAH SYAHIRAH BINTI MUHD HASSANAL | NOR.ALIYAH.SYAHIRAH@student.mmu.edu.my | 0146202605 
-// Member_2: 243UC246KQ | KHAYRIN SOFIYA BINTI JAMEL | KHAYRIN.SOFIYA.JAMEL@student.mmu.edu.my | 0193320041 
-// Member_3: 243UC247CJ | AIMI BINTI MOHD FAIZAL | AIMI.MOHD.FAIZAL@student.mmu.edu.my | 0139071648 
-// Member_4: 241UC24199 | AMIRUL IHTISYAM BIN IDRUS | AMIRUL.IHTISYAM.IDRUS@student.mmu.edu.my | 0194090095	  
-//********************************************************* 
-// Task Distribution 
-// Member_1:   
-// Member_2:   
-// Member_3:   
-// Member_4: 
-// ******************************************************** 
-
-#include "HideBot.h"
-#include "Battlefield.h"
-#include <iostream>
-#include <cstdlib>
-#include <string>
-using namespace std;
 
 void HideBot::actionFire(Battlefield* battlefield, int x, int y){
     if (getShells() <= 0) {
@@ -628,7 +727,7 @@ void HideBot::actionLook(Battlefield* battlefield, int x, int y){
 }
 
 
-void HideBot::actionThink(Battlefield* battlefield, int x, int y){
+void HideBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -685,22 +784,6 @@ int HideBot::hidesLeft() const{
 return MAX_HIDE_TURNS - hideTurnsUsed - 1;
 }
 
-class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, public ThinkingRobot {
-    private:
-        int jumpsUsed = 0;
-        const int MAX_JUMPS = 3;
-
-    public:
-        JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot( x, y, name){}
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = JUMP; }
-        int getRobotType() const override { return JUMP; }
-};
-
 void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
     if (jumpsUsed < MAX_JUMPS) {
         string targetPosition = battlefield->getPlayer(x, y);
@@ -714,7 +797,7 @@ void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
     }
 }
 
-void JumpBot::actionThink(Battlefield* battlefield, int x, int y){
+void JumpBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -761,17 +844,6 @@ void JumpBot::actionRand(Battlefield* battlefield){
     }
 }
 
-class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
-    public:
-        LongShotBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = LONGSHOT; }
-        int getRobotType() const override { return LONGSHOT;}
-};
 
 void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
     if (x < (getRobotX() - 4 ) || x > (getRobotX() + 4 ) || y < (getRobotY() - 4 ) || y > (getRobotY() + 4))
@@ -816,7 +888,7 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
     }
 }
 
-void LongShotBot::actionThink(Battlefield* battlefield, int x, int y){
+void LongShotBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -862,21 +934,6 @@ void LongShotBot::actionRand(Battlefield* battlefield){
         actionMove(battlefield, moveX, moveY);
     }
 }
-
-class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
-    private:
-        int shotsFired = 0;
-        const int MAX_SHOTS_FIRED = 3;
-    public:
-        SemiAutoBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = SEMIAUTO; }
-        int getRobotType() const override { return SEMIAUTO; }
-};
 
 void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
     int targetRobotId;
@@ -927,7 +984,7 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
     delete targetRobot;
     targetRobot = nullptr;
 }
-void SemiAutoBot::actionThink(Battlefield* battlefield, int x, int y){
+void SemiAutoBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -974,21 +1031,10 @@ void SemiAutoBot::actionRand(Battlefield* battlefield){
     }
 }
 
-class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
-    public:
-        ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = THIRTYSHOT; }
-        int getRobotType() const override { return THIRTYSHOT;}
-};
 
 void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y) { setShells(30); }
 
-void ThirtyShotBot::actionThink(Battlefield* battlefield, int x, int y){
+void ThirtyShotBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -1035,24 +1081,13 @@ void ThirtyShotBot::actionRand(Battlefield* battlefield){
     }
 }
 
-class HealBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
-    public:
-        HealBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand (Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = HEAL; }
-        int getRobotType() const override { return HEAL; }
-};
 
 void HealBot::actionFire(Battlefield* battlefield, int x, int y){
     addLife();
     addLife();
     addLife();
 } 
-void HealBot::actionThink(Battlefield* battlefield, int x, int y){
+void HealBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -1099,19 +1134,6 @@ void HealBot::actionRand(Battlefield* battlefield){
     }
 }
 
-class BombBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
-    private:
-        int bombs = 1;
-    public:
-        BombBot(int x, int y, string name):Robot(x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = BOMB; }
-        int getRobotType() const override { return BOMB; }
-};
 
 void BombBot::actionFire(Battlefield* battlefield, int x, int y){
     if(bombs){
@@ -1156,7 +1178,7 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
     bombs--;
 }
 
-void BombBot::actionThink(Battlefield* battlefield, int x, int y){
+void BombBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -1203,22 +1225,6 @@ void BombBot::actionRand(Battlefield* battlefield){
     }
 }
 
-class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
-    private:
-        int reflect = 1;
-        bool isReflect_ = false;
-    public:
-        ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        bool isReflecting();
-        void setRobotType(int type) override { robotType = REFLECTSHOT; }
-        int getRobotType() const override { return REFLECTSHOT; }
- 
-};
-
 void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y){
     if(reflect>0)
         isReflect_ = true;
@@ -1231,21 +1237,6 @@ bool ReflectShotBot::isReflecting() {
     return name;
 }
 
-class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, public ThinkingRobot{
-    private:
-        int lookCount = 0;
-        const int MAX_LOOKS = 3;
-
-    public:
-        ScoutBot(int x, int y, string name):Robot( x, y, name){}
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* battlefield);
-        void setRobotType(int type) override { robotType = SCOUT; }
-        int getRobotType() const override { return SCOUT; }
-};
 
 void ScoutBot::actionLook(Battlefield* battlefield, int x, int y){
     if (lookCount < MAX_LOOKS) {
@@ -1253,7 +1244,7 @@ void ScoutBot::actionLook(Battlefield* battlefield, int x, int y){
         lookCount++;
     }
 }
-void ScoutBot::actionThink(Battlefield* battlefield, int x, int y){
+void ScoutBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
@@ -1300,23 +1291,6 @@ void ScoutBot::actionRand(Battlefield* battlefield){
     }
 }
 
-class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot, public ThinkingRobot {
-    private:
-        int trackersUsed = 0;
-        const int MAX_TRACKERS = 3;
-        vector<int> targets {};
-
-    public:
-        TrackBot(int x, int y, string name):Robot(x, y, name){}
-        void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
-        void actionRand(Battlefield* Battlefield);
-        vector<int> getTrackedTargets() { return targets; }
-        void setRobotType(int type) override { robotType = TRACK; }
-        int getRobotType() const override { return TRACK; }
-};
 
 void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
     if (trackersUsed > MAX_TRACKERS)
@@ -1326,7 +1300,7 @@ void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
     targets.push_back(targetRobotId);
     trackersUsed++;
 }
-void TrackBot::actionThink(Battlefield* battlefield, int x, int y){
+void TrackBot::actionThink(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
