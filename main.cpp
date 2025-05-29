@@ -23,14 +23,131 @@
 #include <iomanip>
 #include <vector>
 #include <random>
-#include "Robot.h"
-#include "Battlefield.h"
-#include "ThinkingRobot.h"
-#include "SeeingRobot.h"
-#include "MovingRobot.h"
-#include "ShootingRobot.h"
-
+// #include "Robot.h"
+// #include "Battlefield.h"
+// #include "ThinkingRobot.h"
+// #include "SeeingRobot.h"
+// #include "MovingRobot.h"
+// #include "ShootingRobot.h"
 using namespace std;
+
+enum RobotType {GENERIC, SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
+
+class Battlefield;
+class GenericRobot;
+
+class Robot{
+    private:
+        int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
+        const int MAX_UPGRADES = 3;
+        string robotName = ""; // The name of this robot        
+    
+    protected:
+        int killCount = 0; // Number of robots this robot managed to destroy/kill
+        int lives = 3; // Number of lives of this robot (initial is 3)
+        int robotId = -1; // The ID of this robot
+        int robotType = GENERIC; // This robot's type; Jump, Hide, etc.
+        int upgradeCount = 0;
+
+    public:
+        Robot(int x, int y, string name); // Constructor
+        virtual ~Robot(){} // Destructor
+        
+        // Set and get the x coordinate of this robot
+        void setRobotX(int x); 
+        int getRobotX() const;
+
+        // Set and get the y coordinate of this robot
+        void setRobotY(int y);
+        int getRobotY() const;
+
+        // Get the name of this robot(fixed so can't set)
+        string getRobotName() const;
+
+        void addLife(); // Adds 1 life to the lives count 
+        bool reduceLife(); // Reduces the lives count by 1
+        int getLives() const; // Get this robot's lives count
+        void setLives(int live);
+        bool isAlive() const; // Checks if this robot's lives count is more than 0
+        
+        int getKills() const; // Get this robot's current kill count
+        void setKills(int kills);
+        void incrementKills(); // Adds 1 to the kill count
+
+        int getUpgradeCount() const;
+        bool canUpgrade() const;
+        void addUpgrade(int currentUpgradeCount);
+
+        // Set and get the robot's type
+        virtual void setRobotType(int type) = 0;
+        virtual int getRobotType() const = 0;
+};
+
+class SeeingRobot : virtual public Robot{
+    public:
+        SeeingRobot(){}
+        virtual void actionLook(Battlefield* battlefield, int x, int y) = 0;
+};
+
+class ShootingRobot : virtual public Robot{
+    private:
+        int shells = 10;
+    public:
+        ShootingRobot(int x, int y, string name):Robot(x, y, name){}
+        void setShells(int num) { shells = num; }
+        int getShells() const { return shells; }
+        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+};
+
+class ThinkingRobot : virtual public Robot{
+    public:
+        ThinkingRobot(){}
+        virtual void actionThink(Battlefield* battlefield) = 0;
+};
+
+class MovingRobot : virtual public Robot{
+    public:
+        MovingRobot(int x, int y, string name):Robot(x, y, name){}
+        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
+};
+
+class Battlefield {
+    private:
+        int battlefieldCols_ = -1; // variable to assign number of columns
+        int battlefieldRows_ = -1; // variable to assign number of rows
+
+        int totalTurns_ = -1; // variable to assign total turns
+        int currentTurn_ = 1; 
+        int currentPlayer = 0;
+    
+
+        int numOfRobots_ = -1; // variable to assign number of robots
+
+        vector<Robot *> robots_; 
+        vector<Robot *> upgradedRobots_[11];
+        queue<Robot *> destroyedRobots_;
+        queue<Robot *> waitingRobots_;  
+        vector < vector <string> > battlefield_;
+        friend class GenericRobot;
+    public:
+        // Get function
+        int battlefieldCols();
+        int battlefieldRows();
+        int turns();
+        int numOfRobots();
+        int currentTurn();
+        string getPlayer(int x, int y);
+        vector <Robot *> getAllRobots() const;
+        Robot* getCurrentPlayer() const;
+        void robotUpgrade(Robot* upgradeRobot_);
+        
+        
+        void readFile(string filename);
+        void placeRobots();
+        void displayBattlefield(int x, int y, vector<int> targets = {}) const;
+        void respawnRobot(int x);
+        void nextTurn();
+};
 
 class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
 private:
@@ -60,14 +177,14 @@ public:
     int getUpgradeCount() const;
 };
 
-class HideBot : public MovingRobot, public ShootingRobot{
+class HideBot : public MovingRobot,public ShootingRobot, public SeeingRobot, public ThinkingRobot{
     private:
         int hideTurnsUsed = 0;
         const int MAX_HIDE_TURNS = 3;
         bool isHidden_ = false;
 
     public:
-        HideBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name){}
+        HideBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -85,7 +202,7 @@ class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
         const int MAX_JUMPS = 3;
 
     public:
-        JumpBot(int x, int y, string name):Robot(x, y, name){}
+        JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -98,7 +215,7 @@ class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
 
 class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
     public:
-        LongShotBot(int x, int y, string name):Robot( x, y, name){}
+        LongShotBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -113,7 +230,7 @@ class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobo
         int shotsFired = 0;
         const int MAX_SHOTS_FIRED = 3;
     public:
-        SemiAutoBot(int x, int y, string name):Robot( x, y, name){}
+        SemiAutoBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -125,7 +242,7 @@ class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobo
 
 class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
     public:
-        ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
+        ThirtyShotBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -138,7 +255,7 @@ class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRo
 
 class HealBot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
     public:
-        HealBot(int x, int y, string name):Robot( x, y, name){}
+        HealBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -152,7 +269,7 @@ class BombBot : public ShootingRobot, public MovingRobot, public SeeingRobot, pu
     private:
         int bombs = 1;
     public:
-        BombBot(int x, int y, string name):Robot(x, y, name){}
+        BombBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -167,7 +284,7 @@ class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingR
         int reflect = 1;
         bool isReflect_ = false;
     public:
-        ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
+        ReflectShotBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
@@ -185,7 +302,7 @@ class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, 
         const int MAX_LOOKS = 3;
 
     public:
-        ScoutBot(int x, int y, string name):Robot( x, y, name){}
+        ScoutBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
@@ -202,7 +319,7 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
         vector<int> targets {};
 
     public:
-        TrackBot(int x, int y, string name):Robot(x, y, name){}
+        TrackBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
@@ -222,7 +339,8 @@ int main() {
     battlefield->readFile("inputFile.txt");
     outFile.open("outputFile.txt");
     battlefield->placeRobots();
-    Robot* currentPlayer = new GenericRobot(0,0,"test"), upgradedRobot = new GenericRobot(0, 0,"test");
+    Robot* currentPlayer = new GenericRobot("test", 0,0);
+    Robot* upgradedRobot = new GenericRobot("test", 0, 0);
     int move, x, y, kills, upgrade, currentPlayerType;
     string name;
     
@@ -351,6 +469,485 @@ int main() {
     return 0;
 }
 
+/**********************************************************************
+ * Robot (constructor)
+ * task: Constructs a robot object by assigning it's x and y 
+ *       coordinates, its name, and its type 
+ * @param x - x coordinate
+ *        y - y coordinate
+ *        name - robot's name
+ *********************************************************************/
+Robot::Robot(int x, int y, string name){
+    setRobotX(x);
+    setRobotY(y);
+    robotName = name;
+}
+
+/**********************************************************************
+ * setRobotX
+ * task: sets the x coordinate of the robot
+ * @param x - x coordinate
+ *********************************************************************/
+void Robot::setRobotX(int x){
+    robotX = x;
+}
+
+/**********************************************************************
+ * getRobotX
+ * task: gets the x coordinate of the robot
+ * @return robotX - x coordinate of the robot
+ *********************************************************************/
+int Robot::getRobotX() const{
+    return robotX;
+}
+
+/**********************************************************************
+ * setRobotY
+ * task: sets the y coordinate of the robot
+ * @param y - y coordinate
+ *********************************************************************/
+void Robot::setRobotY(int y){
+    robotY = y;
+}
+
+/**********************************************************************
+ * getRobotY
+ * task: gets the y coordinate of the robot
+ * @return robotY - y coordinate of the robot
+ *********************************************************************/
+int Robot::getRobotY() const{
+    return robotY;
+}
+
+/**********************************************************************
+ * getRobotName
+ * task: gets the name of the robot
+ * @return robotName - name of the robot
+ *********************************************************************/
+string Robot::getRobotName() const{
+    return robotName;
+}
+
+/**********************************************************************
+ * addLife
+ * task: Increases the lives count by 1
+ *********************************************************************/
+void Robot::addLife(){
+    lives++;
+}
+
+/**********************************************************************
+ * reduceLife
+ * task: Decreases the lives count by 1 if the robot isAlive
+ * @return true if robot is alive after decreasing the lives count 
+ *         by 1, false if robot dead/destroyed
+ *********************************************************************/
+bool Robot::reduceLife(){
+    if(isAlive()){
+        lives--;
+        return isAlive();
+    }
+    return false;
+}
+
+/**********************************************************************
+ * getLives
+ * task: gets the number of lives the robot has left
+ * @return lives - number of lives of the robot 
+ *********************************************************************/
+int Robot::getLives() const{
+    return lives;
+}
+
+/**********************************************************************
+ * setLives
+ * task: sets the lives count
+ * @param live - live count
+ *********************************************************************/
+void Robot::setLives(int live){
+    lives = live;
+}
+
+/**********************************************************************
+ * isAlive
+ * task: Checks if the lives count is greater than 0
+ * @return true if the lives count is greater than 0
+ *********************************************************************/
+bool Robot::isAlive() const{
+    if(lives<=0){
+        cout << "Robot" << robotName << "is dead!";
+        return false;
+    }
+    return true;
+}
+
+/**********************************************************************
+ * getKills
+ * task: gets the number of kills the robot has
+ * @return killCount - number of kills so far
+ *********************************************************************/
+int Robot::getKills() const{
+    return killCount;
+}
+
+/**********************************************************************
+ * setKills
+ * task: sets the kill count
+ * @param kills - kill count
+ *********************************************************************/
+void Robot::setKills(int kills){
+    killCount = kills;
+}
+
+/**********************************************************************
+ * incrementKills
+ * task: Increases the kill count by 1
+ * @return killCount - number of kills so far
+ *********************************************************************/
+void Robot::incrementKills(){
+    killCount++;
+}
+
+/**********************************************************************
+ * getUpgradeCount
+ * task: gets the number of upgrades the robot has went through
+ * @return upgradeCount - number of upgrades so far
+ *********************************************************************/
+int Robot::getUpgradeCount() const{
+    return upgradeCount;
+}
+
+/**********************************************************************
+ * canUpgrade
+ * task: Checks if the upgrade count is lesser than max upgrades
+ * @return true if it hasn't reached max upgrades
+ *********************************************************************/
+bool Robot::canUpgrade() const{
+    if(upgradeCount < MAX_UPGRADES){
+        return true;
+    }
+    return false;
+}
+
+/**********************************************************************
+ * incrementKills
+ * task: Increases the kill count by 1
+ * @return killCount - number of kills so far
+ *********************************************************************/
+void Robot::addUpgrade(int currentUpgradeCount){
+    upgradeCount = currentUpgradeCount + 1;
+}
+
+/**********************************************************************
+ * battlefieldCols
+ * task: 
+ * @return battlefieldCols_ - 
+ *********************************************************************/
+int Battlefield::battlefieldCols(){ 
+    return battlefieldCols_; 
+}
+
+/**********************************************************************
+ * battlefieldRows
+ * task: 
+ * @return battlefieldRows_ - 
+ *********************************************************************/
+int Battlefield::battlefieldRows(){
+    return battlefieldRows_;
+}
+
+/**********************************************************************
+ * turns
+ * task: 
+ * @return totalTurns_ - 
+ *********************************************************************/
+int Battlefield::turns(){
+    return totalTurns_;
+}
+
+/**********************************************************************
+ * numOfRobots
+ * task: 
+ * @return numOfRobots_ - 
+ *********************************************************************/
+int Battlefield::numOfRobots(){
+    return numOfRobots_; 
+}
+
+/**********************************************************************
+ * currentTurn
+ * task: 
+ * @return currentTurn_ - 
+ *********************************************************************/
+int Battlefield::currentTurn(){
+    return currentTurn_; 
+}
+
+/**********************************************************************
+ * getPlayer
+ * task: 
+ * @param x -
+ *        y -
+ * @return  
+ *********************************************************************/
+string Battlefield::getPlayer(int x, int y){
+    return battlefield_[y][x];
+}
+
+/**********************************************************************
+ * getAllRobots
+ * task: 
+ * @return robots_ - 
+ *********************************************************************/
+vector <Robot *> Battlefield::getAllRobots() const {
+    return robots_;
+}
+
+
+/**********************************************************************
+ * getCurrentPlayer
+ * task: 
+ * @return 
+ *********************************************************************/
+Robot* Battlefield::getCurrentPlayer() const {
+    return waitingRobots_.front();
+}
+
+/**********************************************************************
+ * readFile
+ * task: 
+ * @param filename - 
+ *********************************************************************/
+void Battlefield::readFile(string filename) {
+
+    ifstream infile(filename);
+    string line;
+
+    //find matrix
+    getline(infile, line); //read first line
+    size_t pos1 = line.find(":");
+    if (pos1 != string::npos){
+        string numStr = line.substr(pos1+2);
+        stringstream ss(numStr);
+        string colstr, rowstr;
+        ss >> rowstr >> colstr;
+        battlefieldRows_ = stoi(rowstr);
+        battlefieldCols_ = stoi(colstr);
+    }
+
+    battlefield_ = vector<vector<string>>(battlefieldRows_+ 1, vector<string>(battlefieldCols_+ 1, "")); //2D vector for rows and columns
+
+    //find total turn
+    getline(infile, line); //read second line
+    size_t pos2 = line.find(":");
+    if (pos2 != string::npos){
+        string numStr2 = line.substr(pos2+2);
+        totalTurns_ = stoi(numStr2);
+    }
+    
+    //find total robot
+    getline(infile, line);// read the third line
+    size_t pos3 = line.find(":");
+    if (pos3 != string::npos){
+        string numStr3 = line.substr(pos3+2);
+        numOfRobots_ = stoi(numStr3);
+    }
+
+    cout << battlefieldCols_ << " " << battlefieldRows_ << " " << totalTurns_ << " " << numOfRobots_ << endl;
+
+    //find robot name and position
+    for (int i = 0; i < numOfRobots_; i++) {
+        getline(infile, line);
+        istringstream robotLine(line);
+        string name, xStr, yStr;
+        int x, y;
+        robotLine >> name >> yStr >> xStr;
+        if (xStr == "random" && yStr == "random"){
+            x = rand() % (battlefieldRows_);
+            y = rand() % (battlefieldCols_);
+            cout << x << y << endl;
+        } else {
+            x = stoi(xStr);
+            y = stoi(yStr);
+        }
+        robots_.push_back(new GenericRobot(name,x,y));
+    }
+}
+
+/**********************************************************************
+ * placeRobots
+ * task: 
+ *********************************************************************/
+void Battlefield::placeRobots(){
+    for(int i=0;i<battlefield_.size(); i++){
+        for (int j=0; j<battlefield_[i].size(); j++){
+            battlefield_[i][j]="";
+        }
+    }
+
+    for (int i=0;i<robots_.size(); i++){
+        int y = robots_[i]->getRobotY();
+        int x = robots_[i]->getRobotX();
+
+        if(y < battlefield_.size() && x < battlefield_[0].size()){
+            battlefield_[y][x]= to_string(robots_[i]->getRobotID());
+        } else {
+            cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
+            exit(1);
+        }
+        
+        waitingRobots_.push(robots_[i]);
+ 
+    }
+
+};
+
+/**********************************************************************
+ * displayBattlefield
+ * task: Displays the battlefield and any needed players
+ * x and y are the center of the nine square grid when looking
+ * when x = -10 and y = -10, all robots displayed on field (scoutBot)
+ * when x = -5 and y = -5 only current player's position displayed
+ * @param x - the x coordinate of the nine square
+ *        y - the y coordinate of the nine square
+ *********************************************************************/
+void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
+    cout << "Display Battlefield";
+    cout << endl << "    ";
+
+    for (int j=0; j< battlefield_[0].size();j++)
+        cout << "   " << right << setfill('0') << setw(2) << j << "";
+    cout << endl;
+
+    for (int i=0; i< battlefield_.size();i++){
+        cout << "     ";
+        for (int j = 0; j < battlefield_[i].size(); j++)
+            cout << "+----";
+        cout << "+" << endl;
+        cout << "   " << right << setfill('0') << setw(2) << i;
+
+        for (int j = 0;j <battlefield_[0].size(); j++){
+            if(battlefield_[i][j] == ""){
+                cout << "|" << "    ";
+            } else { //placesRobot
+                if(x == -10  && y == -10){ //scout  
+                    cout << "|" << "GR";
+                    cout << "0";   
+                    cout << battlefield_[i][j];
+                }else {
+                    if (stoi(battlefield_[i][j]) == getCurrentPlayer()->getRobotID()){ //general
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
+
+                    if(y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
+                        cout << "|" << "GR";
+                        cout << "0";   
+                        cout << battlefield_[i][j];
+                    }
+                }
+            }
+        }
+        cout << "|" << endl;
+    }
+    cout << "     ";
+    for (int j = 0;j<battlefield_[0].size();j++)
+        cout << "+----";
+    cout << "+" << endl;
+
+}
+
+/**********************************************************************
+ * respawnRobot
+ * task: 
+ * @param index - 
+ *********************************************************************/
+void Battlefield::respawnRobot(int index){
+
+    Robot* died = robots_[index];
+    int size = waitingRobots_.size();
+
+        for(int i = 0; i<size;i++){
+            Robot* current = waitingRobots_.front()
+            if (current->getRobotId() != died->getRobotId()){
+                  waitingRobots_.pop();
+                  waitingRobots_.push(current);
+            }else{
+            waitingRobots_.pop();}
+
+        }
+
+    if(!died->isAlive()){
+        destroyedRobots_.push(died);
+        return;
+    }else{
+        int newX = rand() % (battlefieldRows_);
+        int newY = rand() % (battlefieldCols_);
+
+        GenericRobot* respawn = new GenericRobot(name, newX, newY);
+        respawn->addUpgrade(died->getUpgradeCount()-1);
+        respawn->setLives(died->getLives());
+        respawn->setKills(died->getKills());
+        respawn->setShells(died->getShells());
+
+        battlefield_[died->getRobotY()][died->getRobotX()] = ""; //clear the field
+        battlefield_[newY][newX] = to_string(respawn->getRobotId());
+        waitingRobots_.push(respawn);
+        }
+    
+}
+
+/**********************************************************************
+ * nextTurn
+ * task: 
+ *********************************************************************/
+void Battlefield::nextTurn(){
+    currentTurn_++;
+    GenericRobot* front = waitingRobots_.front();
+    waitingRobots_.pop();
+    waitingRobots_.push(front);
+}
+
+RobotType Battlefield::findTargetRobot(GenericRobot* target) {
+    for (int i = 0; i <= BOMB; ++i) {
+        for (Robot* robot : upgradedRobots_[i]) {
+            if (robot == target) {
+                return static_cast<RobotType>(i);
+            }
+        }
+    }
+    return GENERIC;
+}
+
+/**********************************************************************
+ * robotUpgrade
+ * task: 
+ *********************************************************************/
+ void Battlefield::robotUpgrade(Robot* upgradeRobot_){
+    int size = waitingRobots_.size();
+
+        for(int i = 0; i<size;i++){
+            Robot* current = waitingRobots_.front()
+            if (current->getRobotId() != upgradeRobot_->getRobotId()){
+                  waitingRobots_.pop();
+                  waitingRobots_.push(current);
+            }else{
+            waitingRobots_.pop();
+            waitingRobots_.push(upgradeRobot_)
+            }
+        }
+        
+
+   for (auto& robot : robots_) {
+
+    if (robot->getRobotId() == upgradeRobot_->getRobotId()) {
+        robot = upgradeRobot_;  // Replace pointer
+        break;
+    }
+}
+
+ }
 
 GenericRobot::GenericRobot(string name, int x, int y) : Robot(x, y, name) {
     robotId = robotIncrement;
@@ -432,7 +1029,7 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         bool saveLife = targetRobot->isAlive();
         targetRobot->reduceLife();
 
-        RobotType type = battlefield->findTargetRobot(targetRobot);
+        // RobotType type = battlefield->findTargetRobot(targetRobot);
 
         if (type != GENERIC){
             bool remove = true; //remove when a robot got hit

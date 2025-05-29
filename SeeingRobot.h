@@ -31,6 +31,6 @@ class Battlefield;
 class SeeingRobot : virtual public Robot{
     public:
         SeeingRobot(){}
-        virtual void actionLook(Battlefield* battlefield,int x, int y) = 0;
+        virtual void actionLook(Battlefield* battlefield, int x, int y) = 0;
 };
 #endif
