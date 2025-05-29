@@ -23,7 +23,6 @@
 #include <cstdlib>
 #include <string>
 #include <queue>
-#include "GenericRobot.h"
 #include "Robot.h"
 using namespace std;
 
