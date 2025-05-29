@@ -158,7 +158,7 @@ int main() {
                     upgradedRobot->setLives(currentPlayer->getLives());
                     upgradedRobot->setKills(currentPlayer->getKills());
                     upgradedRobot->setShells(currentPlayer->getShells());
-                    // need to update in Battlefield the robot type
+                    battlefield->robotUpgrade(upgradedRobot);
 
                     cout << currentPlayer->getRobotName() << " upgraded!" << endl;
                     outFile << currentPlayer->getRobotName() << " upgraded!" << endl;
@@ -684,3 +684,693 @@ bool HideBot::isHidden(){
 int HideBot::hidesLeft() const{ 
 return MAX_HIDE_TURNS - hideTurnsUsed - 1;
 }
+
+class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, public ThinkingRobot {
+    private:
+        int jumpsUsed = 0;
+        const int MAX_JUMPS = 3;
+
+    public:
+        JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot( x, y, name){}
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = JUMP; }
+        int getRobotType() const override { return JUMP; }
+};
+
+void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
+    if (jumpsUsed < MAX_JUMPS) {
+        string targetPosition = battlefield->getPlayer(x, y);
+        if (targetPosition.empty()) { //check if theres any robots at the location
+            setRobotX(x);
+            setRobotY(y);
+            jumpsUsed++;
+        } else {
+            cout << "Invalid location! There might be a robot there." << endl;
+        }
+    }
+}
+
+void JumpBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void JumpBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
+    public:
+        LongShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = LONGSHOT; }
+        int getRobotType() const override { return LONGSHOT;}
+};
+
+void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
+    if (x < (getRobotX() - 4 ) || x > (getRobotX() + 4 ) || y < (getRobotY() - 4 ) || y > (getRobotY() + 4))
+        return;
+    
+    if (getShells() <= 0) {
+        cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
+        return;
+    }
+
+    if (battlefield->getPlayer(x, y) != ""){
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<> distr(1, 100); // 1 to 100 randomiser
+
+        int hitChance = distr(gen); 
+        if (hitChance <= 70) {  // 70% chance 
+            int targetRobotId = stoi(battlefield->getPlayer(x, y));
+            GenericRobot* targetRobot = nullptr; 
+            
+            for (GenericRobot* robot : battlefield->getAllRobots()){
+                if (robot->getRobotID() == targetRobotId) {
+                    targetRobot = robot;
+                    break;
+                }
+            }
+
+            if (targetRobot->getRobotType() != HIDE && targetRobot->getRobotType() != REFLECTSHOT){
+                targetRobot->reduceLife();
+                if (!targetRobot->isAlive()){
+                    cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
+                }
+                incrementKills(); //increment kills for this robot    
+            } else if (targetRobot->getRobotType() == HIDE){
+                targetRobot->reduceLife(); //??
+            } else if (targetRobot->getRobotType() != REFLECTSHOT){
+                reduceLife(); //??
+            }
+            delete targetRobot;
+            targetRobot = nullptr;
+        }
+    }
+}
+
+void LongShotBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void LongShotBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    private:
+        int shotsFired = 0;
+        const int MAX_SHOTS_FIRED = 3;
+    public:
+        SemiAutoBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = SEMIAUTO; }
+        int getRobotType() const override { return SEMIAUTO; }
+};
+
+void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
+    int targetRobotId;
+    GenericRobot* targetRobot = nullptr;
+
+    while (shotsFired < MAX_SHOTS_FIRED && getShells() > 0){
+        int targetX = getRobotX() + x;
+        int targetY = getRobotY() + y;
+
+        if(targetX < 0 || targetX >= battlefield->battlefieldCols() || targetY < 0 || targetY >= battlefield->battlefieldRows())
+            return;
+
+        if (battlefield->getPlayer(targetX, targetY) != ""){
+            random_device rd;
+            mt19937 gen(rd());
+            uniform_int_distribution<> distr(1, 100); // 1 to 100 randomiser
+
+            targetRobotId = stoi(battlefield->getPlayer(targetX, targetY)); 
+            
+            for (GenericRobot* robot : battlefield->getAllRobots()){
+                if (robot->getRobotID() == targetRobotId) {
+                    targetRobot = robot;
+                    break;
+                }
+            }
+
+            int hitChance = distr(gen); 
+            if (hitChance <= 70) {  // 70% chance 
+                if (targetRobot->getRobotType() != HIDE && targetRobot->getRobotType() != REFLECTSHOT){
+                    targetRobot->reduceLife();
+                    incrementKills();
+                    if (!targetRobot->isAlive()){
+                        cout << "Robot" << targetRobot->getRobotID() << "has been destroyed." << endl;
+                        shotsFired = 1;
+                        return;
+                    }
+                } else if (targetRobot->getRobotType() == HIDE){
+                    targetRobot->reduceLife(); //??
+                } else if (targetRobot->getRobotType() != REFLECTSHOT){
+                    reduceLife(); //??
+                }
+            }
+        }
+        shotsFired++;
+        setShells(getShells()-1);
+    }
+    shotsFired = 1;
+    delete targetRobot;
+    targetRobot = nullptr;
+}
+void SemiAutoBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void SemiAutoBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    public:
+        ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = THIRTYSHOT; }
+        int getRobotType() const override { return THIRTYSHOT;}
+};
+
+void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y) { setShells(30); }
+
+void ThirtyShotBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void ThirtyShotBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class HealBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    public:
+        HealBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand (Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = HEAL; }
+        int getRobotType() const override { return HEAL; }
+};
+
+void HealBot::actionFire(Battlefield* battlefield, int x, int y){
+    addLife();
+    addLife();
+    addLife();
+} 
+void HealBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void HealBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class BombBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
+    private:
+        int bombs = 1;
+    public:
+        BombBot(int x, int y, string name):Robot(x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = BOMB; }
+        int getRobotType() const override { return BOMB; }
+};
+
+void BombBot::actionFire(Battlefield* battlefield, int x, int y){
+    if(bombs){
+        int cx = battlefield->getCurrentPlayer()->getRobotX();
+        int cy = battlefield->getCurrentPlayer()->getRobotY();
+        int tx, ty, targetRobotId;
+        bool invalidCoordinates;
+        string targetPosition;
+        GenericRobot* target = nullptr;        
+        cout << "BombBot bombed surrounding squares!\n";
+        
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip self
+                tx = cx + dx; 
+                ty = cy + dy;
+                invalidCoordinates = tx < 0 || tx >= battlefield->battlefieldCols() || ty < 0 || ty >= battlefield->battlefieldRows();
+                cout << "Explosion at (" << tx << ", " << ty << ")\n";
+                if(!invalidCoordinates){
+                    targetPosition = battlefield->getPlayer(tx, ty);
+                    if (!targetPosition.empty()) { //check if theres any robots at the location
+                        targetRobotId = stoi(targetPosition); 
+                        
+                        for (GenericRobot* robot : battlefield->getAllRobots()){
+                            if (robot->getRobotID() == targetRobotId) {
+                                target = robot;
+                                break;
+                            }
+                        }
+
+                        if (target) {
+                            target->reduceLife();
+                            if(!target->isAlive())
+                                cout << "Robot " << target->getRobotID() << "has been destroyed." << endl;
+                            incrementKills(); //increment kills for this robot 
+                        }
+                    }                
+                }
+            }
+        }
+    }
+    bombs--;
+}
+
+void BombBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void BombBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
+    private:
+        int reflect = 1;
+        bool isReflect_ = false;
+    public:
+        ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        bool isReflecting();
+        void setRobotType(int type) override { robotType = REFLECTSHOT; }
+        int getRobotType() const override { return REFLECTSHOT; }
+ 
+};
+
+void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y){
+    if(reflect>0)
+        isReflect_ = true;
+}
+
+bool ReflectShotBot::isReflecting() {
+    bool name = isReflect_;
+    isReflect_ = false;
+    reflect--;
+    return name;
+}
+
+class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, public ThinkingRobot{
+    private:
+        int lookCount = 0;
+        const int MAX_LOOKS = 3;
+
+    public:
+        ScoutBot(int x, int y, string name):Robot( x, y, name){}
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
+        void setRobotType(int type) override { robotType = SCOUT; }
+        int getRobotType() const override { return SCOUT; }
+};
+
+void ScoutBot::actionLook(Battlefield* battlefield, int x, int y){
+    if (lookCount < MAX_LOOKS) {
+        battlefield->displayBattlefield(-10, -10);
+        lookCount++;
+    }
+}
+void ScoutBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void ScoutBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot, public ThinkingRobot {
+    private:
+        int trackersUsed = 0;
+        const int MAX_TRACKERS = 3;
+        vector<int> targets {};
+
+    public:
+        TrackBot(int x, int y, string name):Robot(x, y, name){}
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* Battlefield);
+        vector<int> getTrackedTargets() { return targets; }
+        void setRobotType(int type) override { robotType = TRACK; }
+        int getRobotType() const override { return TRACK; }
+};
+
+void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
+    if (trackersUsed > MAX_TRACKERS)
+        return;
+
+    int targetRobotId = stoi(battlefield->getPlayer(x, y));
+    targets.push_back(targetRobotId);
+    trackersUsed++;
+}
+void TrackBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void TrackBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+
+

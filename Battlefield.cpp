@@ -195,8 +195,7 @@ void Battlefield::placeRobots(){
         }
         
         waitingRobots_.push(robots_[i]);
-        allRobotId.push_back(robots_[i]->getRobotID());
-        //if(!robots_[i]->isAlive()){respawnRobot(i);}
+ 
     }
 
 };
@@ -264,30 +263,37 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
  *********************************************************************/
 void Battlefield::respawnRobot(int index){
 
-    GenericRobot* waiting = robots_[index];
-    
-    if(! waiting->isAlive()){
-        destroyedRobots_.push(waiting);
+    Robot* died = robots_[index];
+    int size = waitingRobots_.size();
+
+        for(int i = 0; i<size;i++){
+            Robot* current = waitingRobots_.front()
+            if (current->getRobotId() != died->getRobotId()){
+                  waitingRobots_.pop();
+                  waitingRobots_.push(current);
+            }else{
+            waitingRobots_.pop();}
+
+        }
+
+    if(!died->isAlive()){
+        destroyedRobots_.push(died);
         return;
-    }
-        int oldX = waiting -> getRobotX();
-        int oldY = waiting -> getRobotY();
-        battlefield_[oldY][oldX] = ""; //clear the field
-        waitingRobots_.push(waiting);
+    }else{
+        int newX = rand() % (battlefieldRows_);
+        int newY = rand() % (battlefieldCols_);
 
-        if(!waitingRobots_.empty()){
-            GenericRobot* respawn = waitingRobots_.front();
-            waitingRobots_.pop();
+        GenericRobot* respawn = new GenericRobot(name, newX, newY);
+        respawn->addUpgrade(died->getUpgradeCount()-1);
+        respawn->setLives(died->getLives());
+        respawn->setKills(died->getKills());
+        respawn->setShells(died->getShells());
 
-            int newX = rand() % (battlefieldRows_);
-            int newY = rand() % (battlefieldCols_);
-
-            respawn->setRobotX(newX);
-            respawn->setRobotY(newY);
-            battlefield_[newY][newX]=to_string(respawn->getRobotID());
+        battlefield_[died->getRobotY()][died->getRobotX()] = ""; //clear the field
+        battlefield_[newY][newX] = to_string(respawn->getRobotId());
+        waitingRobots_.push(respawn);
+        }
     
-    }
-
 }
 
 /**********************************************************************
@@ -311,3 +317,32 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
     }
     return GENERIC;
 }
+
+/**********************************************************************
+ * robotUpgrade
+ * task: 
+ *********************************************************************/
+ void Battlefield::robotUpgrade(Robot* upgradeRobot_){
+    int size = waitingRobots_.size();
+
+        for(int i = 0; i<size;i++){
+            Robot* current = waitingRobots_.front()
+            if (current->getRobotId() != upgradeRobot_->getRobotId()){
+                  waitingRobots_.pop();
+                  waitingRobots_.push(current);
+            }else{
+            waitingRobots_.pop();
+            waitingRobots_.push(upgradeRobot_)
+            }
+        }
+        
+
+   for (auto& robot : robots_) {
+
+    if (robot->getRobotId() == upgradeRobot_->getRobotId()) {
+        robot = upgradeRobot_;  // Replace pointer
+        break;
+    }
+}
+
+ }

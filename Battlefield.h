@@ -41,12 +41,11 @@ class Battlefield {
 
         int numOfRobots_ = -1; // variable to assign number of robots
 
-        vector<GenericRobot *> robots_; 
+        vector<Robot *> robots_; 
         vector<Robot *> upgradedRobots_[11];
-        queue<GenericRobot *> destroyedRobots_;
-        queue<GenericRobot *> waitingRobots_;  
+        queue<Robot *> destroyedRobots_;
+        queue<Robot *> waitingRobots_;  
         vector < vector <string> > battlefield_;
-        vector <int> allRobotId;
         friend class GenericRobot;
     public:
         // Get function
@@ -59,6 +58,7 @@ class Battlefield {
         vector <GenericRobot *> getAllRobots() const;
         vector <int> getAllRobotId() const;
         GenericRobot* getCurrentPlayer() const;
+        void robotUpgrade(Robot* upgradeRobot_);
         
         
         void readFile(string filename);
