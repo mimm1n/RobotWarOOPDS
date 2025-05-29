@@ -24,6 +24,7 @@
 #include <string>
 #include "SeeingRobot.h"
 #include "Battlefield.h"
+#include "Robot.h"
 using namespace std;
 
 class TrackBot : public SeeingRobot {

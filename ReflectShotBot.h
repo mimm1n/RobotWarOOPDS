@@ -24,6 +24,7 @@
 #include <string>
 #include "ShootingRobot.h"
 #include "Battlefield.h"
+#include "Robot.h"
 using namespace std;
 
 class ReflectShotBot : public ShootingRobot {
