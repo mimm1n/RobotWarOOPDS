@@ -44,8 +44,10 @@
 using namespace std;
 
 int main() {
+    ofstream outFile;
     Battlefield* battlefield = new Battlefield();
     battlefield->readFile("inputFile.txt");
+    outFile.open("outputFile.txt");
     battlefield->placeRobots();
     Robot* currentPlayer = nullptr, upgradedRobot = nullptr;
     int move, x, y, kills, upgrade, currentPlayerType;
@@ -53,6 +55,8 @@ int main() {
     
     do {
         currentPlayer = battlefield->getCurrentPlayer();
+        battlefield->displayBattlefield(-10,-10);
+
         random_device rd;
         mt19937 gen(rd()); // for think, look, fire, move
         mt19937 gen2(rd()); // for x coordinate
@@ -157,5 +161,6 @@ int main() {
         battlefield->nextTurn();
     } while(!battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
     
+    outFile.close();
     return 0;
 }
