@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <string>
 #include "GenericRobot.h"
+#include "Robot.h"
 using namespace std;
 
 class GenericRobot;
@@ -40,7 +41,7 @@ class Battlefield {
         int numOfRobots_ = -1; // variable to assign number of robots
 
         vector<GenericRobot *> robots_; 
-        vector<GenericRobot *> UpgradedRObots_;
+        vector<Robot *> upgradedRobots_;
         queue<GenericRobot *> destroyedRobots_;
         queue<GenericRobot *> waitingRobots_;  
         vector<vector<string>> battlefield_;

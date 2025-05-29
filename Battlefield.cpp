@@ -17,6 +17,7 @@
 // ******************************************************** 
 
 #include "Battlefield.h"
+#include "Robot.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>

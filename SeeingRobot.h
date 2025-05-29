@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: ThirtyShotBot.cpp   
+// Program: SeeingRobot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,9 +16,21 @@
 // Member_4: 
 // ******************************************************** 
 
-#include "ThirtyShotBot.h"
+#ifndef SEEINGROBBOT_H
+#define SEEINGROBBOT_H
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include "Robot.h"
+#include "Battlefield.h"
 using namespace std;
 
+class Battlefield;
+
+class SeeingRobot : virtual public Robot{
+    public:
+        SeeingRobot(){}
+        virtual void actionLook(Battlefield* battlefield,int x, int y) = 0;
+};
+#endif

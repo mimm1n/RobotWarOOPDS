@@ -22,8 +22,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
-#include "GenericRobot.h"
+#include "SeeingRobot.h"
+#include "Battlefield.h"
 using namespace std;
 
 class TrackBot : public SeeingRobot {
@@ -33,7 +33,7 @@ class TrackBot : public SeeingRobot {
         vector<int> targets {};
 
     public:
-        TrackBot(int x, int y, string name):Robot( x, y, name){}
+        TrackBot(int x, int y, string name):Robot(x, y, name){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
         vector<int> getTrackedTargets() { return targets; }
         void setRobotType(int type) override { robotType = TRACK; }

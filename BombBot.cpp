@@ -17,6 +17,8 @@
 // ******************************************************** 
 
 #include "BombBot.h"
+#include "GenericRobot.h"
+#include "Battlefield.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>

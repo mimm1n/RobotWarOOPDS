@@ -17,6 +17,7 @@
 // ******************************************************** 
 
 #include "HideBot.h"
+#include "Battlefield.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
