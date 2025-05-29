@@ -34,3 +34,4 @@ class ThinkingRobot : virtual public Robot{
         virtual void actionThink(Battlefield* battlefield) = 0;
 };
 #endif
+
