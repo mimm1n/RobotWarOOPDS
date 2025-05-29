@@ -24,6 +24,7 @@
 #include <string>
 #include "Battlefield.h"
 #include "SeeingRobot.h"
+#include "Robot.h"
 using namespace std;
 
 class ScoutBot : public SeeingRobot{

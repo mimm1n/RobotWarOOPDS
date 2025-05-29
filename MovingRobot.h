@@ -30,7 +30,7 @@ class Battlefield;
 
 class MovingRobot : virtual public Robot{
     public:
-        MovingRobot(){}
+        MovingRobot(int x, int y, string name):Robot(x, y, name){}
         virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
 };
 #endif

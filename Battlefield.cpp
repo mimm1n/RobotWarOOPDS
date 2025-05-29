@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <string>
+#include <queue>
 #include "GenericRobot.h"
 using namespace std;
 
