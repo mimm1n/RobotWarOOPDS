@@ -22,9 +22,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "MovingRobot.h"
-#include "Battlefield.h"
 #include "Robot.h"
+#include "Battlefield.h"
+#include "MovingRobot.h"
+
 using namespace std;
 
 class JumpBot : public MovingRobot {
@@ -33,7 +34,7 @@ class JumpBot : public MovingRobot {
         const int MAX_JUMPS = 3;
 
     public:
-        JumpBot(int x, int y, string name):MovingRobot( x, y, name){}
+        JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot( x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void setRobotType(int type) override { robotType = JUMP; }
         int getRobotType() const override { return JUMP; }

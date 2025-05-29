@@ -22,12 +22,17 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "MovingRobot.h"
-#include "Battlefield.h"
 #include "Robot.h"
+#include "Battlefield.h"
+#include "ShootingRobot.h"
+#include "MovingRobot.h"
+#include "SeeingRobot.h"
+#include "ThinkingRobot.h"
+
+
 using namespace std;
 
-class HideBot : public MovingRobot{
+class HideBot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot{
     private:
         int hideTurnsUsed = 0;
         const int MAX_HIDE_TURNS = 3;
@@ -35,7 +40,11 @@ class HideBot : public MovingRobot{
 
     public:
         HideBot(int x, int y, string name):MovingRobot(x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         bool isHidden();
         int hidesLeft() const;
         void setRobotType(int type) override { robotType = HIDE; }
