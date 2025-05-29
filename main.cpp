@@ -55,7 +55,8 @@ int main() {
     
     do {
         currentPlayer = battlefield->getCurrentPlayer();
-        battlefield->displayBattlefield(-10,-10);
+        battlefield->displayBattlefield(-5,-5);
+        outFile << battlefield->displayBattlefield(-5,-5);
 
         random_device rd;
         mt19937 gen(rd()); // for think, look, fire, move
