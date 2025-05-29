@@ -136,6 +136,7 @@ class Battlefield {
         queue<Robot *> waitingRobots_;  
         vector < vector <string> > battlefield_;
         friend class GenericRobot;
+        
     public:
         // Get function
         int battlefieldCols();
@@ -154,10 +155,12 @@ class Battlefield {
         void displayBattlefield(int x, int y, vector<int> targets = {}) const;
         void respawnRobot(int x);
         void nextTurn();
+        RobotType findTargetRobot(GenericRobot* target);
 };
 
 class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
 private:
+
     static int robotIncrement;
     int robotId;
     int upgradeCount = 0;
@@ -166,7 +169,10 @@ private:
     bool upgrade = false;
 
 public:
-    GenericRobot(std::string name, int x, int y);
+    GenericRobot(string name, int x, int y):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){
+    robotId = robotIncrement;
+    robotIncrement++;
+}
 
     //int getRobotID() const;
     void setRobotType(int type) override;
@@ -887,16 +893,17 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
  * @param index - 
  *********************************************************************/
 void Battlefield::respawnRobot(int index){
-
+ 
     Robot* died = robots_[index];
     int size = waitingRobots_.size();
 
         for(int i = 0; i<size;i++){
-            Robot* current = waitingRobots_.front()
-            if (current->getRobotId() != died->getRobotId()){
+            Robot* current = waitingRobots_.front();
+            if (current->getRobotID() != died->getRobotID()){
                   waitingRobots_.pop();
                   waitingRobots_.push(current);
-            }else{
+            }else
+            {
             waitingRobots_.pop();}
 
         }
@@ -907,15 +914,16 @@ void Battlefield::respawnRobot(int index){
     }else{
         int newX = rand() % (battlefieldRows_);
         int newY = rand() % (battlefieldCols_);
+        string name = died->getRobotName();
 
         GenericRobot* respawn = new GenericRobot(name, newX, newY);
         respawn->addUpgrade(died->getUpgradeCount()-1);
         respawn->setLives(died->getLives());
         respawn->setKills(died->getKills());
-        respawn->setShells(died->getShells());
+        // respawn->setShells(died->getShells());
 
         battlefield_[died->getRobotY()][died->getRobotX()] = ""; //clear the field
-        battlefield_[newY][newX] = to_string(respawn->getRobotId());
+        battlefield_[newY][newX] = to_string(respawn->getRobotID());
         waitingRobots_.push(respawn);
         }
     
@@ -927,7 +935,7 @@ void Battlefield::respawnRobot(int index){
  *********************************************************************/
 void Battlefield::nextTurn(){
     currentTurn_++;
-    GenericRobot* front = waitingRobots_.front();
+    Robot* front = waitingRobots_.front();
     waitingRobots_.pop();
     waitingRobots_.push(front);
 }
@@ -951,20 +959,22 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
     int size = waitingRobots_.size();
 
         for(int i = 0; i<size;i++){
-            Robot* current = waitingRobots_.front()
-            if (current->getRobotId() != upgradeRobot_->getRobotId()){
+
+            Robot* current = waitingRobots_.front();
+            if (current->getRobotID() != upgradeRobot_->getRobotID()){
                   waitingRobots_.pop();
                   waitingRobots_.push(current);
-            }else{
+            }else
+            {
             waitingRobots_.pop();
-            waitingRobots_.push(upgradeRobot_)
+            waitingRobots_.push(upgradeRobot_);
             }
         }
         
 
    for (auto& robot : robots_) {
 
-    if (robot->getRobotId() == upgradeRobot_->getRobotId()) {
+    if (robot->getRobotID() == upgradeRobot_->getRobotID()) {
         robot = upgradeRobot_;  // Replace pointer
         break;
     }
@@ -972,153 +982,149 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
 
  }
 
-GenericRobot::GenericRobot(string name, int x, int y) : Robot(x, y, name) {
-    robotId = robotIncrement;
-    robotIncrement++;
-}
 
-int GenericRobot::getRobotID() const { return robotId; }
+// int GenericRobot::getRobotID() const { return robotId; }
 void GenericRobot::setRobotType(int type) { robotType = type; }
 int GenericRobot::getRobotType() const { return robotType; }
 
-virtual void GenericRobot::actions(Battlefield* battlefield){
+ void GenericRobot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void HideBot::actions(Battlefield* battlefield){
+ void HideBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void JumpBot::actions(Battlefield* battlefield){
+ void JumpBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void LongShotBot::actions(Battlefield* battlefield){
+ void LongShotBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void SemiAutoBot::actions(Battlefield* battlefield){
+ void SemiAutoBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void ThirtyShotBot::actions(Battlefield* battlefield){
+ void ThirtyShotBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void HealBot::actions(Battlefield* battlefield){
+ void HealBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void BombBot::actions(Battlefield* battlefield){
+ void BombBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void ReflectShotBot::actions(Battlefield* battlefield){
+ void ReflectShotBot::actions(Battlefield* battlefield){
+    // actionRand(battlefield);
+}
+
+ void ScoutBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void ScoutBot::actions(Battlefield* battlefield){
+ void TrackBot::actions(Battlefield* battlefield){
     actionRand(battlefield);
 }
 
-virtual void TrackBot::actions(Battlefield* battlefield){
-    actionRand(battlefield);
+ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
+    // if (getShells() <= 0) {
+    //     cout << "Out of shells!" << endl;
+    //     return;
+    // }
+    // setShells(getShells() - 1);
+
+    // if (x == 0 && y == 0) {
+    //     cout << "Cannot shoot at own position." << endl;
+    //     return;
+    // }
+
+    // int currentX = getRobotX();
+    // int currentY = getRobotY();
+    // int lookX = currentX + x;
+    // int lookY = currentY + y;
+
+    // if (lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+    //     lookY < 0 || lookY >= battlefield->battlefieldRows()) {
+    //     cout << "Out of bounds" << endl;
+    //     return;
+    // }
+
+    // string playerStr = battlefield->getPlayer(lookX, lookY);
+    // if (playerStr.empty() || !isdigit(playerStr[0])) {
+    //     cout << "Missed!" << endl;  //covers returns like an empty string or any invalid 
+    //     return;
+    // }
+
+    // int targetRobotId = stoi(playerStr); //reuse 
+    // GenericRobot* targetRobot = nullptr;
+
+    // for (Robot* robot : battlefield->robots_) {
+    //     if (robot->getRobotID() == targetRobotId) {
+    //         targetRobot = robot;
+    //         break;
+    //     }
+    // }
+
+    // if (!targetRobot) {
+    //     cout << "Missed!" << endl;
+    //     return;
+    // }
+
+    // if (HideBot* hidden = dynamic_cast<HideBot*>(targetRobot)) {
+    //     if (hidden->isHidden()) {
+    //         cout << "Shot missed. Robot is hidden." << endl;
+    //         return;
+    //     }
+    // }
+
+    // if (ReflectShotBot* reflect = dynamic_cast<ReflectShotBot*>(targetRobot)) {
+    //     if (reflect->isReflecting()) {
+    //         cout << "Shot reflected." << endl;
+    //         reduceLife();
+    //         if (!isAlive()) {
+    //             cout << "Robot " << getRobotID() << " has been destroyed." << endl;
+    //         }
+    //         return;
+    //     }
+    // }
+
+    // random_device rd;
+    // mt19937 gen(rd());
+    // uniform_int_distribution<> distr(1, 100);
+    // int hitChance = distr(gen);
+
+    // if (hitChance <= 70) {
+    //     bool saveLife = targetRobot->isAlive();
+    //     targetRobot->reduceLife();
+
+    //     // RobotType type = battlefield->findTargetRobot(targetRobot);
+
+    //     // if (type != GENERIC){
+    //     //     bool remove = true; //remove when a robot got hit
+
+    //     //     if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
+    //     //         if (hideBot->hidesLeft() > 0) {
+    //     //             remove = false; 
+    //     //         } // dont remove if hides still more than 0
+    //     //     }
+    //     // }
+
+    //     if (saveLife && !targetRobot->isAlive()) {
+    //         cout << "Robot " << targetRobot->getRobotID() << " has been destroyed." << endl;
+    //     }
+
+    //     incrementKills();
+    // } else {
+    //     cout << "Shot missed!" << endl;
+    // }
 }
 
-virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
-    if (getShells() <= 0) {
-        cout << "Out of shells!" << endl;
-        return;
-    }
-    setShells(getShells() - 1);
-
-    if (x == 0 && y == 0) {
-        cout << "Cannot shoot at own position." << endl;
-        return;
-    }
-
-    int currentX = getRobotX();
-    int currentY = getRobotY();
-    int lookX = currentX + x;
-    int lookY = currentY + y;
-
-    if (lookX < 0 || lookX >= battlefield->battlefieldCols() ||
-        lookY < 0 || lookY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds" << endl;
-        return;
-    }
-
-    string playerStr = battlefield->getPlayer(lookX, lookY);
-    if (playerStr.empty() || !isdigit(playerStr[0])) {
-        cout << "Missed!" << endl;  //covers returns like an empty string or any invalid 
-        return;
-    }
-
-    int targetRobotId = stoi(playerStr); //reuse 
-    GenericRobot* targetRobot = nullptr;
-
-    for (GenericRobot* robot : battlefield->robots_) {
-        if (robot->getRobotID() == targetRobotId) {
-            targetRobot = robot;
-            break;
-        }
-    }
-
-    if (!targetRobot) {
-        cout << "Missed!" << endl;
-        return;
-    }
-
-    if (HideBot* hidden = dynamic_cast<HideBot*>(targetRobot)) {
-        if (hidden->isHidden()) {
-            cout << "Shot missed. Robot is hidden." << endl;
-            return;
-        }
-    }
-
-    if (ReflectShotBot* reflect = dynamic_cast<ReflectShotBot*>(targetRobot)) {
-        if (reflect->isReflecting()) {
-            cout << "Shot reflected." << endl;
-            reduceLife();
-            if (!isAlive()) {
-                cout << "Robot " << getRobotID() << " has been destroyed." << endl;
-            }
-            return;
-        }
-    }
-
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> distr(1, 100);
-    int hitChance = distr(gen);
-
-    if (hitChance <= 70) {
-        bool saveLife = targetRobot->isAlive();
-        targetRobot->reduceLife();
-
-        // RobotType type = battlefield->findTargetRobot(targetRobot);
-
-        if (type != GENERIC){
-            bool remove = true; //remove when a robot got hit
-
-            if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
-                if (hideBot->hidesLeft() > 0) {
-                    remove = false; 
-                } // dont remove if hides still more than 0
-            }
-        }
-
-        if (saveLife && !targetRobot->isAlive()) {
-            cout << "Robot " << targetRobot->getRobotID() << " has been destroyed." << endl;
-        }
-
-        incrementKills();
-    } else {
-        cout << "Shot missed!" << endl;
-    }
-}
-
-virtual void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
+ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1139,7 +1145,7 @@ virtual void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
     cout << "Robot " << getRobotID() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-virtual void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
+ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1156,7 +1162,7 @@ virtual void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
                 GenericRobot* robotLooked = nullptr;
                 
                 //find robot corresponing to that ID 
-                for (GenericRobot* robot : battlefield->robots_) {
+                for (Robot* robot : battlefield->robots_) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
@@ -1171,8 +1177,9 @@ virtual void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
         }
     }
 }
+}
 
-virtual void GenericRobot::actionThink(Battlefield* battlefield) {
+void GenericRobot::actionThink(Battlefield* battlefield) {
     actionRand(battlefield);
 }
 
@@ -1284,7 +1291,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y){
     int targetRobotId = stoi(playerStr); //reuse 
     GenericRobot* targetRobot = nullptr;
 
-    for (GenericRobot* robot : battlefield->robots_) {
+    for (Robot* robot : battlefield->robots_) {
         if (robot->getRobotID() == targetRobotId) {
             targetRobot = robot;
             break;
