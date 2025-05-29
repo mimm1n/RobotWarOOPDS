@@ -72,7 +72,7 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         return;
     }
 
-    int targetRobotId = stoi(battlefield->getPlayer(lookX, lookY));
+    int targetRobotId = stoi(playerStr); //reuse 
     GenericRobot* targetRobot = nullptr;
 
     for (GenericRobot* robot : battlefield->robots_) {
@@ -111,8 +111,27 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
     int hitChance = distr(gen);
 
     if (hitChance <= 70) {
+        bool saveLife = targetRobot->isAlive();
         targetRobot->reduceLife();
-        if (!targetRobot->isAlive()) {
+
+        RobotType type = battlefield->findTargetRobot(targetRobot);
+
+        if (type != GENERIC){
+            bool remove = true; //remove when a robot got hit
+
+            if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
+                if (hideBot->hidesLeft() > 0) {
+                    remove = false; 
+                } // dont remove if hides still more than 0
+            }
+
+            if (remove || !targetRobot->isAlive()){
+                auto& list = battlefield->upgradedRobots_[type];
+                list.erase(remove(list.begin(), list.end(), targetRobot), list.end()); 
+            }
+        }
+
+        if (saveLife && !targetRobot->isAlive()) {
             cout << "Robot " << targetRobot->getRobotID() << " has been destroyed." << endl;
         }
 
@@ -160,7 +179,9 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
             int lookX = currentX + dx;
             int lookY = currentY + dy;
 
-            if ((battlefield->battlefield_[lookY][lookX]) != "") {
+            if (lookX >= 0 && lookX < battlefield->battlefieldCols() &&
+                    lookY >= 0 && lookY < battlefield->battlefieldRows() &&
+                !battlefield->battlefield_[lookY][lookX].empty()) {
                 int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]);
                 GenericRobot* robotLooked = nullptr;
                 for (GenericRobot* robot : battlefield->robots_) {
@@ -207,6 +228,7 @@ void GenericRobot::upgradeRobot(Battlefield* battlefield, int upgradeType) {
         default: return;
     }
 
+    battlefield->upgradedRobots_[upgradeType].push_back(this); // add to the upgraded robot list 
     upgradeCount++;
     upgrade = false;
 }

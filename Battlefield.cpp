@@ -299,3 +299,14 @@ void Battlefield::nextTurn(){
     waitingRobots_.pop();
     waitingRobots_.push(front);
 }
+
+RobotType Battlefield::findTargetRobot(GenericRobot* target) {
+    for (int i = 0; i <= BOMB; ++i) {
+        for (Robot* robot : upgradedRobots_[i]) {
+            if (robot == target) {
+                return static_cast<RobotType>(i);
+            }
+        }
+    }
+    return GENERIC;
+}
