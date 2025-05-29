@@ -60,14 +60,14 @@ public:
     int getUpgradeCount() const;
 };
 
-class HideBot : public MovingRobot, public ShootingRobot, public SeeingRobot, public ThinkingRobot{
+class HideBot : public MovingRobot, public ShootingRobot{
     private:
         int hideTurnsUsed = 0;
         const int MAX_HIDE_TURNS = 3;
         bool isHidden_ = false;
 
     public:
-        HideBot(int x, int y, string name):Robot(x, y, name){}
+        HideBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
