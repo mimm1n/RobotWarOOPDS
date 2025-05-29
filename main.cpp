@@ -52,8 +52,7 @@ class Robot{
     public:
         Robot(int x, int y, string name); // Constructor
         virtual ~Robot(){} // Destructor
-
-        // Set and get the x coordinate of this robot
+           // Set and get the x coordinate of this robot
         void setRobotID(int id); 
         int getRobotID() const;
         
@@ -89,7 +88,7 @@ class Robot{
 
 class SeeingRobot : virtual public Robot{
     public:
-        SeeingRobot(){}
+        virtual ~SeeingRobot(){}
         virtual void actionLook(Battlefield* battlefield, int x, int y) = 0;
 };
 
@@ -97,6 +96,7 @@ class ShootingRobot : virtual public Robot{
     private:
         int shells = 10;
     public:
+       virtual ~ShootingRobot(){}
         ShootingRobot(int x, int y, string name):Robot(x, y, name){}
         void setShells(int num) { shells = num; }
         int getShells() const { return shells; }
@@ -105,12 +105,13 @@ class ShootingRobot : virtual public Robot{
 
 class ThinkingRobot : virtual public Robot{
     public:
-        ThinkingRobot(){}
+        virtual ~ThinkingRobot(){}
         virtual void actionThink(Battlefield* battlefield) = 0;
 };
 
 class MovingRobot : virtual public Robot{
     public:
+        virtual ~MovingRobot(){}
         MovingRobot(int x, int y, string name):Robot(x, y, name){}
         virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
 };
@@ -486,15 +487,13 @@ Robot::Robot(int x, int y, string name){
     setRobotY(y);
     robotName = name;
 }
-
 void Robot::setRobotID(int id){
     robotId = id;
 }
 
 int Robot::getRobotID() const{
     return robotId;
-}
-/**********************************************************************
+}/**********************************************************************
  * setRobotX
  * task: sets the x coordinate of the robot
  * @param x - x coordinate
@@ -962,7 +961,6 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
 
 GenericRobot::GenericRobot(string name, int x, int y) : Robot(x, y, name) {
     robotId = robotIncrement;
-    setRobotID(robotId);
     robotIncrement++;
 }
 
