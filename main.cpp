@@ -89,7 +89,7 @@ int main() {
 
                     if (currentPlayerType == GENERIC){
                         uniform_int_distribution<> upgradeDistr(1, 10);
-                        int upgrade = upgradeDistr(gen4);
+                        upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new ScoutBot(x, y, name); break;
                             case 2: upgradedRobot = new TrackBot(x, y, name); break;
@@ -104,7 +104,7 @@ int main() {
                         }
                     } else if (currentPlayerType == SCOUT || currentPlayerType == TRACK){
                         uniform_int_distribution<> upgradeDistr(1, 8);
-                        int upgrade = upgradeDistr(gen4);
+                        upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new LongShotBot(x, y, name); break;
                             case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
@@ -117,7 +117,7 @@ int main() {
                         }
                     } else if (currentPlayerType == HIDE || currentPlayerType == JUMP){
                         uniform_int_distribution<> upgradeDistr(1, 8);
-                        int upgrade = upgradeDistr(gen4);
+                        upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new LongShotBot(x, y, name); break;
                             case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
@@ -130,7 +130,7 @@ int main() {
                         }
                     } else {
                         uniform_int_distribution<> upgradeDistr(1, 8);
-                        int upgrade = upgradeDistr(gen4);
+                        upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new ScoutBot(x, y, name); break;
                             case 2: upgradedRobot = new TrackBot(x, y, name); break;
