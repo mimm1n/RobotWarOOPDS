@@ -22,10 +22,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include "Robot.h"
 #include "ShootingRobot.h"
 #include "GenericRobot.h"
 #include "Battlefield.h"
-#include "Robot.h"
 
 using namespace std;
 

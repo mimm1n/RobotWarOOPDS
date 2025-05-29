@@ -162,6 +162,15 @@ void Robot::incrementKills(){
 }
 
 /**********************************************************************
+ * getUpgradeCount
+ * task: gets the number of upgrades the robot has went through
+ * @return upgradeCount - number of upgrades so far
+ *********************************************************************/
+int Robot::getUpgradeCount() const{
+    return upgradeCount;
+}
+
+/**********************************************************************
  * canUpgrade
  * task: Checks if the upgrade count is lesser than max upgrades
  * @return true if it hasn't reached max upgrades

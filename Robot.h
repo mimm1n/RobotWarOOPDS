@@ -64,6 +64,7 @@ class Robot{
         void setKills(int kills);
         void incrementKills(); // Adds 1 to the kill count
 
+        int getUpgradeCount() const;
         bool canUpgrade() const;
         void addUpgrade(int currentUpgradeCount);
 
