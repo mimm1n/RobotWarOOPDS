@@ -386,11 +386,11 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
 
     string playerStr = battlefield->getPlayer(lookX, lookY);
     if (playerStr.empty() || !isdigit(playerStr[0])) {
-        cout << "Missed!" << endl;  //covers returns like an empty string or any invalid 
+        cout << "Missed!" << endl;
         return;
     }
 
-    int targetRobotId = stoi(playerStr); //reuse 
+    int targetRobotId = stoi(playerStr);
     Robot* targetRobot = nullptr;
 
     for (Robot* robot : battlefield->robots_) {
@@ -405,6 +405,7 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         return;
     }
 
+    // Handle HideBot behavior
     if (HideBot* hidden = dynamic_cast<HideBot*>(targetRobot)) {
         if (hidden->isHidden()) {
             cout << "Shot missed. Robot is hidden." << endl;
@@ -412,6 +413,7 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         }
     }
 
+    // Handle ReflectShotBot behavior
     if (ReflectShotBot* reflect = dynamic_cast<ReflectShotBot*>(targetRobot)) {
         if (reflect->isReflecting()) {
             cout << "Shot reflected." << endl;
@@ -423,28 +425,24 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         }
     }
 
+    // 70% chance to hit
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> distr(1, 100);
     int hitChance = distr(gen);
 
     if (hitChance <= 70) {
-        bool saveLife = targetRobot->isAlive();
+        bool wasAlive = targetRobot->isAlive();
         targetRobot->reduceLife();
 
-        // RobotType type = battlefield->findTargetRobot(targetRobot);
-
-        // if (type != GENERIC){
-        //     bool remove = true; //remove when a robot got hit
-
-            if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
-                if (hideBot->hidesLeft() > 0) {
-                    remove = false; 
-                } // dont remove if hides still more than 0
+        // Special logic for HideBot (optional, add if needed)
+        if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
+            if (hideBot->hidesLeft() > 0) {
+                // Additional behavior if needed when hidesLeft > 0
             }
         }
 
-        if (saveLife && !targetRobot->isAlive()) {
+        if (wasAlive && !targetRobot->isAlive()) {
             cout << "Robot " << targetRobot->getRobotID() << " has been destroyed." << endl;
         }
 
@@ -588,7 +586,7 @@ void GenericRobot::actionRand(Battlefield* battlefield) {
     }
 }
 
-void HideBot::actionFire(Battlefield* battlefield, int x, int y){
+void HideBot::actionFire(Battlefield* battlefield, int x, int y) {
     if (getShells() <= 0) {
         cout << "Out of shells!" << endl;
         return;
@@ -613,14 +611,14 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y){
 
     string playerStr = battlefield->getPlayer(lookX, lookY);
     if (playerStr.empty() || !isdigit(playerStr[0])) {
-        cout << "Missed!" << endl;  //covers returns like an empty string or any invalid 
+        cout << "Missed!" << endl;
         return;
     }
 
-    int targetRobotId = stoi(playerStr); //reuse 
-    GenericRobot* targetRobot = nullptr;
+    int targetRobotId = stoi(playerStr);
+    Robot* targetRobot = nullptr;
 
-    for (GenericRobot* robot : battlefield->robots_) {
+    for (Robot* robot : battlefield->robots_) {
         if (robot->getRobotID() == targetRobotId) {
             targetRobot = robot;
             break;
@@ -632,6 +630,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y){
         return;
     }
 
+    // Handle HideBot behavior
     if (HideBot* hidden = dynamic_cast<HideBot*>(targetRobot)) {
         if (hidden->isHidden()) {
             cout << "Shot missed. Robot is hidden." << endl;
@@ -639,6 +638,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y){
         }
     }
 
+    // Handle ReflectShotBot behavior
     if (ReflectShotBot* reflect = dynamic_cast<ReflectShotBot*>(targetRobot)) {
         if (reflect->isReflecting()) {
             cout << "Shot reflected." << endl;
@@ -650,45 +650,28 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y){
         }
     }
 
+    // 70% chance to hit
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> distr(1, 100);
     int hitChance = distr(gen);
 
     if (hitChance <= 70) {
-        bool saveLife = targetRobot->isAlive();
+        bool wasAlive = targetRobot->isAlive();
         targetRobot->reduceLife();
 
-        RobotType type = battlefield->findTargetRobot(targetRobot);
-
-        if (type != GENERIC){
-            bool remove = true; //remove when a robot got hit
-
-            if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
-                if (hideBot->hidesLeft() > 0) {
-                    remove = false; 
-                } // dont remove if hides still more than 0
-            }
-
-            if (remove || !targetRobot->isAlive()){
-                auto& list = battlefield->upgradedRobots_[type];
-                list.erase(remove(list.begin(), list.end(), targetRobot), list.end()); 
+        // Special logic for HideBot (optional, add if needed)
+        if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
+            if (hideBot->hidesLeft() > 0) {
+                // Additional behavior if needed when hidesLeft > 0
             }
         }
 
-        if (saveLife && !targetRobot->isAlive()) {
+        if (wasAlive && !targetRobot->isAlive()) {
             cout << "Robot " << targetRobot->getRobotID() << " has been destroyed." << endl;
         }
 
         incrementKills();
-        upgrade = true;
-
-        if (getUpgradeCount() < MAX_UPGRADE) {
-            int chosenUpgrade = getRobotType();
-            upgradeRobot(battlefield, chosenUpgrade);
-        } else {
-            cout << "Max upgrade reached." << endl;
-        }
     } else {
         cout << "Shot missed!" << endl;
     }
