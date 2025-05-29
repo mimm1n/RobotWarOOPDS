@@ -52,6 +52,10 @@ class Robot{
     public:
         Robot(int x, int y, string name); // Constructor
         virtual ~Robot(){} // Destructor
+
+        // Set and get the x coordinate of this robot
+        void setRobotID(int id); 
+        int getRobotID() const;
         
         // Set and get the x coordinate of this robot
         void setRobotX(int x); 
@@ -161,7 +165,7 @@ private:
 public:
     GenericRobot(std::string name, int x, int y);
 
-    int getRobotID() const;
+    //int getRobotID() const;
     void setRobotType(int type) override;
     int getRobotType() const override;
 
@@ -483,6 +487,13 @@ Robot::Robot(int x, int y, string name){
     robotName = name;
 }
 
+void Robot::setRobotID(int id){
+    robotId = id;
+}
+
+int Robot::getRobotID() const{
+    return robotId;
+}
 /**********************************************************************
  * setRobotX
  * task: sets the x coordinate of the robot
@@ -951,6 +962,7 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
 
 GenericRobot::GenericRobot(string name, int x, int y) : Robot(x, y, name) {
     robotId = robotIncrement;
+    setRobotID(robotId);
     robotIncrement++;
 }
 
