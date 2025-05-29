@@ -59,28 +59,23 @@ int main() {
         outFile << battlefield->displayBattlefield(-5,-5);
 
         random_device rd;
-        mt19937 gen(rd()); // for think, look, fire, move
-        mt19937 gen2(rd()); // for x coordinate
-        mt19937 gen3(rd()); // for y coordinate
-        mt19937 gen4(rd()); // for upgrades
+        mt19937 gen(rd()), gen2(rd()), gen3(rd()), gen4(rd());
 
         uniform_int_distribution<> (1,4); 
         move = posDistr(gen);
+
+        uniform_int_distribution<> dirDistr(-1, 1);
+        x = dirDistr(gen2);
+        y = dirDistr(gen3);
         
         switch(move){
             case 1: // Think
                 currentPlayer->actionThink(battlefield);
                 break;
             case 2: // Look
-                uniform_int_distribution<> dirDistr(-1, 1);
-                x = dirDistr(gen2);
-                y = dirDistr(gen3);
                 currentPlayer->actionLook(battlefield, x, y);
                 break;
             case 3: // Fire
-                uniform_int_distribution<> dirDistr(-1, 1);
-                x = dirDistr(gen2);
-                y = dirDistr(gen3);
                 kills = currentPlayer->getKills();
                 currentPlayer->actionFire(battlefield, x, y);
 
@@ -153,9 +148,6 @@ int main() {
                 }
                 break;
             case 4: // Move
-                uniform_int_distribution<> dirDistr(-1, 1);
-                x = dirDistr(gen2);
-                y = dirDistr(gen3);
                 currentPlayer->actionMove(battlefield, x, y);
                 break;
         }
