@@ -261,26 +261,31 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
  * @param index - 
  *********************************************************************/
 void Battlefield::respawnRobot(int index){
-    GenericRobot* destroyed = robots_[index];
-    destroyedRobots_.push(destroyed);
-    int oldX = destroyed -> getRobotX();
-    int oldY = destroyed -> getRobotY();
-    battlefield_[oldY][oldX] = ""; //clear the field
 
-    GenericRobot* waiting = destroyedRobots_.front();
-    waitingRobots_.push(waiting);
-    destroyedRobots_.pop();
-    if(!waitingRobots_.empty()){
-        GenericRobot* respawn = waitingRobots_.front();
-        waitingRobots_.pop();
-
-        int newX = rand() % (battlefieldRows_);
-        int newY = rand() % (battlefieldCols_);
-
-        respawn->setRobotX(newX);
-        respawn->setRobotY(newY);
-        battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    GenericRobot* waiting = robots_[index];
+    
+    if(! waiting->isAlive()){
+        destroyedRobots_.push(waiting);
+        return;
     }
+        int oldX = waiting -> getRobotX();
+        int oldY = waiting -> getRobotY();
+        battlefield_[oldY][oldX] = ""; //clear the field
+        waitingRobots_.push(waiting);
+
+        if(!waitingRobots_.empty()){
+            GenericRobot* respawn = waitingRobots_.front();
+            waitingRobots_.pop();
+
+            int newX = rand() % (battlefieldRows_);
+            int newY = rand() % (battlefieldCols_);
+
+            respawn->setRobotX(newX);
+            respawn->setRobotY(newY);
+            battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    
+    }
+
 }
 
 /**********************************************************************

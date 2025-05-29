@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: ScoutBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,15 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
-
+#include "ScoutBot.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
-#include "Battlefield.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
-    public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
-};
-#endif
+void ScoutBot::actionLook(Battlefield* battlefield, int x, int y){
+    if (lookCount < MAX_LOOKS) {
+        battlefield->displayBattlefield(-10, -10);
+        lookCount++;
+    }
+}

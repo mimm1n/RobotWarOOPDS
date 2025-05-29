@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: JumpBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,21 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
-
+#include "JumpBot.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
-#include "Battlefield.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
-    public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
-};
-#endif
+void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
+    if (jumpsUsed < MAX_JUMPS) {
+        string targetPosition = battlefield->getPlayer(x, y);
+        if (targetPosition.empty()) { //check if theres any robots at the location
+            setRobotX(x);
+            setRobotY(y);
+            jumpsUsed++;
+        } else {
+            cout << "Invalid location! There might be a robot there." << endl;
+        }
+    }
+}

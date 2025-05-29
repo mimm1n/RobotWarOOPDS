@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: ReflectShotBot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,26 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
+#ifndef REFLECTSHOTBOT_H
+#define REFLECTSHOTBOT_H
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
-#include "Battlefield.h"
+#include "GenericRobot.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
+class ReflectShotBot : public ShootingRobot {
     private:
-        int shells = 10;
+        int reflect = 1;
+        bool isReflect_ = false;
     public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        bool isReflecting();
+        void setRobotType(int type) override { robotType = REFLECTSHOT; }
+        int getRobotType() const override { return REFLECTSHOT; }
+ 
 };
 #endif
