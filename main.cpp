@@ -136,6 +136,7 @@ class Battlefield {
         queue<Robot *> waitingRobots_;  
         vector < vector <string> > battlefield_;
         friend class GenericRobot;
+    
         
     public:
         // Get function
@@ -1159,7 +1160,7 @@ int GenericRobot::getRobotType() const { return robotType; }
                 !battlefield->battlefield_[lookY][lookX].empty()) {  //check if in bounds 
                 
                 int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]);
-                GenericRobot* robotLooked = nullptr;
+                Robot* robotLooked = nullptr;
                 
                 //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->robots_) {
@@ -1291,7 +1292,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y){
     int targetRobotId = stoi(playerStr); //reuse 
     GenericRobot* targetRobot = nullptr;
 
-    for (Robot* robot : battlefield->robots_) {
+    for (Robot* robot : battlefield->getAllRobots()) {
         if (robot->getRobotID() == targetRobotId) {
             targetRobot = robot;
             break;
