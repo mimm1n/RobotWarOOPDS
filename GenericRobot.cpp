@@ -111,8 +111,27 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
     int hitChance = distr(gen);
 
     if (hitChance <= 70) {
+        bool saveLife = targetRobot->isAlive();
         targetRobot->reduceLife();
-        if (!targetRobot->isAlive()) {
+
+        RobotType type = battlefield->findTargetRobot(targetRobot);
+
+        if (type != GENERIC){
+            bool remove = true;
+
+            if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
+                if (hideBot->hidesLeft() > 0) {
+                    shouldRemove = false; 
+                } // dont remove if hides still more than 0
+            }
+
+            if (shouldRemove || !targetRobot->isAlive()){
+                auto& list = battlefield->upgradedRobots_[type];
+                list.erase(remove(list.begin(), list.end(), targetRobot), list.end()); 
+            }
+        }
+
+        if (wasAlive && !targetRobot->isAlive()) {
             cout << "Robot " << targetRobot->getRobotID() << " has been destroyed." << endl;
         }
 
@@ -207,6 +226,7 @@ void GenericRobot::upgradeRobot(Battlefield* battlefield, int upgradeType) {
         default: return;
     }
 
+    battlefield->upgradedRobots_[upgradeType].push_back(this); // add to the upgraded robot list 
     upgradeCount++;
     upgrade = false;
 }
