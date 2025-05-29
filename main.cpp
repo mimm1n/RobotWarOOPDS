@@ -299,11 +299,6 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
                     remove = false; 
                 } // dont remove if hides still more than 0
             }
-
-            if (remove || !targetRobot->isAlive()){
-                auto& list = battlefield->upgradedRobots_[type];
-                list.erase(remove(list.begin(), list.end(), targetRobot), list.end()); 
-            }
         }
 
         if (saveLife && !targetRobot->isAlive()) {
@@ -311,14 +306,6 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         }
 
         incrementKills();
-        upgrade = true;
-
-        if (getUpgradeCount() < MAX_UPGRADE) {
-            int chosenUpgrade = getRobotType();
-            upgradeRobot(battlefield, chosenUpgrade);
-        } else {
-            cout << "Max upgrade reached." << endl;
-        }
     } else {
         cout << "Shot missed!" << endl;
     }
@@ -349,22 +336,30 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
-    for (int dx = -1; dx <= 1; ++dx) {
+    for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
             int lookX = currentX + dx;
             int lookY = currentY + dy;
 
             if (lookX >= 0 && lookX < battlefield->battlefieldCols() &&
                     lookY >= 0 && lookY < battlefield->battlefieldRows() &&
-                !battlefield->battlefield_[lookY][lookX].empty()) {
+                !battlefield->battlefield_[lookY][lookX].empty()) {  //check if in bounds 
+                
                 int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]);
                 GenericRobot* robotLooked = nullptr;
+                
+                //find robot corresponing to that ID 
                 for (GenericRobot* robot : battlefield->robots_) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
                 }
+
+                if (robotLooked) {
+                cout << "Robot " << robotLooked->getRobotID() << " is at position (" 
+                    << lookX << ", " << lookY << ")." << endl;
+                    
             }
         }
     }
@@ -374,53 +369,39 @@ void GenericRobot::actionThink(Battlefield* battlefield) {
     actionRand(battlefield);
 }
 
-void GenericRobot::upgradeRobot(Battlefield* battlefield, int upgradeType) {
-    if (upgradeCount >= MAX_UPGRADE) {
-        cout << "Max upgrade reached.";
-        return;
-    }
+// void GenericRobot::upgradeRobot(Battlefield* battlefield, int upgradeType) {
+//     if (upgradeCount >= MAX_UPGRADE) {
+//         cout << "Max upgrade reached.";
+//         return;
+//     }
 
-    Robot* current = battlefield->getCurrentPlayer();
-    if (!current) return;  //prevents dereferencing of nullptr
+//     Robot* current = battlefield->getCurrentPlayer();
+//     if (!current) return;  //prevents dereferencing of nullptr
 
-    int x = current->getRobotX();
-    int y = current->getRobotY();
-    string name = current->getRobotName();
+//     int x = current->getRobotX();
+//     int y = current->getRobotY();
+//     string name = current->getRobotName();
 
-    if (robotUpgraded) {
-        delete robotUpgraded;
-        robotUpgraded = nullptr;
-    } //clear memory before new upgrade
+//     if (robotUpgraded) {
+//         delete robotUpgraded;
+//         robotUpgraded = nullptr;
+//     } //clear memory before new upgrade
 
-    switch (upgradeType) {
-        case 1: robotUpgraded = new ScoutBot(x, y, name); break;
-        case 5: robotUpgraded = new ThirtyShotBot(x, y, name); break;
-        case 6: robotUpgraded = new JumpBot(x, y, name); break;
-        case 7: robotUpgraded = new HideBot(x, y, name); break;
-        case 8: robotUpgraded = new ReflectShotBot(x, y, name); break;
-        case 9: robotUpgraded = new HealBot(x, y, name); break;
-        case 10: robotUpgraded = new BombBot(x, y, name); break;
-        default: return;
-    }
+//     switch (upgradeType) {
+//         case 1: robotUpgraded = new ScoutBot(x, y, name); break;
+//         case 5: robotUpgraded = new ThirtyShotBot(x, y, name); break;
+//         case 6: robotUpgraded = new JumpBot(x, y, name); break;
+//         case 7: robotUpgraded = new HideBot(x, y, name); break;
+//         case 8: robotUpgraded = new ReflectShotBot(x, y, name); break;
+//         case 9: robotUpgraded = new HealBot(x, y, name); break;
+//         case 10: robotUpgraded = new BombBot(x, y, name); break;
+//         default: return;
+//     }
 
-    battlefield->upgradedRobots_[upgradeType].push_back(this); // add to the upgraded robot list 
-    upgradeCount++;
-    upgrade = false;
-}
-
-bool GenericRobot::toUpgrade() const {
-    return upgradeCount < MAX_UPGRADE && upgrade;
-}
-
-void GenericRobot::ToGeneric(int upgradeType) {
-    delete robotUpgraded;
-    robotUpgraded = nullptr;
-    robotType = GENERIC;
-}
-
-int GenericRobot::getUpgradeCount() const {
-    return upgradeCount;
-}
+    
+//     upgradeCount++;
+//     upgrade = false;
+// }
 
 void GenericRobot::actionRand(Battlefield* battlefield) {
     random_device rd;
