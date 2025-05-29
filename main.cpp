@@ -61,12 +61,12 @@ int main() {
         random_device rd;
         mt19937 gen(rd()), gen2(rd()), gen3(rd()), gen4(rd());
 
-        uniform_int_distribution<> (1,4); 
-        move = posDistr(gen);
+        uniform_int_distribution<> moveDistr(1, 4);
+        int move = moveDistr(gen);
 
         uniform_int_distribution<> dirDistr(-1, 1);
-        x = dirDistr(gen2);
-        y = dirDistr(gen3);
+        int x = dirDistr(gen2);
+        int y = dirDistr(gen3);
         
         switch(move){
             case 1: // Think
@@ -79,7 +79,6 @@ int main() {
                 kills = currentPlayer->getKills();
                 currentPlayer->actionFire(battlefield, x, y);
 
-                //GENERIC, SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB
                 if (kills < currentPlayer->getKills()){ // upgrade 
                     if (!currentPlayer->canUpgrade()) continue;
 
@@ -89,8 +88,8 @@ int main() {
                     name = currentPlayer->getRobotName();
 
                     if (currentPlayerType == GENERIC){
-                        uniform_int_distribution<> (1,10);
-                        upgrade = posDistr(gen4);
+                        uniform_int_distribution<> upgradeDistr(1, 10);
+                        int upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new ScoutBot(x, y, name); break;
                             case 2: upgradedRobot = new TrackBot(x, y, name); break;
@@ -104,8 +103,8 @@ int main() {
                             case 10: upgradedRobot = new BombBot(x, y, name); break;
                         }
                     } else if (currentPlayerType == SCOUT || currentPlayerType == TRACK){
-                        uniform_int_distribution<> (1,8);
-                        upgrade = posDistr(gen4);
+                        uniform_int_distribution<> upgradeDistr(1, 8);
+                        int upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new LongShotBot(x, y, name); break;
                             case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
@@ -117,8 +116,8 @@ int main() {
                             case 8: upgradedRobot = new BombBot(x, y, name); break;
                         }
                     } else if (currentPlayerType == HIDE || currentPlayerType == JUMP){
-                        uniform_int_distribution<> (1,8);
-                        upgrade = posDistr(gen4);
+                        uniform_int_distribution<> upgradeDistr(1, 8);
+                        int upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new LongShotBot(x, y, name); break;
                             case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
@@ -130,21 +129,22 @@ int main() {
                             case 8: upgradedRobot = new BombBot(x, y, name); break;
                         }
                     } else {
-                        uniform_int_distribution<> (1,4);
-                        upgrade = posDistr(gen4);
+                        uniform_int_distribution<> upgradeDistr(1, 8);
+                        int upgrade = upgradeDistr(gen4);
                         switch(upgrade){
                             case 1: upgradedRobot = new ScoutBot(x, y, name); break;
                             case 2: upgradedRobot = new TrackBot(x, y, name); break;
-                            case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
-                            case 4: upgradedRobot = new JumpBot(x, y, name); break;
-                            case 5: upgradedRobot = new HideBot(x, y, name); break;
+                            case 3: upgradedRobot = new JumpBot(x, y, name); break;
+                            case 4: upgradedRobot = new HideBot(x, y, name); break;
                         }
                     }
                     upgradedRobot->addUpgrade(currentPlayer->upgradeCount);
                     upgradedRobot->setLives(currentPlayer->getLives());
                     upgradedRobot->setKills(currentPlayer->getKills());
                     upgradedRobot->setShells(currentPlayer->getShells());
-                    // need to update in Battlefield the robot type 
+                    // need to update in Battlefield the robot type
+                    delete upgradedRobot;
+                    upgradedRobot = nullptr; 
                 }
                 break;
             case 4: // Move
@@ -152,6 +152,8 @@ int main() {
                 break;
         }
         battlefield->nextTurn();
+        delete currentPlayer;
+        currentPlayer = nullptr;
     } while(!battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
     
     outFile.close();
