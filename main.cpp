@@ -391,9 +391,9 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
     }
 
     int targetRobotId = stoi(playerStr); //reuse 
-    GenericRobot* targetRobot = nullptr;
+    Robot* targetRobot = nullptr;
 
-    for (GenericRobot* robot : battlefield->robots_) {
+    for (Robot* robot : battlefield->robots_) {
         if (robot->getRobotID() == targetRobotId) {
             targetRobot = robot;
             break;
@@ -432,10 +432,10 @@ virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
         bool saveLife = targetRobot->isAlive();
         targetRobot->reduceLife();
 
-        RobotType type = battlefield->findTargetRobot(targetRobot);
+        // RobotType type = battlefield->findTargetRobot(targetRobot);
 
-        if (type != GENERIC){
-            bool remove = true; //remove when a robot got hit
+        // if (type != GENERIC){
+        //     bool remove = true; //remove when a robot got hit
 
             if (HideBot* hideBot = dynamic_cast<HideBot*>(targetRobot)) {
                 if (hideBot->hidesLeft() > 0) {
