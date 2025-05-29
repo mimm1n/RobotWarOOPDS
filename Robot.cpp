@@ -113,6 +113,15 @@ int Robot::getLives() const{
 }
 
 /**********************************************************************
+ * setLives
+ * task: sets the lives count
+ * @param live - live count
+ *********************************************************************/
+void Robot::setLives(int live){
+    lives = live;
+}
+
+/**********************************************************************
  * isAlive
  * task: Checks if the lives count is greater than 0
  * @return true if the lives count is greater than 0
@@ -135,10 +144,40 @@ int Robot::getKills() const{
 }
 
 /**********************************************************************
+ * setKills
+ * task: sets the kill count
+ * @param kills - kill count
+ *********************************************************************/
+void Robot::setKills(int kills){
+    killCount = kills;
+}
+
+/**********************************************************************
  * incrementKills
  * task: Increases the kill count by 1
  * @return killCount - number of kills so far
  *********************************************************************/
 void Robot::incrementKills(){
     killCount++;
+}
+
+/**********************************************************************
+ * canUpgrade
+ * task: Checks if the upgrade count is lesser than max upgrades
+ * @return true if it hasn't reached max upgrades
+ *********************************************************************/
+bool Robot::canUpgrade() const{
+    if(upgradeCount < MAX_UPGRADES){
+        return true;
+    }
+    return false;
+}
+
+/**********************************************************************
+ * incrementKills
+ * task: Increases the kill count by 1
+ * @return killCount - number of kills so far
+ *********************************************************************/
+void Robot::addUpgrade(int currentUpgradeCount){
+    upgradeCount = currentUpgradeCount + 1;
 }

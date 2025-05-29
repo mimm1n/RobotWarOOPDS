@@ -29,6 +29,7 @@ enum RobotType {GENERIC, SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HID
 class Robot{
     private:
         int robotX = -1, robotY = -1; // x and y coordinates of the robot (x,y)
+        const int MAX_UPGRADES = 3;
         string robotName = ""; // The name of this robot        
     
     protected:
@@ -36,6 +37,7 @@ class Robot{
         int lives = 3; // Number of lives of this robot (initial is 3)
         int robotId = -1; // The ID of this robot
         int robotType = GENERIC; // This robot's type; Jump, Hide, etc.
+        int upgradeCount = 0;
 
     public:
         Robot(int x, int y, string name); // Constructor
@@ -55,10 +57,15 @@ class Robot{
         void addLife(); // Adds 1 life to the lives count 
         bool reduceLife(); // Reduces the lives count by 1
         int getLives() const; // Get this robot's lives count
+        void setLives(int live);
         bool isAlive() const; // Checks if this robot's lives count is more than 0
         
         int getKills() const; // Get this robot's current kill count
+        void setKills(int kills);
         void incrementKills(); // Adds 1 to the kill count
+
+        bool canUpgrade() const;
+        void addUpgrade(int currentUpgradeCount);
 
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
