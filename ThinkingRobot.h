@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Thinking.h   
+// Program: ThinkingRobot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,8 +16,8 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef THINKING_H
-#define THINKING_H
+#ifndef THINKINGROBOT_H
+#define THINKINGROBOT_H
 
 #include <iostream>
 #include <cstdlib>

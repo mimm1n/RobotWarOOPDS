@@ -22,8 +22,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
-#include "GenericRobot.h"
+#include "ShootingRobot.h"
+#include "Battlefield.h"
 using namespace std;
 
 class HealBot : public ShootingRobot {

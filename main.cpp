@@ -25,12 +25,21 @@
 #include <random>
 #include "Robot.h"
 #include "Battlefield.h"
-#include "Thinking.h"
-#include "Seeing.h"
-#include "Moving.h"
-#include "Shooting.h"
+#include "ThinkingRobot.h"
+#include "SeeingRobot.h"
+#include "MovingRobot.h"
+#include "ShootingRobot.h"
 #include "GenericRobot.h"
 #include "BombBot.h"
+#include "HealBot.h"
+#include "HideBot.h"
+#include "JumpBot.h"
+#include "LongShotBot.h"
+#include "ReflectShotBot.h"
+#include "ScoutBot.h"
+#include "SemiAutoBot.h"
+#include "ThirtyShotBot.h"
+#include "TrackBot.h"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Moving.h   
+// Program: ShootingRobot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,8 +16,8 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef MOVING_H
-#define MOVING_H
+#ifndef SHOOTINGROBOT_H
+#define SHOOTINGROBOT_H
 
 #include <iostream>
 #include <cstdlib>
@@ -26,11 +26,15 @@
 #include "Battlefield.h"
 using namespace std;
 
-class Battlefield; 
+class Battlefield;
 
-class MovingRobot : virtual public Robot{
+class ShootingRobot : virtual public Robot{
+    private:
+        int shells = 10;
     public:
-        MovingRobot(){}
-        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
+        ShootingRobot(){}
+        void setShells(int num) { shells = num; }
+        int getShells() const { return shells; }
+        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
 };
 #endif

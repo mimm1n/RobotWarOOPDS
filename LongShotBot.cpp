@@ -17,6 +17,8 @@
 // ******************************************************** 
 
 #include "LongShotBot.h"
+#include "ShootingRobot.h"
+#include "GenericRobot.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
