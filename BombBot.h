@@ -31,12 +31,16 @@ using namespace std;
 
 class ShootingRobot;
 
-class BombBot : public ShootingRobot {
+class BombBot : public ShootingRobot public MovingRobot, public SeeingRobot, public ThinkingRobot {
     private:
         int bombs = 1;
     public:
         BombBot(int x, int y, string name):Robot(x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         void setRobotType(int type) override { robotType = BOMB; }
         int getRobotType() const override { return BOMB; }
 };

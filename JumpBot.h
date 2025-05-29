@@ -28,7 +28,7 @@
 
 using namespace std;
 
-class JumpBot : public MovingRobot {
+class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, public ThinkingRobot {
     private:
         int jumpsUsed = 0;
         const int MAX_JUMPS = 3;
@@ -36,6 +36,10 @@ class JumpBot : public MovingRobot {
     public:
         JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot( x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         void setRobotType(int type) override { robotType = JUMP; }
         int getRobotType() const override { return JUMP; }
 };

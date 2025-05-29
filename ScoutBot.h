@@ -27,7 +27,7 @@
 #include "Robot.h"
 using namespace std;
 
-class ScoutBot : public SeeingRobot{
+class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, public ThinkingRobot{
     private:
         int lookCount = 0;
         const int MAX_LOOKS = 3;
@@ -35,6 +35,10 @@ class ScoutBot : public SeeingRobot{
     public:
         ScoutBot(int x, int y, string name):Robot( x, y, name){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionRand(Battlefield* battlefield);
         void setRobotType(int type) override { robotType = SCOUT; }
         int getRobotType() const override { return SCOUT; }
 };

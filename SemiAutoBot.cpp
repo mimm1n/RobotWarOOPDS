@@ -73,3 +73,50 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
     delete targetRobot;
     targetRobot = nullptr;
 }
+void SemiAutoBot::actionThink(Battlefield* battlefield, int x, int y){
+    actionRand(battlefield);
+}
+
+void SemiAutoBot::actionRand(Battlefield* battlefield){
+
+        random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> posDistr(0, 8);
+
+    int directionMove = posDistr(gen);
+
+    int currentX = getRobotX();
+    int currentY = getRobotY();
+
+    int moveX = 0, moveY = 0;
+
+    switch (directionMove) {
+        case 0: moveX = -1; moveY = -1; break;
+        case 1: moveX =  0; moveY = -1; break;
+        case 2: moveX =  1; moveY = -1; break;
+        case 3: moveX = -1; moveY =  0; break;
+        case 4: moveX =  1; moveY =  0; break;
+        case 5: moveX = -1; moveY =  1; break;
+        case 6: moveX =  0; moveY =  1; break;
+        case 7: moveX =  1; moveY =  1; break;
+        case 8: moveX =  0; moveY =  0; break;
+    }
+
+    random_device rd2;
+    mt19937 gen2(rd2());
+    uniform_int_distribution<> actionDistr(0, 10);
+
+    actionThink(battlefield);
+    actionLook(battlefield, 0, 0);
+
+    int randomInt = actionDistr(gen2);
+
+    if (randomInt % 2 == 0) {
+        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY);
+    } else {
+        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY);
+    }
+}
+

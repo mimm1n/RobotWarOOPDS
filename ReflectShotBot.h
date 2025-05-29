@@ -27,13 +27,16 @@
 #include "Robot.h"
 using namespace std;
 
-class ReflectShotBot : public ShootingRobot {
+class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
     private:
         int reflect = 1;
         bool isReflect_ = false;
     public:
         ReflectShotBot(int x, int y, string name):Robot( x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield, int x, int y) override;
         bool isReflecting();
         void setRobotType(int type) override { robotType = REFLECTSHOT; }
         int getRobotType() const override { return REFLECTSHOT; }
