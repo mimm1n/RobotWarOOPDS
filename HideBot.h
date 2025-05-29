@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: HideBot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,27 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
+#ifndef HIDEBOT_H
+#define HIDEBOT_H
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
-#include "Battlefield.h"
+#include "GenericRobot.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
+class HideBot : public MovingRobot{
     private:
-        int shells = 10;
+        int hideTurnsUsed = 0;
+        const int MAX_HIDE_TURNS = 3;
+        bool isHidden_ = false;
+
     public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        HideBot(int x, int y, string name):Robot( x, y, name){}
+        void actionMove(Battlefield* battlefield, int x, int y) override;
+        bool isHidden();
+        void setRobotType(int type) override { robotType = HIDE; }
+        int getRobotType() const override { return HIDE; }
 };
 #endif

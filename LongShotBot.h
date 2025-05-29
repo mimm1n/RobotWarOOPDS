@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: LongShotBot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,21 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
+#ifndef LONGSHOTBOT_H
+#define LONGSHOTBOT_H
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
-#include "Battlefield.h"
+#include "GenericRobot.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
+class LongShotBot : public ShootingRobot {
     public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        LongShotBot(int x, int y, string name):Robot( x, y, name){}
+        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        void setRobotType(int type) override { robotType = LONGSHOT; }
+        int getRobotType() const override { return LONGSHOT;}
 };
 #endif

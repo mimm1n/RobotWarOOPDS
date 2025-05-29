@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: TrackBot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,27 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
+#ifndef TRACKBOT_H
+#define TRACKBOT_H
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
-#include "Battlefield.h"
+#include "GenericRobot.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
+class TrackBot : public SeeingRobot {
     private:
-        int shells = 10;
+        int trackersUsed = 0;
+        const int MAX_TRACKERS = 3;
+        vector<int> targets {};
+
     public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        TrackBot(int x, int y, string name):Robot( x, y, name){}
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        vector<int> getTrackedTargets() { return targets; }
+        void setRobotType(int type) override { robotType = TRACK; }
+        int getRobotType() const override { return TRACK; }
 };
 #endif

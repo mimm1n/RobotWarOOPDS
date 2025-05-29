@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: ScoutBot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,25 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
+#ifndef SCOUTBOT_H
+#define SCOUTBOT_H
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
-#include "Battlefield.h"
+#include "GenericRobot.h"
 using namespace std;
 
-class Battlefield;
-
-class ShootingRobot : virtual public Robot{
+class ScoutBot : public SeeingRobot{
     private:
-        int shells = 10;
+        int lookCount = 0;
+        const int MAX_LOOKS = 3;
+
     public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        ScoutBot(int x, int y, string name):Robot( x, y, name){}
+        void actionLook(Battlefield* battlefield, int x, int y) override;
+        void setRobotType(int type) override { robotType = SCOUT; }
+        int getRobotType() const override { return SCOUT; }
 };
 #endif

@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: HideBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,25 +16,22 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
-
+#include "HideBot.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
-#include "Battlefield.h"
 using namespace std;
 
-class Battlefield;
+void HideBot::actionMove(Battlefield* battlefield, int x, int y){
+    if (hideTurnsUsed < MAX_HIDE_TURNS) {
+        isHidden_ = true;
+        hideTurnsUsed++;
+    }
+}
 
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
-    public:
-        ShootingRobot(int x, int y, string name){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
-};
-#endif
+bool HideBot::isHidden(){
+    if (hideTurnsUsed >= MAX_HIDE_TURNS)
+        isHidden_ = false;
+    return isHidden_;
+}
+

@@ -40,6 +40,7 @@ class Battlefield {
         int numOfRobots_ = -1; // variable to assign number of robots
 
         vector<GenericRobot *> robots_; 
+        vector<GenericRobot *> UpgradedRObots_;
         queue<GenericRobot *> destroyedRobots_;
         queue<GenericRobot *> waitingRobots_;  
         vector<vector<string>> battlefield_;
