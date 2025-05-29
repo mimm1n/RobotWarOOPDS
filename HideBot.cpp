@@ -36,3 +36,6 @@ bool HideBot::isHidden(){
     return isHidden_;
 }
 
+int HideBot::hidesLeft() const{ 
+return MAX_HIDE_TURNS - hideTurnsUsed - 1;
+}

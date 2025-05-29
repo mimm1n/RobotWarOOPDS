@@ -24,6 +24,7 @@
 #include <string>
 #include "MovingRobot.h"
 #include "Battlefield.h"
+#include "Robot.h"
 using namespace std;
 
 class HideBot : public MovingRobot{
@@ -33,9 +34,10 @@ class HideBot : public MovingRobot{
         bool isHidden_ = false;
 
     public:
-        HideBot(int x, int y, string name):Robot( x, y, name){}
+        HideBot(int x, int y, string name):MovingRobot(x, y, name){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         bool isHidden();
+        int hidesLeft() const;
         void setRobotType(int type) override { robotType = HIDE; }
         int getRobotType() const override { return HIDE; }
 };

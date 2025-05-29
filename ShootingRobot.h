@@ -32,7 +32,7 @@ class ShootingRobot : virtual public Robot{
     private:
         int shells = 10;
     public:
-        ShootingRobot(){}
+        ShootingRobot(int x, int y, string name):Robot(x, y, name){}
         void setShells(int num) { shells = num; }
         int getShells() const { return shells; }
         virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;

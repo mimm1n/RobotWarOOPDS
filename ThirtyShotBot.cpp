@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program:BombBot.h   
+// Program: TrackBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,28 +16,11 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef BOMBBOT_H
-#define BOMBBOT_H
-
+#include "ThirtyShotBot.h"
+#include "Battlefield.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "ShootingRobot.h"
-#include "GenericRobot.h"
-#include "Battlefield.h"
-#include "Robot.h"
-
 using namespace std;
 
-class ShootingRobot;
-
-class BombBot : public ShootingRobot {
-    private:
-        int bombs = 1;
-    public:
-        BombBot(int x, int y, string name):Robot(x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void setRobotType(int type) override { robotType = BOMB; }
-        int getRobotType() const override { return BOMB; }
-};
-#endif
+void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y) { setShells(30); }

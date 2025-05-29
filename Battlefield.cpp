@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <string>
+#include <queue>
 #include "GenericRobot.h"
 using namespace std;
 
@@ -195,7 +196,7 @@ void Battlefield::placeRobots(){
         
         waitingRobots_.push(robots_[i]);
         allRobotId.push_back(robots_[i]->getRobotID());
-        // if(!robots_[i]->isAlive()){respawnRobot(i);}
+        //if(!robots_[i]->isAlive()){respawnRobot(i);}
     }
 
 };
@@ -298,4 +299,15 @@ void Battlefield::nextTurn(){
     GenericRobot* front = waitingRobots_.front();
     waitingRobots_.pop();
     waitingRobots_.push(front);
+}
+
+RobotType Battlefield::findTargetRobot(GenericRobot* target) {
+    for (int i = 0; i <= BOMB; ++i) {
+        for (Robot* robot : upgradedRobots_[i]) {
+            if (robot == target) {
+                return static_cast<RobotType>(i);
+            }
+        }
+    }
+    return GENERIC;
 }

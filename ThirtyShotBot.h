@@ -22,14 +22,16 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "SHootingRobot.h"
+#include "ShootingRobot.h"
 #include "Battlefield.h"
+#include "Robot.h"
 using namespace std;
 
 class ThirtyShotBot : public ShootingRobot {
     public:
         ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override { setShells(30); }
+        void actionFire(Battlefield* battlefield, int x, int y) override;
         void setRobotType(int type) override { robotType = THIRTYSHOT; }
         int getRobotType() const override { return THIRTYSHOT;}
 };
+#endif
