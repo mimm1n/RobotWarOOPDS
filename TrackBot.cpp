@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Moving.h   
+// Program: TrackBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,18 +16,18 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef MOVING_H
-#define MOVING_H
-
+#include "TrackBot.h"
+#include "Battlefield.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
 using namespace std;
 
-class MovingRobot : virtual public Robot{
-    public:
-        MovingRobot(){}
-        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
-};
-#endif
+void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
+    if (trackersUsed > MAX_TRACKERS)
+        return;
+
+    int targetRobotId = stoi(battlefield->getPlayer(x, y));
+    targets.push_back(targetRobotId);
+    trackersUsed++;
+}

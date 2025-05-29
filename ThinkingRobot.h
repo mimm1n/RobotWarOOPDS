@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Seeing.h   
+// Program: ThinkingRobot.h   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,18 +16,21 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SEEING_H
-#define SEEING_H
+#ifndef THINKINGROBOT_H
+#define THINKINGROBOT_H
 
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include "Robot.h"
+#include "Battlefield.h"
 using namespace std;
 
-class SeeingRobot : virtual public Robot{
+class Battlefield;
+
+class ThinkingRobot : virtual public Robot{
     public:
-        SeeingRobot(){}
-        virtual void actionLook(Battlefield* battlefield,int x, int y) = 0;
+        ThinkingRobot(){}
+        virtual void actionThink(Battlefield* battlefield) = 0;
 };
 #endif

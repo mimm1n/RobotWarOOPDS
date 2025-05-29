@@ -23,7 +23,10 @@
 #include <cstdlib>
 #include <string>
 #include "GenericRobot.h"
+#include "Robot.h"
 using namespace std;
+
+class GenericRobot;
 
 class Battlefield {
     private:
@@ -38,6 +41,7 @@ class Battlefield {
         int numOfRobots_ = -1; // variable to assign number of robots
 
         vector<GenericRobot *> robots_; 
+        vector<Robot *> upgradedRobots_;
         queue<GenericRobot *> destroyedRobots_;
         queue<GenericRobot *> waitingRobots_;  
         vector<vector<string>> battlefield_;
@@ -45,15 +49,15 @@ class Battlefield {
         friend class GenericRobot;
     public:
         // Get function
-        int battlefieldCols() { return battlefieldCols_; }
-        int battlefieldRows() { return battlefieldRows_; }
-        int turns() { return totalTurns_; }
-        int numOfRobots() { return numOfRobots_; }
-        int currentTurn(){ return currentTurn_; }
-        string getPlayer(int x, int y){return battlefield_[y][x];}
-        vector <GenericRobot *> getAllRobots() const {return robots_;}
-        vector <int> getAllRobotId() const {return allRobotId;}
-        GenericRobot* getCurrentPlayer() const { return waitingRobots_.front(); }
+        int battlefieldCols();
+        int battlefieldRows();
+        int turns();
+        int numOfRobots();
+        int currentTurn();
+        string getPlayer(int x, int y);
+        vector <GenericRobot *> getAllRobots() const;
+        vector <int> getAllRobotId() const;
+        GenericRobot* getCurrentPlayer() const;
         
         
         void readFile(string filename);

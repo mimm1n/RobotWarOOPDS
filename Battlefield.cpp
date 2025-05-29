@@ -17,11 +17,98 @@
 // ******************************************************** 
 
 #include "Battlefield.h"
+#include "Robot.h"
 #include <iostream>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
 #include <cstdlib>
 #include <string>
 #include "GenericRobot.h"
 using namespace std;
+
+/**********************************************************************
+ * battlefieldCols
+ * task: 
+ * @return battlefieldCols_ - 
+ *********************************************************************/
+int Battlefield::battlefieldCols(){ 
+    return battlefieldCols_; 
+}
+
+/**********************************************************************
+ * battlefieldRows
+ * task: 
+ * @return battlefieldRows_ - 
+ *********************************************************************/
+int Battlefield::battlefieldRows(){
+    return battlefieldRows_;
+}
+
+/**********************************************************************
+ * turns
+ * task: 
+ * @return totalTurns_ - 
+ *********************************************************************/
+int Battlefield::turns(){
+    return totalTurns_;
+}
+
+/**********************************************************************
+ * numOfRobots
+ * task: 
+ * @return numOfRobots_ - 
+ *********************************************************************/
+int Battlefield::numOfRobots(){
+    return numOfRobots_; 
+}
+
+/**********************************************************************
+ * currentTurn
+ * task: 
+ * @return currentTurn_ - 
+ *********************************************************************/
+int Battlefield::currentTurn(){
+    return currentTurn_; 
+}
+
+/**********************************************************************
+ * getPlayer
+ * task: 
+ * @param x -
+ *        y -
+ * @return  
+ *********************************************************************/
+string Battlefield::getPlayer(int x, int y){
+    return battlefield_[y][x];
+}
+
+/**********************************************************************
+ * getAllRobots
+ * task: 
+ * @return robots_ - 
+ *********************************************************************/
+vector <GenericRobot *> Battlefield::getAllRobots() const {
+    return robots_;
+}
+
+/**********************************************************************
+ * getAllRobotId
+ * task: 
+ * @return allRobotId - 
+ *********************************************************************/
+vector <int> Battlefield::getAllRobotId() const {
+    return allRobotId;
+}
+
+/**********************************************************************
+ * getCurrentPlayer
+ * task: 
+ * @return 
+ *********************************************************************/
+GenericRobot* Battlefield::getCurrentPlayer() const {
+    return waitingRobots_.front();
+}
 
 /**********************************************************************
  * readFile
@@ -175,26 +262,31 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
  * @param index - 
  *********************************************************************/
 void Battlefield::respawnRobot(int index){
-    GenericRobot* destroyed = robots_[index];
-    destroyedRobots_.push(destroyed);
-    int oldX = destroyed -> getRobotX();
-    int oldY = destroyed -> getRobotY();
-    battlefield_[oldY][oldX] = ""; //clear the field
 
-    GenericRobot* waiting = destroyedRobots_.front();
-    waitingRobots_.push(waiting);
-    destroyedRobots_.pop();
-    if(!waitingRobots_.empty()){
-        GenericRobot* respawn = waitingRobots_.front();
-        waitingRobots_.pop();
-
-        int newX = rand() % (battlefieldRows_);
-        int newY = rand() % (battlefieldCols_);
-
-        respawn->setRobotX(newX);
-        respawn->setRobotY(newY);
-        battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    GenericRobot* waiting = robots_[index];
+    
+    if(! waiting->isAlive()){
+        destroyedRobots_.push(waiting);
+        return;
     }
+        int oldX = waiting -> getRobotX();
+        int oldY = waiting -> getRobotY();
+        battlefield_[oldY][oldX] = ""; //clear the field
+        waitingRobots_.push(waiting);
+
+        if(!waitingRobots_.empty()){
+            GenericRobot* respawn = waitingRobots_.front();
+            waitingRobots_.pop();
+
+            int newX = rand() % (battlefieldRows_);
+            int newY = rand() % (battlefieldCols_);
+
+            respawn->setRobotX(newX);
+            respawn->setRobotY(newY);
+            battlefield_[newY][newX]=to_string(respawn->getRobotID());
+    
+    }
+
 }
 
 /**********************************************************************

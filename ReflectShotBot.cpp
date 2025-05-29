@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: Shooting.h   
+// Program: ReflectShotBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,22 +16,21 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef SHOOTING_H
-#define SHOOTING_H
-
+#include "ReflectShotBot.h"
+#include "Battlefield.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "Robot.h"
 using namespace std;
 
-class ShootingRobot : virtual public Robot{
-    private:
-        int shells = 10;
-    public:
-        ShootingRobot(){}
-        void setShells(int num) { shells = num; }
-        int getShells() const { return shells; }
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
-};
-#endif
+void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y){
+    if(reflect>0)
+        isReflect_ = true;
+}
+
+bool ReflectShotBot::isReflecting() {
+    bool name = isReflect_;
+    isReflect_ = false;
+    reflect--;
+    return name;
+}
