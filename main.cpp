@@ -445,18 +445,18 @@ void GenericRobot::actionRand(Battlefield* battlefield) {
     }
 }
 
-class HideBot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot{
+class HideBot : public ShootingRobot, public MovingRobot{
     private:
         int hideTurnsUsed = 0;
         const int MAX_HIDE_TURNS = 3;
         bool isHidden_ = false;
 
     public:
-        HideBot(int x, int y, string name):MovingRobot(x, y, name){}
+        HideBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name){}
         void actionFire(Battlefield* battlefield, int x, int y) override;
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
-        void actionThink(Battlefield* battlefield, int x, int y) override;
+        void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
         bool isHidden();
         int hidesLeft() const;
