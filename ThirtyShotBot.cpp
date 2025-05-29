@@ -1,5 +1,5 @@
 //*********************************************************   
-// Program: ThirtyShotBot.h   
+// Program: TrackBot.cpp   
 // Course: CCP6124 OOPDS  
 // Lecture Class: TC2L 
 // Tutorial Class: TT7L 
@@ -16,21 +16,11 @@
 // Member_4: 
 // ******************************************************** 
 
-#ifndef THIRTYSHOTBOT_H
-#define THIRTYSHOTBOT_H
-
+#include "ThirtyShotBot.h"
+#include "Battlefield.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include "ShootingRobot.h"
-#include "Battlefield.h"
 using namespace std;
 
-class ThirtyShotBot : public ShootingRobot {
-    public:
-        ThirtyShotBot(int x, int y, string name):Robot( x, y, name){}
-        void actionFire(Battlefield* battlefield, int x, int y) override;
-        void setRobotType(int type) override { robotType = THIRTYSHOT; }
-        int getRobotType() const override { return THIRTYSHOT;}
-};
-#endif
+void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y) { setShells(30); }

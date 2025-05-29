@@ -28,6 +28,8 @@
 
 using namespace std;
 
+class ShootingRobot;
+
 class BombBot : public ShootingRobot {
     private:
         int bombs = 1;

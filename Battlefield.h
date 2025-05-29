@@ -44,7 +44,7 @@ class Battlefield {
         vector<Robot *> upgradedRobots_[11];
         queue<GenericRobot *> destroyedRobots_;
         queue<GenericRobot *> waitingRobots_;  
-        vector<vector<string>> battlefield_;
+        vector < vector <string> > battlefield_;
         vector <int> allRobotId;
         friend class GenericRobot;
     public:
