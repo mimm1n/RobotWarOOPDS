@@ -81,6 +81,8 @@ class Robot{
         bool canUpgrade() const;
         void addUpgrade(int currentUpgradeCount);
 
+        virtual void actions(Battlefield* battlefield) = 0;
+
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
         virtual int getRobotType() const = 0;
@@ -175,10 +177,11 @@ public:
     virtual void actionLook(Battlefield* battlefield, int x, int y) override;
     virtual void actionThink(Battlefield* battlefield) override;
     void actionRand(Battlefield* battlefield);
+    virtual void actions(Battlefield* battlefield) override;
 
-    void upgradeRobot(Battlefield* battlefield, int upgradeType);
-    bool toUpgrade() const;
-    void ToGeneric(int upgradeType);
+    // void upgradeRobot(Battlefield* battlefield, int upgradeType);
+    // bool toUpgrade() const;
+    // void ToGeneric(int upgradeType);
     int getUpgradeCount() const;
 };
 
@@ -195,6 +198,7 @@ class HideBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         bool isHidden();
         int hidesLeft() const;
         void setRobotType(int type) override { robotType = HIDE; }
@@ -213,6 +217,7 @@ class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = JUMP; }
         int getRobotType() const override { return JUMP; }
 };
@@ -226,6 +231,7 @@ class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobo
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = LONGSHOT; }
         int getRobotType() const override { return LONGSHOT;}
 };
@@ -241,6 +247,7 @@ class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobo
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = SEMIAUTO; }
         int getRobotType() const override { return SEMIAUTO; }
 };
@@ -253,6 +260,7 @@ class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRo
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = THIRTYSHOT; }
         int getRobotType() const override { return THIRTYSHOT;}
 };
@@ -266,6 +274,7 @@ class HealBot : public ShootingRobot, public MovingRobot, public SeeingRobot, pu
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand (Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = HEAL; }
         int getRobotType() const override { return HEAL; }
 };
@@ -280,6 +289,7 @@ class BombBot : public ShootingRobot, public MovingRobot, public SeeingRobot, pu
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = BOMB; }
         int getRobotType() const override { return BOMB; }
 };
@@ -294,6 +304,7 @@ class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingR
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionLook(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
+        virtual void actions(Battlefield* battlefield) override;
         bool isReflecting();
         void setRobotType(int type) override { robotType = REFLECTSHOT; }
         int getRobotType() const override { return REFLECTSHOT; }
@@ -313,6 +324,7 @@ class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, 
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         void setRobotType(int type) override { robotType = SCOUT; }
         int getRobotType() const override { return SCOUT; }
 };
@@ -330,6 +342,7 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
         void actionMove(Battlefield* battlefield, int x, int y) override;
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* Battlefield);
+        virtual void actions(Battlefield* battlefield) override;
         vector<int> getTrackedTargets() { return targets; }
         void setRobotType(int type) override { robotType = TRACK; }
         int getRobotType() const override { return TRACK; }
@@ -357,114 +370,114 @@ int main() {
         cout << "----------------------------------" << endl;
         outFile << setw(22) << "Action Log" << endl;
         outFile << "----------------------------------" << endl;
+        currentPlayer->actions(battlefield);
+        // random_device rd;
+        // mt19937 gen(rd()), gen2(rd()), gen3(rd()), gen4(rd());
 
-        random_device rd;
-        mt19937 gen(rd()), gen2(rd()), gen3(rd()), gen4(rd());
+        // uniform_int_distribution<> moveDistr(1, 4);
+        // int move = moveDistr(gen);
 
-        uniform_int_distribution<> moveDistr(1, 4);
-        int move = moveDistr(gen);
-
-        uniform_int_distribution<> dirDistr(-1, 1);
-        int x = dirDistr(gen2);
-        int y = dirDistr(gen3);
+        // uniform_int_distribution<> dirDistr(-1, 1);
+        // int x = dirDistr(gen2);
+        // int y = dirDistr(gen3);
         
-        switch(move){
-            case 1: // Think
-                currentPlayer->actionThink(battlefield);
-                cout << currentPlayer->getRobotName() << " is thinking" << endl;
-                outFile << currentPlayer->getRobotName() << " is thinking" << endl;
-                break;
-            case 2: // Look
-                currentPlayer->actionLook(battlefield, x, y);
-                cout << currentPlayer->getRobotName() << " is looking" << endl;
-                outFile << currentPlayer->getRobotName() << " is looking" << endl;
-                break;
-            case 3: // Fire
-                kills = currentPlayer->getKills();
-                currentPlayer->actionFire(battlefield, x, y);
-                cout << currentPlayer->getRobotName() << " is shooting..." << endl;
-                outFile << currentPlayer->getRobotName() << " is shooting..." << endl;
+        // switch(move){
+        //     case 1: // Think
+        //         currentPlayer->actionThink(battlefield);
+        //         cout << currentPlayer->getRobotName() << " is thinking" << endl;
+        //         outFile << currentPlayer->getRobotName() << " is thinking" << endl;
+        //         break;
+        //     case 2: // Look
+        //         currentPlayer->actionLook(battlefield, x, y);
+        //         cout << currentPlayer->getRobotName() << " is looking" << endl;
+        //         outFile << currentPlayer->getRobotName() << " is looking" << endl;
+        //         break;
+        //     case 3: // Fire
+        //         kills = currentPlayer->getKills();
+        //         currentPlayer->actionFire(battlefield, x, y);
+        //         cout << currentPlayer->getRobotName() << " is shooting..." << endl;
+        //         outFile << currentPlayer->getRobotName() << " is shooting..." << endl;
 
-                if (kills < currentPlayer->getKills()){ // upgrade 
-                    cout << currentPlayer->getRobotName() << " killed "; 
-                    cout << battlefield->getPlayer(currentPlayer->getRobotX()+x,currentPlayer->getRobotY()+y) << "!" << endl;
-                    outFile << currentPlayer->getRobotName() << " killed "; 
-                    outFile << battlefield->getPlayer(currentPlayer->getRobotX()+x,currentPlayer->getRobotY()+y) << "!" << endl;
+        //         if (kills < currentPlayer->getKills()){ // upgrade 
+        //             cout << currentPlayer->getRobotName() << " killed "; 
+        //             cout << battlefield->getPlayer(currentPlayer->getRobotX()+x,currentPlayer->getRobotY()+y) << "!" << endl;
+        //             outFile << currentPlayer->getRobotName() << " killed "; 
+        //             outFile << battlefield->getPlayer(currentPlayer->getRobotX()+x,currentPlayer->getRobotY()+y) << "!" << endl;
 
-                    if (!currentPlayer->canUpgrade()) continue;
+        //             if (!currentPlayer->canUpgrade()) continue;
 
-                    currentPlayerType = currentPlayer->getRobotType();
-                    x = currentPlayer->getRobotX();
-                    y = currentPlayer->getRobotY();
-                    name = currentPlayer->getRobotName();
+        //             currentPlayerType = currentPlayer->getRobotType();
+        //             x = currentPlayer->getRobotX();
+        //             y = currentPlayer->getRobotY();
+        //             name = currentPlayer->getRobotName();
 
-                    if (currentPlayerType == GENERIC){
-                        uniform_int_distribution<> upgradeDistr(1, 10);
-                        upgrade = upgradeDistr(gen4);
-                        switch(upgrade){
-                            case 1: upgradedRobot = new ScoutBot(x, y, name); break;
-                            case 2: upgradedRobot = new TrackBot(x, y, name); break;
-                            case 3: upgradedRobot = new LongShotBot(x, y, name); break;
-                            case 4: upgradedRobot = new SemiAutoBot(x, y, name); break;
-                            case 5: upgradedRobot = new ThirtyShotBot(x, y, name); break;
-                            case 6: upgradedRobot = new JumpBot(x, y, name); break;
-                            case 7: upgradedRobot = new HideBot(x, y, name); break;
-                            case 8: upgradedRobot = new ReflectShotBot(x, y, name); break;
-                            case 9: upgradedRobot = new HealBot(x, y, name); break;
-                            case 10: upgradedRobot = new BombBot(x, y, name); break;
-                        }
-                    } else if (currentPlayerType == SCOUT || currentPlayerType == TRACK){
-                        uniform_int_distribution<> upgradeDistr(1, 8);
-                        upgrade = upgradeDistr(gen4);
-                        switch(upgrade){
-                            case 1: upgradedRobot = new LongShotBot(x, y, name); break;
-                            case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
-                            case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
-                            case 4: upgradedRobot = new JumpBot(x, y, name); break;
-                            case 5: upgradedRobot = new HideBot(x, y, name); break;
-                            case 6: upgradedRobot = new ReflectShotBot(x, y, name); break;
-                            case 7: upgradedRobot = new HealBot(x, y, name); break;
-                            case 8: upgradedRobot = new BombBot(x, y, name); break;
-                        }
-                    } else if (currentPlayerType == HIDE || currentPlayerType == JUMP){
-                        uniform_int_distribution<> upgradeDistr(1, 8);
-                        upgrade = upgradeDistr(gen4);
-                        switch(upgrade){
-                            case 1: upgradedRobot = new LongShotBot(x, y, name); break;
-                            case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
-                            case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
-                            case 4: upgradedRobot = new ScoutBot(x, y, name); break;
-                            case 5: upgradedRobot = new TrackBot(x, y, name); break;
-                            case 6: upgradedRobot = new ReflectShotBot(x, y, name); break;
-                            case 7: upgradedRobot = new HealBot(x, y, name); break;
-                            case 8: upgradedRobot = new BombBot(x, y, name); break;
-                        }
-                    } else {
-                        uniform_int_distribution<> upgradeDistr(1, 4);
-                        upgrade = upgradeDistr(gen4);
-                        switch(upgrade){
-                            case 1: upgradedRobot = new ScoutBot(x, y, name); break;
-                            case 2: upgradedRobot = new TrackBot(x, y, name); break;
-                            case 3: upgradedRobot = new JumpBot(x, y, name); break;
-                            case 4: upgradedRobot = new HideBot(x, y, name); break;
-                        }
-                    }
-                    upgradedRobot->addUpgrade(currentPlayer->getUpgradeCount());
-                    upgradedRobot->setLives(currentPlayer->getLives());
-                    upgradedRobot->setKills(currentPlayer->getKills());
-                    upgradedRobot->setShells(currentPlayer->getShells());
-                    battlefield->robotUpgrade(upgradedRobot);
+        //             if (currentPlayerType == GENERIC){
+        //                 uniform_int_distribution<> upgradeDistr(1, 10);
+        //                 upgrade = upgradeDistr(gen4);
+        //                 switch(upgrade){
+        //                     case 1: upgradedRobot = new ScoutBot(x, y, name); break;
+        //                     case 2: upgradedRobot = new TrackBot(x, y, name); break;
+        //                     case 3: upgradedRobot = new LongShotBot(x, y, name); break;
+        //                     case 4: upgradedRobot = new SemiAutoBot(x, y, name); break;
+        //                     case 5: upgradedRobot = new ThirtyShotBot(x, y, name); break;
+        //                     case 6: upgradedRobot = new JumpBot(x, y, name); break;
+        //                     case 7: upgradedRobot = new HideBot(x, y, name); break;
+        //                     case 8: upgradedRobot = new ReflectShotBot(x, y, name); break;
+        //                     case 9: upgradedRobot = new HealBot(x, y, name); break;
+        //                     case 10: upgradedRobot = new BombBot(x, y, name); break;
+        //                 }
+        //             } else if (currentPlayerType == SCOUT || currentPlayerType == TRACK){
+        //                 uniform_int_distribution<> upgradeDistr(1, 8);
+        //                 upgrade = upgradeDistr(gen4);
+        //                 switch(upgrade){
+        //                     case 1: upgradedRobot = new LongShotBot(x, y, name); break;
+        //                     case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
+        //                     case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
+        //                     case 4: upgradedRobot = new JumpBot(x, y, name); break;
+        //                     case 5: upgradedRobot = new HideBot(x, y, name); break;
+        //                     case 6: upgradedRobot = new ReflectShotBot(x, y, name); break;
+        //                     case 7: upgradedRobot = new HealBot(x, y, name); break;
+        //                     case 8: upgradedRobot = new BombBot(x, y, name); break;
+        //                 }
+        //             } else if (currentPlayerType == HIDE || currentPlayerType == JUMP){
+        //                 uniform_int_distribution<> upgradeDistr(1, 8);
+        //                 upgrade = upgradeDistr(gen4);
+        //                 switch(upgrade){
+        //                     case 1: upgradedRobot = new LongShotBot(x, y, name); break;
+        //                     case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
+        //                     case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
+        //                     case 4: upgradedRobot = new ScoutBot(x, y, name); break;
+        //                     case 5: upgradedRobot = new TrackBot(x, y, name); break;
+        //                     case 6: upgradedRobot = new ReflectShotBot(x, y, name); break;
+        //                     case 7: upgradedRobot = new HealBot(x, y, name); break;
+        //                     case 8: upgradedRobot = new BombBot(x, y, name); break;
+        //                 }
+        //             } else {
+        //                 uniform_int_distribution<> upgradeDistr(1, 4);
+        //                 upgrade = upgradeDistr(gen4);
+        //                 switch(upgrade){
+        //                     case 1: upgradedRobot = new ScoutBot(x, y, name); break;
+        //                     case 2: upgradedRobot = new TrackBot(x, y, name); break;
+        //                     case 3: upgradedRobot = new JumpBot(x, y, name); break;
+        //                     case 4: upgradedRobot = new HideBot(x, y, name); break;
+        //                 }
+        //             }
+        //             upgradedRobot->addUpgrade(currentPlayer->getUpgradeCount());
+        //             upgradedRobot->setLives(currentPlayer->getLives());
+        //             upgradedRobot->setKills(currentPlayer->getKills());
+        //             upgradedRobot->setShells(currentPlayer->getShells());
+        //             battlefield->robotUpgrade(upgradedRobot);
 
-                    cout << currentPlayer->getRobotName() << " upgraded!" << endl;
-                    outFile << currentPlayer->getRobotName() << " upgraded!" << endl;
-                    delete upgradedRobot;
-                    upgradedRobot = nullptr; 
-                }
-                break;
-            case 4: // Move
-                currentPlayer->actionMove(battlefield, x, y);
-                break;
-        }
+        //             cout << currentPlayer->getRobotName() << " upgraded!" << endl;
+        //             outFile << currentPlayer->getRobotName() << " upgraded!" << endl;
+        //             delete upgradedRobot;
+        //             upgradedRobot = nullptr; 
+        //         }
+        //         break;
+        //     case 4: // Move
+        //         currentPlayer->actionMove(battlefield, x, y);
+        //         break;
+        // }
         battlefield->nextTurn();
         delete currentPlayer;
         currentPlayer = nullptr;
@@ -967,6 +980,50 @@ GenericRobot::GenericRobot(string name, int x, int y) : Robot(x, y, name) {
 int GenericRobot::getRobotID() const { return robotId; }
 void GenericRobot::setRobotType(int type) { robotType = type; }
 int GenericRobot::getRobotType() const { return robotType; }
+
+virtual void GenericRobot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void HideBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void JumpBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void LongShotBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void SemiAutoBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void ThirtyShotBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void HealBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void BombBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void ReflectShotBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void ScoutBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
+
+virtual void TrackBot::actions(Battlefield* battlefield){
+    actionRand(battlefield);
+}
 
 virtual void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
     if (getShells() <= 0) {
