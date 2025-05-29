@@ -1032,7 +1032,7 @@ int GenericRobot::getRobotType() const { return robotType; }
     actionRand(battlefield);
 }
 
-void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
+// void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
 //     if (getShells() <= 0) {
 //         cout << "Out of shells!" << endl;
 //         return;
@@ -1368,10 +1368,10 @@ void HideBot::actionLook(Battlefield* battlefield, int x, int y){
 
             if (lookX >= 0 && lookX < battlefield->battlefieldCols() &&
                     lookY >= 0 && lookY < battlefield->battlefieldRows() &&
-                !battlefield->battlefield_[lookY][lookX].empty()) {
-                int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]);
-                GenericRobot* robotLooked = nullptr;
-                for (GenericRobot* robot : battlefield->robots_) {
+                !battlefield->getPlayer(lookX, lookY).empty()) {
+                int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY));
+                Robot* robotLooked = nullptr;
+                for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
@@ -1518,9 +1518,9 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
         int hitChance = distr(gen); 
         if (hitChance <= 70) {  // 70% chance 
             int targetRobotId = stoi(battlefield->getPlayer(x, y));
-            GenericRobot* targetRobot = nullptr; 
+            Robot* targetRobot = nullptr; 
             
-            for (GenericRobot* robot : battlefield->getAllRobots()){
+            for (Robot* robot : battlefield->getAllRobots()){
                 if (robot->getRobotID() == targetRobotId) {
                     targetRobot = robot;
                     break;
@@ -1593,7 +1593,7 @@ void LongShotBot::actionRand(Battlefield* battlefield){
 
 void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
     int targetRobotId;
-    GenericRobot* targetRobot = nullptr;
+    Robot* targetRobot = nullptr;
 
     while (shotsFired < MAX_SHOTS_FIRED && getShells() > 0){
         int targetX = getRobotX() + x;
@@ -1609,7 +1609,7 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
 
             targetRobotId = stoi(battlefield->getPlayer(targetX, targetY)); 
             
-            for (GenericRobot* robot : battlefield->getAllRobots()){
+            for (Robot* robot : battlefield->getAllRobots()){
                 if (robot->getRobotID() == targetRobotId) {
                     targetRobot = robot;
                     break;
@@ -1798,7 +1798,7 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
         int tx, ty, targetRobotId;
         bool invalidCoordinates;
         string targetPosition;
-        GenericRobot* target = nullptr;        
+       Robot* target = nullptr;        
         cout << "BombBot bombed surrounding squares!\n";
         
         for (int dx = -1; dx <= 1; ++dx) {
@@ -1813,7 +1813,7 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
                     if (!targetPosition.empty()) { //check if theres any robots at the location
                         targetRobotId = stoi(targetPosition); 
                         
-                        for (GenericRobot* robot : battlefield->getAllRobots()){
+                        for (Robot* robot : battlefield->getAllRobots()){
                             if (robot->getRobotID() == targetRobotId) {
                                 target = robot;
                                 break;
