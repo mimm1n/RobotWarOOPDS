@@ -222,7 +222,7 @@ class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
         JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionMove(Battlefield* battlefield, int x, int y) override;
         // void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionLook(Battlefield* battlefield, int x, int y) override;
+        // void actionLook(Battlefield* battlefield, int x, int y) override; //doesnt have a function calling this so can uncomment when function added
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
         virtual void actions(Battlefield* battlefield) override;
@@ -329,7 +329,7 @@ class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, 
         ScoutBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
         // void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
+        // void actionMove(Battlefield* battlefield, int x, int y) override;  // doesnt have function for this 
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* battlefield);
         virtual void actions(Battlefield* battlefield) override;
@@ -347,7 +347,7 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
         TrackBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
         void actionLook(Battlefield* battlefield, int x, int y) override;
         // void actionFire(Battlefield* battlefield, int x, int y) override;
-        void actionMove(Battlefield* battlefield, int x, int y) override;
+        // void actionMove(Battlefield* battlefield, int x, int y) override; //doesnt have actionMove called fucntion 
         void actionThink(Battlefield* battlefield) override;
         void actionRand(Battlefield* Battlefield);
         virtual void actions(Battlefield* battlefield) override;
