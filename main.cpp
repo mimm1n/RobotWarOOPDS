@@ -591,6 +591,8 @@ void Battlefield::placeRobots(){
  *        y - the y coordinate of the nine square
  *********************************************************************/
 void Battlefield::displayBattlefield(int x, int y, ostream &cout) const{
+    string playerStr;
+    int id;
     cout << "Display Battlefield";
     cout << endl << "    ";
 
@@ -614,7 +616,9 @@ void Battlefield::displayBattlefield(int x, int y, ostream &cout) const{
                     cout << "0";   
                     cout << battlefield_[i][j];
                 } else {
-                    if (stoi(battlefield_[i][j]) == getCurrentPlayer()->getRobotID()){ //general
+                    playerStr = battlefield_[i][j];
+                    id = stoi(playerStr);
+                    if (playerStr != "" && id == getCurrentPlayer()->getRobotID()){ //general
                         cout << "|" << "GR";
                         cout << "0";   
                         cout << battlefield_[i][j];
@@ -737,16 +741,45 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
 
  }
 
- void Battlefield::robotMove(int robotId, int x, int y){
-    for(int i = 0; i < battlefieldRows_; i++){
-        for(int j = 0; j < battlefieldCols_; j++){
-            if (stoi(battlefield_[i][j]) == robotId){
-                battlefield_[i][j] = "";
+void Battlefield::robotMove(int robotId, int x, int y) {
+    for (int i = 0; i < battlefieldRows_; ++i) {
+        for (int j = 0; j < battlefieldCols_; ++j) {
+            string& cell = battlefield_[i][j];
+
+            if (!cell.empty()) {
+                try {
+                    int id = stoi(cell);
+                    if (id == robotId) {
+                        battlefield_[i][j] = "";
+                    }
+                } catch (const std::invalid_argument& e) {
+                    // Skip non-integer cells
+                    cerr << "Non-integer cell value at (" << j << ", " << i << "): '" << cell << "'\n";
+                }
             }
         }
     }
-    battlefield_[y][x] = robotId;
- }
+
+    // Assign new position (convert robotId to string)
+    battlefield_[y][x] = to_string(robotId);
+}
+
+
+//  void Battlefield::robotMove(int robotId, int x, int y){
+//     string playerStr;
+//     int id;
+//     for(int i = 0; i < battlefieldRows_; i++){
+//         for(int j = 0; j < battlefieldCols_; j++){
+//             playerStr = battlefield_[i][j];
+//             if (playerStr != ""){
+//                 id = stoi(playerStr);
+//                 if (id == robotId)
+//                     battlefield_[i][j] = "";
+//             }
+//         }
+//     }
+//     battlefield_[y][x] = robotId;
+//  }
 
 /**********************************************************************
  * GenericRobot Functions
@@ -773,7 +806,8 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
             if (!invalidCoordinates && !battlefield->battlefield_[lookY][lookX].empty() && dx != 0 && dy != 0){  
-                int lookRobotId = stoi(battlefield->battlefield_[lookY][lookX]);
+                string playerStr = battlefield->battlefield_[lookY][lookX];
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
                 
                 //find robot corresponing to that ID 
@@ -1019,13 +1053,14 @@ void HideBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -1226,13 +1261,14 @@ void JumpBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -1418,13 +1454,14 @@ void LongShotBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -1613,8 +1650,9 @@ void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
-                int lookRobotId = stoi(battlefield->getPlayer(lookX, lookY));
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
                 
                 //find robot corresponing to that ID 
@@ -1808,13 +1846,14 @@ void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -2004,13 +2043,14 @@ void HealBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -2200,13 +2240,14 @@ void BombBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -2365,13 +2406,14 @@ void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y){
             int lookX = currentX + dx;
             int lookY = currentY + dy;
             invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){  
+            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
+                string playerStr = battlefield->getPlayer(lookX, lookY);  
+                int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                string playerStr = battlefield->getPlayer(lookX, lookY);
-                int targetId = stoi(playerStr);
-
+                
+                //find robot corresponing to that ID 
                 for (Robot* robot : battlefield->getAllRobots()) {
-                    if (robot->getRobotID() == targetId) {
+                    if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
                     }
@@ -2731,12 +2773,12 @@ void TrackBot::actionThink(Battlefield* battlefield){
 }
 
 void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
-    if (trackersUsed > MAX_TRACKERS)
-        return;
+    // if (trackersUsed > MAX_TRACKERS)
+    //     return;
 
-    int targetRobotId = stoi(battlefield->getPlayer(x, y));
-    targets.push_back(targetRobotId);
-    trackersUsed++;
+    // int targetRobotId = stoi(battlefield->getPlayer(x, y));
+    // targets.push_back(targetRobotId);
+    // trackersUsed++;
 }
 
 void TrackBot::actionMove(Battlefield* battlefield, int x, int y){
