@@ -96,6 +96,7 @@ class Robot{
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
         virtual int getRobotType() const = 0;
+        friend ostream &operator<<(ostream &cout, const Robot &r);
 };
 
 /**********************************************************************
@@ -162,11 +163,12 @@ class Battlefield {
         
         void readFile(string filename);
         void placeRobots();
-        void displayBattlefield(int x, int y, vector<int> targets = {}) const;
+        void displayBattlefield(int x, int y, ostream &cout) const;
         void respawnRobot(int x);
         void nextTurn();
         RobotType findTargetRobot(GenericRobot* target);
         void robotUpgrade(Robot* upgradeRobot_);
+        friend ostream &operator<<(ostream &cout, const Battlefield &b) ;
 };
 
 /**********************************************************************
@@ -362,6 +364,22 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
 
 int GenericRobot::robotIncrement = 1;
 
+ostream &operator<<(ostream &cout, const Robot &r){
+        // r.getRobotName().displayBattlefield(-5,-5, cout);
+        cout << r.getRobotName() << endl;
+        cout << setfill(' ') << setw(22) << "Action Log" << endl;
+        cout << "----------------------------------" << endl;
+        cout <<  "Robot " << r.robotId << " is at position (" << r.robotX << ", " << r.robotY << ")." << endl << endl;
+        return cout;
+}
+
+ostream &operator<<(ostream &cout, const Battlefield &b) {
+        b.displayBattlefield(-5,-5, cout);
+    
+        return cout;
+}
+
+
 /**********************************************************************
  * MAIN FUNCTION
  *********************************************************************/
@@ -377,18 +395,27 @@ int main() {
     string name;
     
     do {
+   
         currentPlayer = battlefield->getCurrentPlayer();
-        battlefield->displayBattlefield(-5,-5);
+        battlefield->displayBattlefield(-5,-5, cout);
+        outFile << *battlefield;
+        outFile << *currentPlayer;
         cout << battlefield->getCurrentPlayer()->getRobotName() << endl;
         //outFile << battlefield->displayBattlefield(-5,-5);
         cout << setfill(' ') << setw(22) << "Action Log" << endl;
         cout << "----------------------------------" << endl;
-        outFile << setw(22) << "Action Log" << endl;
-        outFile << "----------------------------------" << endl;
+        // outFile << setw(22) << "Action Log" << endl;
+        // outFile << "----------------------------------" << endl;
         currentPlayer->actions(battlefield);
+    
+    
         battlefield->nextTurn();
+
         delete currentPlayer;
         currentPlayer = nullptr;
+
+    
+    
     } while(battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
     cout << "end game" << endl;
     outFile.close();
@@ -561,7 +588,7 @@ void Battlefield::placeRobots(){
  * @param x - the x coordinate of the nine square
  *        y - the y coordinate of the nine square
  *********************************************************************/
-void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
+void Battlefield::displayBattlefield(int x, int y, ostream &cout) const{
     cout << "Display Battlefield";
     cout << endl << "    ";
 
