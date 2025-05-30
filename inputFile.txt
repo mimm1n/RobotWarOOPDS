@@ -1,5 +1,5 @@
 M by N: 10 10
-Turns: 25
+Turns: 5
 Robots: 5
 Kidd 3 6
 Jet 1 1

@@ -24,12 +24,6 @@
 #include <vector>
 #include <random>
 #include <queue>
-// #include "Robot.h"
-// #include "Battlefield.h"
-// #include "ThinkingRobot.h"
-// #include "SeeingRobot.h"
-// #include "MovingRobot.h"
-// #include "ShootingRobot.h"
 using namespace std;
 
 enum RobotType {GENERIC, SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HIDE, REFLECTSHOT, HEAL, BOMB};
@@ -37,7 +31,6 @@ enum RobotType {GENERIC, SCOUT, TRACK, LONGSHOT, SEMIAUTO, THIRTYSHOT, JUMP, HID
 /**********************************************************************
  * CLASS DEFINITIONS
  *********************************************************************/
-
 class Battlefield;
 class GenericRobot;
 
@@ -87,7 +80,7 @@ class Robot{
         bool isAlive() const; // Checks if this robot's lives count is more than 0
         
         int getKills() const { return killCount; }
-        void setKills(int kills) { killCount = setKills; }
+        void setKills(int kills) { killCount = kills; }
         void incrementKills() { killCount++; }
 
         int getUpgradeCount() const { return upgradeCount; }
@@ -114,7 +107,7 @@ class ShootingRobot : virtual public Robot{
     public:
        virtual ~ShootingRobot(){}
         ShootingRobot(int x, int y, string name):Robot(x, y, name){}
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        //virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
 };
 
 class ThinkingRobot : virtual public Robot{
@@ -151,21 +144,19 @@ class Battlefield {
         queue<Robot *> waitingRobots_;  
         vector < vector <string> > battlefield_;
         friend class GenericRobot;
-    
         
     public:
         // Get function
-        int battlefieldCols();
-        int battlefieldRows();
-        int turns();
-        int numOfRobots();
-        int currentTurn();
-        string getPlayer(int x, int y);
-        vector <Robot *> getAllRobots() const;
-        Robot* getCurrentPlayer() const;
+        int battlefieldCols() { return battlefieldCols_; }
+        int battlefieldRows() { return battlefieldRows_; }
+        int turns() { return totalTurns_; }
+        int numOfRobots() { return numOfRobots_; }
+        int currentTurn() { return currentTurn_; }
+        string getPlayer(int x, int y) { return battlefield_[y][x]; }
+        vector <Robot *> getAllRobots() const { return robots_; }
+        Robot* getCurrentPlayer() const { return waitingRobots_.front(); }
+        
         void robotUpgrade(Robot* upgradeRobot_);
-        
-        
         void readFile(string filename);
         void placeRobots();
         void displayBattlefield(int x, int y, vector<int> targets = {}) const;
@@ -179,13 +170,12 @@ class Battlefield {
  *********************************************************************/
 class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
     private:
-
         static int robotIncrement;
-        int robotId;
-        int upgradeCount = 0;
-        const int MAX_UPGRADE = 3;
-        Robot* robotUpgraded = nullptr;
-        bool upgrade = false;
+        // int robotId;
+        // int upgradeCount = 0;
+        // const int MAX_UPGRADE = 3;
+        // Robot* robotUpgraded = nullptr;
+        // bool upgrade = false;
 
     public:
         GenericRobot(string name, int x, int y):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){
@@ -194,20 +184,21 @@ class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobo
         }
 
         //int getRobotID() const;
-        void setRobotType(int type) override;
-        int getRobotType() const override;
+        void setRobotType(int type) override { robotType = type; }
+        int getRobotType() const override { return robotType; }
 
-    // virtual void actionFire(Battlefield* battlefield, int x, int y) override;
-    virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-    virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-    virtual void actionThink(Battlefield* battlefield) override;
-    void actionRand(Battlefield* battlefield);
-    virtual void actions(Battlefield* battlefield) override;
+        virtual void actions(Battlefield* battlefield) override;
+        // virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
+        virtual void actionThink(Battlefield* battlefield) override;
+        void actionRand(Battlefield* battlefield);
+        
 
         // void upgradeRobot(Battlefield* battlefield, int upgradeType);
         // bool toUpgrade() const;
         // void ToGeneric(int upgradeType);
-        int getUpgradeCount() const;
+        //int getUpgradeCount() const;
 };
 
 /**********************************************************************
@@ -339,7 +330,6 @@ class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingR
  
 };
 
-
 class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, public ThinkingRobot{
     private:
         int lookCount = 0;
@@ -376,8 +366,7 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
         int getRobotType() const override { return TRACK; }
 };
 
-
-int GenericRobot::robotIncrement = 0;
+int GenericRobot::robotIncrement = 1;
 
 /**********************************************************************
  * MAIN FUNCTION
@@ -396,8 +385,9 @@ int main() {
     do {
         currentPlayer = battlefield->getCurrentPlayer();
         battlefield->displayBattlefield(-5,-5);
+        cout << battlefield->getCurrentPlayer()->getRobotName() << endl;
         //outFile << battlefield->displayBattlefield(-5,-5);
-        cout << setw(22) << "Action Log" << endl;
+        cout << setfill(' ') << setw(22) << "Action Log" << endl;
         cout << "----------------------------------" << endl;
         outFile << setw(22) << "Action Log" << endl;
         outFile << "----------------------------------" << endl;
@@ -406,8 +396,8 @@ int main() {
         battlefield->nextTurn();
         delete currentPlayer;
         currentPlayer = nullptr;
-    } while(!battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
-    
+    } while(battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
+    cout << "end game" << endl;
     outFile.close();
     return 0;
 }
@@ -476,80 +466,6 @@ bool Robot::canUpgrade() const{
 /**********************************************************************
  * Battlefield Functions
  *********************************************************************/
-/**********************************************************************
- * battlefieldCols
- * task: 
- * @return battlefieldCols_ - 
- *********************************************************************/
-int Battlefield::battlefieldCols(){ 
-    return battlefieldCols_; 
-}
-
-/**********************************************************************
- * battlefieldRows
- * task: 
- * @return battlefieldRows_ - 
- *********************************************************************/
-int Battlefield::battlefieldRows(){
-    return battlefieldRows_;
-}
-
-/**********************************************************************
- * turns
- * task: 
- * @return totalTurns_ - 
- *********************************************************************/
-int Battlefield::turns(){
-    return totalTurns_;
-}
-
-/**********************************************************************
- * numOfRobots
- * task: 
- * @return numOfRobots_ - 
- *********************************************************************/
-int Battlefield::numOfRobots(){
-    return numOfRobots_; 
-}
-
-/**********************************************************************
- * currentTurn
- * task: 
- * @return currentTurn_ - 
- *********************************************************************/
-int Battlefield::currentTurn(){
-    return currentTurn_; 
-}
-
-/**********************************************************************
- * getPlayer
- * task: 
- * @param x -
- *        y -
- * @return  
- *********************************************************************/
-string Battlefield::getPlayer(int x, int y){
-    return battlefield_[y][x];
-}
-
-/**********************************************************************
- * getAllRobots
- * task: 
- * @return robots_ - 
- *********************************************************************/
-vector <Robot *> Battlefield::getAllRobots() const {
-    return robots_;
-}
-
-/**********************************************************************
- * getCurrentPlayer
- * task: 
- * @return 
- *********************************************************************/
-Robot* Battlefield::getCurrentPlayer() const {
-    return waitingRobots_.front();
-}
-
 /**********************************************************************
  * readFile
  * task: 
@@ -632,9 +548,7 @@ void Battlefield::placeRobots(){
             cout << "Error message: Invalid location for the robot " << robots_[i]->getRobotName() << endl;
             exit(1);
         }
-        
         waitingRobots_.push(robots_[i]);
- 
     }
 
 };
@@ -671,14 +585,16 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
                     cout << "|" << "GR";
                     cout << "0";   
                     cout << battlefield_[i][j];
-                }else {
+                } else {
                     if (stoi(battlefield_[i][j]) == getCurrentPlayer()->getRobotID()){ //general
                         cout << "|" << "GR";
                         cout << "0";   
                         cout << battlefield_[i][j];
+                    } else {
+                        cout << "|" << "    ";
                     }
-
-                    if(y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
+                    
+                    if (y == i-1 || y == i || y == i+1 || x == j-1 || x == j || x == j+1){ //look
                         cout << "|" << "GR";
                         cout << "0";   
                         cout << battlefield_[i][j];
@@ -692,7 +608,6 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
     for (int j = 0;j<battlefield_[0].size();j++)
         cout << "+----";
     cout << "+" << endl;
-
 }
 
 /**********************************************************************
@@ -701,25 +616,23 @@ void Battlefield::displayBattlefield(int x, int y, vector <int> targets ) const{
  * @param index - 
  *********************************************************************/
 void Battlefield::respawnRobot(int index){
- 
     Robot* died = robots_[index];
     int size = waitingRobots_.size();
 
-        for(int i = 0; i<size;i++){
-            Robot* current = waitingRobots_.front();
-            if (current->getRobotID() != died->getRobotID()){
-                  waitingRobots_.pop();
-                  waitingRobots_.push(current);
-            }else
-            {
-            waitingRobots_.pop();}
-
+    for (int i = 0; i<size;i++){
+        Robot* current = waitingRobots_.front();
+        if (current->getRobotID() != died->getRobotID()){
+            waitingRobots_.pop();
+            waitingRobots_.push(current);
+        } else {
+            waitingRobots_.pop();
         }
+    }
 
-    if(!died->isAlive()){
+    if (!died->isAlive()){
         destroyedRobots_.push(died);
         return;
-    }else{
+    } else {
         int newX = rand() % (battlefieldRows_);
         int newY = rand() % (battlefieldCols_);
         string name = died->getRobotName();
@@ -733,7 +646,7 @@ void Battlefield::respawnRobot(int index){
         battlefield_[died->getRobotY()][died->getRobotX()] = ""; //clear the field
         battlefield_[newY][newX] = to_string(respawn->getRobotID());
         waitingRobots_.push(respawn);
-        }
+    }
     
 }
 
@@ -749,11 +662,10 @@ void Battlefield::nextTurn(){
 }
 
 RobotType Battlefield::findTargetRobot(GenericRobot* target) {
-    for (int i = 0; i <= BOMB; ++i) {
-        for (Robot* robot : upgradedRobots_[i]) {
-            if (robot == target) {
+    for (int i = 0; i <= BOMB; ++i){
+        for (Robot* robot : upgradedRobots_[i]){
+            if (robot == target)
                 return static_cast<RobotType>(i);
-            }
         }
     }
     return GENERIC;
@@ -766,27 +678,23 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
  void Battlefield::robotUpgrade(Robot* upgradeRobot_){
     int size = waitingRobots_.size();
 
-        for(int i = 0; i<size;i++){
-
-            Robot* current = waitingRobots_.front();
-            if (current->getRobotID() != upgradeRobot_->getRobotID()){
-                  waitingRobots_.pop();
-                  waitingRobots_.push(current);
-            }else
-            {
+    for(int i = 0; i<size;i++){
+        Robot* current = waitingRobots_.front();
+        if (current->getRobotID() != upgradeRobot_->getRobotID()){
+            waitingRobots_.pop();
+            waitingRobots_.push(current);
+        } else {
             waitingRobots_.pop();
             waitingRobots_.push(upgradeRobot_);
-            }
         }
-        
+    }
 
    for (auto& robot : robots_) {
-
-    if (robot->getRobotID() == upgradeRobot_->getRobotID()) {
-        robot = upgradeRobot_;  // Replace pointer
-        break;
+        if (robot->getRobotID() == upgradeRobot_->getRobotID()) {
+            robot = upgradeRobot_;  // Replace pointer
+            break;
+        }
     }
-}
 
  }
 
@@ -794,8 +702,6 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
  * GenericRobot Functions
  *********************************************************************/
 // int GenericRobot::getRobotID() const { return robotId; }
-void GenericRobot::setRobotType(int type) { robotType = type; }
-int GenericRobot::getRobotType() const { return robotType; }
 
 void GenericRobot::actions(Battlefield* battlefield){
     actionRand(battlefield);
@@ -893,7 +799,7 @@ void GenericRobot::actions(Battlefield* battlefield){
 // }
 
 
- void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
+void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -914,7 +820,7 @@ void GenericRobot::actions(Battlefield* battlefield){
     cout << "Robot " << getRobotID() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
- void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
+void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -939,17 +845,17 @@ void GenericRobot::actions(Battlefield* battlefield){
                 }
 
                 if (robotLooked) {
-                cout << "Robot " << robotLooked->getRobotID() << " is at position (" 
+                    cout << "Robot " << robotLooked->getRobotID() << " is at position (" 
                     << lookX << ", " << lookY << ")." << endl;
-                    
+                }
             }
         }
     }
 }
-}
 
 void GenericRobot::actionThink(Battlefield* battlefield) {
-    actionRand(battlefield);
+    cout << "action think" << endl;
+    //actionRand(battlefield);
 }
 
 // void GenericRobot::upgradeRobot(Battlefield* battlefield, int upgradeType) {
@@ -987,6 +893,7 @@ void GenericRobot::actionThink(Battlefield* battlefield) {
 // }
 
 void GenericRobot::actionRand(Battlefield* battlefield) {
+    cout << "action rand1" << endl;
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
@@ -1015,6 +922,7 @@ void GenericRobot::actionRand(Battlefield* battlefield) {
     uniform_int_distribution<> actionDistr(0, 10);
 
     actionThink(battlefield);
+    cout << "action think2" << endl;
     actionLook(battlefield, 0, 0);
 
     int randomInt = actionDistr(gen2);
@@ -1026,13 +934,6 @@ void GenericRobot::actionRand(Battlefield* battlefield) {
         // actionFire(battlefield, moveX, moveY);
         actionMove(battlefield, moveX, moveY);
     }
-}
-
-/**********************************************************************
- * HideBot Functions
- *********************************************************************/
-void HideBot::actions(Battlefield* battlefield){
-    actionRand(battlefield);
 }
 
 /**********************************************************************
@@ -1171,8 +1072,7 @@ void HideBot::actionThink(Battlefield* battlefield){
 }
 
 void HideBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1345,8 +1245,7 @@ void LongShotBot::actionThink(Battlefield* battlefield){
 }
 
 void LongShotBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1449,8 +1348,7 @@ void SemiAutoBot::actionThink(Battlefield* battlefield){
 }
 
 void SemiAutoBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1505,8 +1403,7 @@ void ThirtyShotBot::actionThink(Battlefield* battlefield){
 }
 
 void ThirtyShotBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1565,8 +1462,7 @@ void HealBot::actionThink(Battlefield* battlefield){
 }
 
 void HealBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1662,8 +1558,7 @@ void BombBot::actionThink(Battlefield* battlefield){
 }
 
 void BombBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1711,13 +1606,6 @@ void ReflectShotBot::actions(Battlefield* battlefield){
     // actionRand(battlefield);
 }
 
-/**********************************************************************
- * ReflectShotBot Functions
- *********************************************************************/
-void ReflectShotBot::actions(Battlefield* battlefield){
-    // actionRand(battlefield);
-}
-
 // void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y){
 //     if(reflect>0)
 //         isReflect_ = true;
@@ -1749,8 +1637,7 @@ void ScoutBot::actionThink(Battlefield* battlefield){
 }
 
 void ScoutBot::actionRand(Battlefield* battlefield){
-
-        random_device rd;
+    random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
 
@@ -1812,7 +1699,6 @@ void TrackBot::actionThink(Battlefield* battlefield){
 }
 
 void TrackBot::actionRand(Battlefield* battlefield){
-
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
