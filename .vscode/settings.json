@@ -26,6 +26,7 @@
     "vector": "cpp",
     "iostream": "cpp",
     "ostream": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "typeinfo": "cpp"
   }
 }
