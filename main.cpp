@@ -410,7 +410,7 @@ int main() {
         cout << "----------------------------------" << endl;
         // outFile << setw(22) << "Action Log" << endl;
         // outFile << "----------------------------------" << endl;
-        currentPlayer->actions(battlefield, outFile);
+        currentPlayer->actions(battlefield, cout);
         outFile << *battlefield;
         outFile << *currentPlayer;
         battlefield->nextTurn();
@@ -469,7 +469,8 @@ void Robot::reduceLife(){
     if(isAlive()){
         lives--;
     }
-    lives = 0;
+    else{
+    lives = 0;}
 }
 
 /**********************************************************************
@@ -479,7 +480,7 @@ void Robot::reduceLife(){
  *********************************************************************/
 bool Robot::isAlive() const{
     if(lives<=0){
-        cout << "Robot" << robotName << "is dead!";
+        cout << "Robot " << robotName << " is dead!";
         return false;
     }
     return true;
@@ -689,7 +690,7 @@ void Battlefield::respawnRobot(int robotId){
             waitingRobots_.push(current);
         }
     }
-
+ cout << died->getLives() << endl;
     if (!died->isAlive()) {
         destroyedRobots_.push(died);
         return;
@@ -755,7 +756,9 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
 
     for(int i = 0; i<size;i++){
         Robot* current = waitingRobots_.front();
-        if (current->getRobotID() != upgradeRobot_->getRobotID()){
+    if(current){
+
+       if (current->getRobotID() != upgradeRobot_->getRobotID()){
             waitingRobots_.pop();
             waitingRobots_.push(current);
         } else {
@@ -763,14 +766,17 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
             waitingRobots_.push(upgradeRobot_);
         }
     }
+    }
 
    for (auto& robot : robots_) {
+    if(robot){
         if (robot->getRobotID() == upgradeRobot_->getRobotID()) {
-            delete robot;
+            // delete robot;
             robot = upgradeRobot_;  // Replace pointer
             break;
         }
     }
+   }
 
  }
 
@@ -878,7 +884,7 @@ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y, ostream &c
 
     int nextX = currentX + x;
     int nextY = currentY + y;
-
+    // cout << nextX << nextY << endl;
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
         cout << "Out of Bounds!." << endl;
         return;
@@ -907,12 +913,12 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &c
 
     // int targetX = getRobotX() + x;
     // int targetY = getRobotY() + y;
-    int targetX = x;
-    int targetY = y;
+    int targetX =x;
+    int targetY =y;
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = (x == getRobotX() && y == getRobotY());
+    bool ownSelf = (x == 0 && y == 0);
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
@@ -922,8 +928,8 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &c
         }
         return;
     }
-
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+cout << battlefield->getPlayer(targetX, targetY) << endl;
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -990,12 +996,13 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &c
 
             upgradedRobot->isUpgrading(getUpgradeCount() - 1, getLives(), getKills(), getShells());
             upgradedRobot->setRobotID(getRobotID());
-            cout << "Robot " << upgradedRobot->getRobotName() << " has upgraded to " << upgradedRobot->getRobotType() << endl;
+            cout << "Robot " << upgradedRobot->getRobotName() << " has upgraded to " << robotTypeName(upgradedRobot->getRobotType()) << endl;
             battlefield->robotUpgrade(upgradedRobot);
             return;
         }
-    }
-    cout << "Missed completely!" << endl;
+        cout << "70" << endl;
+    }else{
+    cout << "Missed completely!" << endl;}
 }
 
 void GenericRobot::actionRand(Battlefield* battlefield) {
@@ -1174,7 +1181,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) 
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -1387,7 +1394,7 @@ void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -1599,7 +1606,7 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -1805,7 +1812,7 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -2012,7 +2019,7 @@ void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -2218,7 +2225,7 @@ void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -2603,7 +2610,7 @@ void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream 
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -2785,7 +2792,7 @@ void ScoutBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
         return;
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
@@ -3025,7 +3032,7 @@ void TrackBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
         if (found) break; 
     }
 
-    if (battlefield->getPlayer(targetX, targetY) != "") {
+    if (!(battlefield->getPlayer(targetX, targetY)).empty()) {
         Robot* targetRobot = nullptr;
         string playerStr = battlefield->getPlayer(targetX, targetY);
         int targetRobotId = stoi(playerStr);
