@@ -2807,7 +2807,7 @@ void TrackBot::actionThink(Battlefield* battlefield, ostream &cout){
     }
 }
 
-void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
+void TrackBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
     bool invalidCoordinates;
