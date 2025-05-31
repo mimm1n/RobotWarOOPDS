@@ -402,16 +402,15 @@ int main() {
     do {
         currentPlayer = battlefield->getCurrentPlayer();
         battlefield->displayBattlefield(-10,-10, cout);
-        cout << battlefield->currentTurn() << endl;
+        cout << "Current turn: " << battlefield->currentTurn() << endl;
         cout << robotTypeName(battlefield->getCurrentPlayer()->getRobotType()) << " ";
-        cout << battlefield->getCurrentPlayer()->getRobotName() << " GR0"<< battlefield->getCurrentPlayer()->getRobotID() << endl;
+        cout << "Current Player: " << battlefield->getCurrentPlayer()->getRobotName() << " GR0"<< battlefield->getCurrentPlayer()->getRobotID() << endl;
         //outFile << battlefield->displayBattlefield(-5,-5);
         cout << setfill(' ') << setw(22) << "Action Log" << endl;
         cout << "----------------------------------" << endl;
         // outFile << setw(22) << "Action Log" << endl;
         // outFile << "----------------------------------" << endl;
         currentPlayer->actions(battlefield, outFile);
-      
         outFile << *battlefield;
         outFile << *currentPlayer;
         battlefield->nextTurn();
@@ -419,9 +418,7 @@ int main() {
 
 
     } while(battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
-
-    cout << "end game" << endl;
-
+    cout << "End Game." << endl;
     outFile.close();
 
     return 0;
@@ -447,7 +444,7 @@ string robotTypeName(int robotType){
     return "";
 }
 
- /**********************************************************************
+/**********************************************************************
  * Robot Functions
  *********************************************************************/
 /**********************************************************************
@@ -733,10 +730,10 @@ void Battlefield::respawnRobot(int robotId){
 void Battlefield::nextTurn(){
     currentTurn_++;
     Robot* front = waitingRobots_.front();
-    cout << "Current Player:" << front->getRobotName() << endl;
+    cout << "Current Player: " << front->getRobotName() << endl;
     waitingRobots_.push(front);
     waitingRobots_.pop();
-    cout << "Next Player:" << waitingRobots_.front()->getRobotName() << endl;
+    cout << "Next Player: " << waitingRobots_.front()->getRobotName() << endl;
 }
 
 RobotType Battlefield::findTargetRobot(GenericRobot* target) {
@@ -769,6 +766,7 @@ RobotType Battlefield::findTargetRobot(GenericRobot* target) {
 
    for (auto& robot : robots_) {
         if (robot->getRobotID() == upgradeRobot_->getRobotID()) {
+            delete robot;
             robot = upgradeRobot_;  // Replace pointer
             break;
         }
@@ -826,27 +824,32 @@ void GenericRobot::actions(Battlefield* battlefield, ostream &cout){
 }
 
 void GenericRobot::actionThink(Battlefield* battlefield, ostream &cout) {
-    cout << "action think" << endl;
+    cout << "Robot " << getRobotName() << " is thinking..." << endl;
     actionRand(battlefield);
 }
 
 void GenericRobot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout) {
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
+
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && !battlefield->battlefield_[lookY][lookX].empty() && dx != 0 && dy != 0){  
-                string playerStr = battlefield->battlefield_[lookY][lookX];
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
-                for (Robot* robot : battlefield->robots_) {
+
+                for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
                         break;
@@ -854,8 +857,9 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y, ostream &c
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -863,6 +867,12 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y, ostream &c
 }
 
 void GenericRobot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout) {
+
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -870,7 +880,7 @@ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y, ostream &c
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     if (battlefield->battlefield_[nextY][nextX] != "") {
@@ -887,7 +897,7 @@ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y, ostream &c
 }
 
 void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -902,13 +912,13 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &c
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -953,8 +963,8 @@ void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &c
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            battlefield->respawnRobot(targetRobot->getRobotID());
             cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
 
@@ -1037,7 +1047,7 @@ void HideBot::actions(Battlefield* battlefield, ostream &cout){
 }
 
 void HideBot::actionThink(Battlefield* battlefield, ostream &cout){
-    cout << "Robot " << getRobotName() << " is thinking..." << endl;
+    cout << "Robot " << getRobotName() << "  is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> posDistr(0, 8);
@@ -1081,19 +1091,23 @@ void HideBot::actionThink(Battlefield* battlefield, ostream &cout){
 void HideBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -1102,8 +1116,9 @@ void HideBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -1111,6 +1126,12 @@ void HideBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void HideBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1118,7 +1139,7 @@ void HideBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1129,7 +1150,7 @@ void HideBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -1142,13 +1163,13 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) 
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -1193,6 +1214,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) 
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1204,14 +1226,19 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) 
             int curY = getRobotY();
 
             uniform_int_distribution<> upgradeDist(1, 8);
+            // int choice;
+            // do {
+            //     choice = upgradeDist(gen2);
+            // } while (choice == 5);  // 7 HideBot
+
             int choice = upgradeDist(gen2);
 
             switch (choice) {
                 case 1: upgradedRobot = new LongShotBot(x, y, name); break;
                 case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
                 case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
-                case 4: upgradedRobot = new JumpBot(x, y, name); break;
-                case 5: upgradedRobot = new HideBot(x, y, name); break;
+                case 4: upgradedRobot = new ScoutBot(x, y, name); break;
+                case 5: upgradedRobot = new TrackBot(x, y, name); break;
                 case 6: upgradedRobot = new ReflectShotBot(x, y, name); break;
                 case 7: upgradedRobot = new HealBot(x, y, name); break;
                 case 8: upgradedRobot = new BombBot(x, y, name); break;
@@ -1246,28 +1273,26 @@ void JumpBot::actions(Battlefield* battlefield, ostream &cout){
 
 void JumpBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> posDistr(0, 8);
 
-    int directionMove = posDistr(gen);
+    // int directionMove = posDistr(gen);
+
+    int battlefieldWidth = battlefield->battlefieldCols();
+    int battlefieldHeight = battlefield->battlefieldRows(); 
 
     int currentX = getRobotX();
     int currentY = getRobotY();
 
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> xDistr(0, battlefieldWidth-1);
+    uniform_int_distribution<> yDistr(0, battlefieldHeight-1);
+    
     int moveX = 0, moveY = 0;
 
-    switch (directionMove) {
-        case 0: moveX = -1; moveY = -1; break;
-        case 1: moveX =  0; moveY = -1; break;
-        case 2: moveX =  1; moveY = -1; break;
-        case 3: moveX = -1; moveY =  0; break;
-        case 4: moveX =  1; moveY =  0; break;
-        case 5: moveX = -1; moveY =  1; break;
-        case 6: moveX =  0; moveY =  1; break;
-        case 7: moveX =  1; moveY =  1; break;
-        case 8: moveX =  0; moveY =  0; break;
-    }
+    do {
+        moveX = xDistr(gen);
+        moveY = yDistr(gen);
+    } while ((moveX == currentX && moveY == currentY) || battlefield->getPlayer(moveY,moveX) != "");
 
     random_device rd2;
     mt19937 gen2(rd2());
@@ -1289,19 +1314,23 @@ void JumpBot::actionThink(Battlefield* battlefield, ostream &cout){
 void JumpBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -1310,8 +1339,9 @@ void JumpBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -1333,7 +1363,7 @@ void JumpBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -1346,13 +1376,13 @@ void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -1397,6 +1427,7 @@ void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1414,8 +1445,8 @@ void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
                 case 1: upgradedRobot = new LongShotBot(x, y, name); break;
                 case 2: upgradedRobot = new SemiAutoBot(x, y, name); break;
                 case 3: upgradedRobot = new ThirtyShotBot(x, y, name); break;
-                case 4: upgradedRobot = new JumpBot(x, y, name); break;
-                case 5: upgradedRobot = new HideBot(x, y, name); break;
+                case 4: upgradedRobot = new TrackBot(x, y, name); break;
+                case 5: upgradedRobot = new ScoutBot(x, y, name); break;
                 case 6: upgradedRobot = new ReflectShotBot(x, y, name); break;
                 case 7: upgradedRobot = new HealBot(x, y, name); break;
                 case 8: upgradedRobot = new BombBot(x, y, name); break;
@@ -1482,19 +1513,23 @@ void LongShotBot::actionThink(Battlefield* battlefield, ostream &cout){
 void LongShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -1503,8 +1538,9 @@ void LongShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &co
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -1512,6 +1548,12 @@ void LongShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &co
 }
 
 void LongShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1519,7 +1561,7 @@ void LongShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &co
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1530,7 +1572,7 @@ void LongShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &co
 }
 
 void LongShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -1544,13 +1586,13 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
     bool outOfRange = abs(x) > 4 || abs(y) > 4;
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfRange || outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else if (outOfBounds) {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         } else {
             cout << "Target is out of range" << endl;
         }
@@ -1597,6 +1639,7 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1678,19 +1721,23 @@ void SemiAutoBot::actionThink(Battlefield* battlefield, ostream &cout){
 void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -1699,8 +1746,9 @@ void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y, ostream &co
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -1708,6 +1756,12 @@ void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y, ostream &co
 }
 
 void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1715,7 +1769,7 @@ void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y, ostream &co
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1726,7 +1780,7 @@ void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y, ostream &co
 }
 
 void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
     // Hit chance logic
     random_device rd;
     mt19937 gen(rd()), gen2(rd());
@@ -1740,13 +1794,13 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else{
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         } 
         return;
     }
@@ -1793,6 +1847,7 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
                 targetRobot->reduceLife();
                 incrementKills();
                 killedARobot = true;
+                cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
                 battlefield->respawnRobot(targetRobot->getRobotID());
             }
             shotsFired++;
@@ -1874,19 +1929,23 @@ void ThirtyShotBot::actionThink(Battlefield* battlefield, ostream &cout){
 void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -1895,8 +1954,9 @@ void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -1904,6 +1964,12 @@ void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &
 }
 
 void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1911,7 +1977,7 @@ void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1922,7 +1988,7 @@ void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &
 }
 
 void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -1935,13 +2001,13 @@ void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -1986,6 +2052,7 @@ void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2000,14 +2067,10 @@ void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &
             int choice = upgradeDist(gen2);
 
             switch (choice) {
-                case 1: upgradedRobot = new LongShotBot(curX, curY, name); break;
-                case 2: upgradedRobot = new SemiAutoBot(curX, curY, name); break;
-                case 3: upgradedRobot = new ThirtyShotBot(curX, curY, name); break;
-                case 4: upgradedRobot = new ScoutBot(curX, curY, name); break;
-                case 5: upgradedRobot = new TrackBot(curX, curY, name); break;
-                case 6: upgradedRobot = new ReflectShotBot(curX, curY, name); break;
-                case 7: upgradedRobot = new HealBot(curX, curY, name); break;
-                case 8: upgradedRobot = new BombBot(curX, curY, name); break;
+                case 1: upgradedRobot = new HideBot(curX, curY, name); break;
+                case 2: upgradedRobot = new JumpBot(curX, curY, name); break;
+                case 3: upgradedRobot = new ScoutBot(curX, curY, name); break;
+                case 4: upgradedRobot = new TrackBot(curX, curY, name); break;
             }
 
             upgradedRobot->isUpgrading(getUpgradeCount() - 1, getLives(), getKills(), getShells());
@@ -2069,21 +2132,26 @@ void HealBot::actionThink(Battlefield* battlefield, ostream &cout){
 }
 
 void HealBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
+ 
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -2092,8 +2160,9 @@ void HealBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -2101,6 +2170,12 @@ void HealBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void HealBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -2108,7 +2183,7 @@ void HealBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2119,7 +2194,7 @@ void HealBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -2132,13 +2207,13 @@ void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -2183,6 +2258,7 @@ void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2197,15 +2273,12 @@ void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
             int choice = upgradeDist(gen2);
 
             switch (choice) {
-                case 1: upgradedRobot = new LongShotBot(curX, curY, name); break;
-                case 2: upgradedRobot = new SemiAutoBot(curX, curY, name); break;
-                case 3: upgradedRobot = new ThirtyShotBot(curX, curY, name); break;
-                case 4: upgradedRobot = new ScoutBot(curX, curY, name); break;
-                case 5: upgradedRobot = new TrackBot(curX, curY, name); break;
-                case 6: upgradedRobot = new ReflectShotBot(curX, curY, name); break;
-                case 7: upgradedRobot = new HealBot(curX, curY, name); break;
-                case 8: upgradedRobot = new BombBot(curX, curY, name); break;
+                case 1: upgradedRobot = new HideBot(curX, curY, name); break;
+                case 2: upgradedRobot = new JumpBot(curX, curY, name); break;
+                case 3: upgradedRobot = new ScoutBot(curX, curY, name); break;
+                case 4: upgradedRobot = new TrackBot(curX, curY, name); break;
             }
+
 
             upgradedRobot->isUpgrading(getUpgradeCount() - 1, getLives(), getKills(), getShells());
             upgradedRobot->setRobotID(getRobotID());
@@ -2266,21 +2339,26 @@ void BombBot::actionThink(Battlefield* battlefield, ostream &cout){
 }
 
 void BombBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
+
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -2289,8 +2367,9 @@ void BombBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -2298,6 +2377,11 @@ void BombBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void BombBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -2305,7 +2389,7 @@ void BombBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2316,7 +2400,7 @@ void BombBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
 }
 
 void BombBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
     if(bombs){
         int cx = getRobotX();
         int cy = getRobotY();
@@ -2349,6 +2433,7 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
                     if (targetRobot && !isHiding && !isReflecting){
                         targetRobot->reduceLife();
                         incrementKills();
+                        cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
                         battlefield->respawnRobot(targetRobot->getRobotID());
                         killedRobot = true;
                     }
@@ -2432,21 +2517,26 @@ void ReflectShotBot::actionThink(Battlefield* battlefield, ostream &cout){
 }
 
 void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
+
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
     for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -2455,8 +2545,9 @@ void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream 
                 }
 
                 if (robotLooked) {
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -2464,6 +2555,12 @@ void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream 
 }
 
 void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -2471,7 +2568,7 @@ void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream 
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2482,7 +2579,7 @@ void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream 
 }
 
 void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -2495,13 +2592,13 @@ void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream 
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -2546,6 +2643,7 @@ void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream 
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2560,14 +2658,10 @@ void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream 
             int choice = upgradeDist(gen2);
 
             switch (choice) {
-                case 1: upgradedRobot = new LongShotBot(curX, curY, name); break;
-                case 2: upgradedRobot = new SemiAutoBot(curX, curY, name); break;
-                case 3: upgradedRobot = new ThirtyShotBot(curX, curY, name); break;
-                case 4: upgradedRobot = new ScoutBot(curX, curY, name); break;
-                case 5: upgradedRobot = new TrackBot(curX, curY, name); break;
-                case 6: upgradedRobot = new ReflectShotBot(curX, curY, name); break;
-                case 7: upgradedRobot = new HealBot(curX, curY, name); break;
-                case 8: upgradedRobot = new BombBot(curX, curY, name); break;
+                case 1: upgradedRobot = new HideBot(curX, curY, name); break;
+                case 2: upgradedRobot = new JumpBot(curX, curY, name); break;
+                case 3: upgradedRobot = new ScoutBot(curX, curY, name); break;
+                case 4: upgradedRobot = new TrackBot(curX, curY, name); break;
             }
 
             upgradedRobot->isUpgrading(getUpgradeCount() - 1, getLives(), getKills(), getShells());
@@ -2643,6 +2737,12 @@ void ScoutBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout)
 }
 
 void ScoutBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -2650,7 +2750,7 @@ void ScoutBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout)
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2661,7 +2761,7 @@ void ScoutBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout)
 }
 
 void ScoutBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -2674,13 +2774,13 @@ void ScoutBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -2725,6 +2825,7 @@ void ScoutBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2810,19 +2911,24 @@ void TrackBot::actionThink(Battlefield* battlefield, ostream &cout){
 void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
-    for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid to track a new bot 
+
+    for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -2830,13 +2936,10 @@ void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
                     }
                 }
 
-                if (robotLooked){
-                    if (trackersUsed < MAX_TRACKERS){
-                        targets.push_back(robotLooked->getRobotID());
-                        trackersUsed++;
-                    } 
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                if (robotLooked) {
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
@@ -2854,6 +2957,12 @@ void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
 }
 
 void TrackBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
+    
+    if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
+    cout << "Invalid move." << endl;
+    return;  //check so it doesnt move to its own place or more than allowed
+    }
+
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -2861,7 +2970,7 @@ void TrackBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout)
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of bounds." << endl;
+        cout << "Out of Bounds!." << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2872,7 +2981,7 @@ void TrackBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout)
 }
 
 void TrackBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
-    cout << "Action is firing" << endl;
+    cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
         cout << "No more shots left! " << getRobotName() << " has fired its maximum shells.\n";
@@ -2885,13 +2994,13 @@ void TrackBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
 
     bool outOfBounds = targetX < 0 || targetX >= battlefield->battlefieldCols() ||
                     targetY < 0 || targetY >= battlefield->battlefieldRows();
-    bool ownSelf = x == 0 && y == 0;
+    bool ownSelf = (x == getRobotX() && y == getRobotY());
 
     if (outOfBounds || ownSelf) {
         if (ownSelf) {
-            cout << "Can't shoot own self" << endl;
+            cout << "Can't shoot own self!" << endl;
         } else {
-            cout << "Out of bounds" << endl;
+            cout << "Out of Bounds!" << endl;
         }
         return;
     }
@@ -2955,6 +3064,7 @@ void TrackBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
+            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
