@@ -419,6 +419,22 @@ int main() {
 /**********************************************************************
  * FUNCTION DEFINTIONS
  *********************************************************************/
+string robotTypeName(int robotType){
+    switch(robotType){
+        case 0: return "GenericRobot";
+        case 1: return "ScoutBot";
+        case 2: return "TrackBot";
+        case 3: return "LongShotBot";
+        case 4: return "SemiAutoBot";
+        case 5: return "ThirtyShotBot";
+        case 6: return "JumpBot";
+        case 7: return "HideBot";
+        case 8: return "ReflectShotBot";
+        case 9: return "HealBot";
+        case 10: return "BombBot";
+    }
+    return "";
+}
 
  /**********************************************************************
  * Robot Functions
@@ -656,39 +672,50 @@ void Battlefield::respawnRobot(int robotId){
             break;
         }
     }
-    int size = waitingRobots_.size();
 
-    for (int i = 0; i<size;i++){
+    if (died == nullptr) return;
+
+    int size = waitingRobots_.size();
+    for (int i = 0; i < size; i++) {
         Robot* current = waitingRobots_.front();
-        if (current->getRobotID() != died->getRobotID()){
-            waitingRobots_.pop();
+        waitingRobots_.pop();
+        
+        if (current->getRobotID() != died->getRobotID()) {
             waitingRobots_.push(current);
-        } else {
-            waitingRobots_.pop();
         }
     }
 
-    if (!died->isAlive()){
+    if (!died->isAlive()) {
         destroyedRobots_.push(died);
         return;
-    } else {
-        int newX = rand() % (battlefieldRows_);
-        int newY = rand() % (battlefieldCols_);
-        string name = died->getRobotName();
-
-        GenericRobot* respawn = new GenericRobot(name, newX, newY);
-        respawn->isUpgrading(died->getUpgradeCount()-1, died->getLives(), died->getKills(), died->getShells());
-        respawn->setRobotID(robotId);
-        // respawn->addUpgrade(died->getUpgradeCount()-1);
-        // respawn->setLives();
-        // respawn->setKills();
-        // respawn->setShells();
-
-        battlefield_[died->getRobotY()][died->getRobotX()] = ""; //clear the field
-        battlefield_[newY][newX] = to_string(respawn->getRobotID());
-        waitingRobots_.push(respawn);
     }
-    
+
+    int newX, newY;
+    string name = died->getRobotName();
+    do {
+        newX = rand() % battlefieldRows_;
+        newY = rand() % battlefieldCols_;
+    } while (!battlefield_[newY][newX].empty());
+
+    GenericRobot* respawn = new GenericRobot(name, newX, newY);
+
+    respawn->isUpgrading(died->getUpgradeCount() - 1, died->getLives(), died->getKills(), died->getShells());
+    respawn->setRobotID(robotId);
+
+    // Clear the old battlefield position if valid
+    int oldX = died->getRobotX();
+    int oldY = died->getRobotY();
+
+    if (oldY >= 0 && oldY < battlefieldRows_ && oldX >= 0 && oldX < battlefieldCols_) {
+        battlefield_[oldY][oldX] = "";
+    }
+
+    // Update battlefield with new position
+    battlefield_[newY][newX] = to_string(respawn->getRobotID());
+
+    // Add the new robot to the queue
+    waitingRobots_.push(respawn);
+    cout << "Robot " << died->getRobotName() << " has respawned at (" << newX << ", " << newY << ")" << endl;
 }
 
 /**********************************************************************
