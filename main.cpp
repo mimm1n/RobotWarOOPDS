@@ -480,7 +480,7 @@ void Robot::reduceLife(){
  *********************************************************************/
 bool Robot::isAlive() const{
     if(lives<=0){
-        cout << "Robot " << robotName << " is dead!";
+        cout << "Robot" << robotName << " is dead!" << endl;
         return false;
     }
     return true;
@@ -886,9 +886,10 @@ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y, ostream &c
     int nextY = currentY + y;
     // cout << nextX << nextY << endl;
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
+    
     if (battlefield->battlefield_[nextY][nextX] != "") {
         cout << "Robot " << getRobotName() << " tried to move to position (" << nextX << ", " << nextY << ") but place taken!" << endl;
         return;
@@ -969,7 +970,7 @@ cout << battlefield->getPlayer(targetX, targetY) << endl;
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1146,7 +1147,7 @@ void HideBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1221,7 +1222,7 @@ void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) 
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1434,7 +1435,7 @@ void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1568,7 +1569,7 @@ void LongShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &co
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1646,7 +1647,7 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -1776,7 +1777,7 @@ void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y, ostream &co
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -1854,7 +1855,7 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y, ostream &co
                 targetRobot->reduceLife();
                 incrementKills();
                 killedARobot = true;
-                cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+                cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
                 battlefield->respawnRobot(targetRobot->getRobotID());
             }
             shotsFired++;
@@ -1984,7 +1985,7 @@ void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2059,7 +2060,7 @@ void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2190,7 +2191,7 @@ void HealBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2265,7 +2266,7 @@ void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2396,7 +2397,7 @@ void BombBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2440,7 +2441,7 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
                     if (targetRobot && !isHiding && !isReflecting){
                         targetRobot->reduceLife();
                         incrementKills();
-                        cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+                        cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
                         battlefield->respawnRobot(targetRobot->getRobotID());
                         killedRobot = true;
                     }
@@ -2575,7 +2576,7 @@ void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream 
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2650,7 +2651,7 @@ void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream 
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2757,7 +2758,7 @@ void ScoutBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout)
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -2832,7 +2833,7 @@ void ScoutBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
@@ -2977,7 +2978,7 @@ void TrackBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout)
     int nextY = currentY + y;
 
     if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!." << endl;
+        cout << "Out of Bounds!" << endl;
         return;
     }
     battlefield->robotMove(getRobotID(), nextX, nextY);
@@ -3071,7 +3072,7 @@ void TrackBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout)
         if (hitChance <= 70) {
             targetRobot->reduceLife();
             incrementKills();
-            cout << "Robot " << getRobotName() << " killed Robot " << targetRobot->getRobotName() << endl;
+            cout << "Robot " << getRobotName() << " successfully killed Robot " << targetRobot->getRobotName() << "!" << endl;
             battlefield->respawnRobot(targetRobot->getRobotID());
 
             if (!canUpgrade()) return;
