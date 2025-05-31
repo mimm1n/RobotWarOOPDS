@@ -1151,7 +1151,7 @@ void HideBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
         return;
     }
 
-    if (battlefield->battlefield_[nextY][nextX] != "") {
+    if (battlefield->getPlayer(nextX, nextY) != "") {
         cout << "Robot " << getRobotName() << " tried to move to position (" << nextX << ", " << nextY << ") but place taken!" << endl;
         return;
     }
@@ -1370,21 +1370,25 @@ void JumpBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
             battlefield->robotMove(getRobotID(), x, y);
             setRobotX(x);
             setRobotY(y);
+
+            int jumpedX = getRobotX();
+            int jumpedY = getRobotY();
+
             jumpsUsed++;
-            cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
+
+            if (x == 0 && y == 0) {
+                cout << "Invalid move." << endl;
+                return;  //check so it doesnt move to its own place or more than allowed
+            }
+
+            if (jumpedX < 0 || jumpedX >= battlefield->battlefieldCols() || jumpedY < 0 || jumpedY >= battlefield->battlefieldRows()) {
+                    cout << "Out of Bounds!" << endl;
+                    return;
+            }
+            cout << "Robot " << getRobotName() << " jumped to position (" << jumpedX << ", " << jumpedY << ")" << endl;
         } else {
             cout << "Invalid location! There might be a robot there." << endl;
         }
-    }
-
-    if (x == 0 && y == 0) {
-    cout << "Invalid move." << endl;
-    return;  //check so it doesnt move to its own place or more than allowed
-    }
-
-    if (nextX < 0 || nextX >= battlefield->battlefieldCols() || nextY < 0 || nextY >= battlefield->battlefieldRows()) {
-        cout << "Out of Bounds!" << endl;
-        return;
     }
 }
 
