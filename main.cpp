@@ -418,7 +418,7 @@ int main() {
 
 
     } while(battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
-    cout << "End Game." << endl;
+    cout << endl << "End Game." << endl;
     outFile.close();
 
     return 0;
