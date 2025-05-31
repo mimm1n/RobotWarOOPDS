@@ -411,7 +411,7 @@ int main() {
         battlefield->nextTurn();
 
     } while(battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
-    cout << "end game" << endl;
+    cout << "End Game." << endl;
     outFile.close();
     return 0;
 }
@@ -791,7 +791,7 @@ void GenericRobot::actions(Battlefield* battlefield){
 }
 
 void GenericRobot::actionThink(Battlefield* battlefield) {
-    cout << "action think" << endl;
+    cout << "Robot " << getRobotName() << "is thinking..." << endl;
     actionRand(battlefield);
 }
 
