@@ -411,7 +411,6 @@ int main() {
         // outFile << setw(22) << "Action Log" << endl;
         // outFile << "----------------------------------" << endl;
         currentPlayer->actions(battlefield, outFile);
-      
         outFile << *battlefield;
         outFile << *currentPlayer;
         battlefield->nextTurn();
@@ -445,7 +444,7 @@ string robotTypeName(int robotType){
     return "";
 }
 
- /**********************************************************************
+/**********************************************************************
  * Robot Functions
  *********************************************************************/
 /**********************************************************************
@@ -2912,19 +2911,24 @@ void TrackBot::actionThink(Battlefield* battlefield, ostream &cout){
 void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
     int currentX = getRobotX();
     int currentY = getRobotY();
-    bool invalidCoordinates;
 
-    for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid to track a new bot 
+
+    for (int dx = -1; dx <= 1; ++dx) {  //iterate 3x3 grid
         for (int dy = -1; dy <= 1; ++dy) {
-            int lookX = currentX + dx;
+            int lookX = currentX + dx; //looks at the neighbouring robots
             int lookY = currentY + dy;
-            invalidCoordinates = lookX < 0 && lookX > battlefield->battlefieldCols() && lookY < 0 && lookY > battlefield->battlefieldRows();
-            if (!invalidCoordinates && battlefield->getPlayer(lookX, lookY) != "" && dx != 0 && dy != 0){
-                string playerStr = battlefield->getPlayer(lookX, lookY);  
+
+            if (dx==0 && dy ==0) continue;
+
+            bool outOfBounds = lookX < 0 || lookX >= battlefield->battlefieldCols() ||
+                            lookY < 0 || lookY >= battlefield->battlefieldRows();
+            if (outOfBounds) continue;
+
+            string playerStr = battlefield->getPlayer(lookX, lookY);
+            if (!playerStr.empty()) {
                 int lookRobotId = stoi(playerStr);
                 Robot* robotLooked = nullptr;
-                
-                //find robot corresponing to that ID 
+
                 for (Robot* robot : battlefield->getAllRobots()) {
                     if (robot->getRobotID() == lookRobotId) {
                         robotLooked = robot;
@@ -2932,13 +2936,10 @@ void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
                     }
                 }
 
-                if (robotLooked){
-                    if (trackersUsed < MAX_TRACKERS){
-                        targets.push_back(robotLooked->getRobotID());
-                        trackersUsed++;
-                    } 
-                    cout << "Robot " << robotLooked->getRobotName() << " is at position (" 
-                    << lookX << ", " << lookY << ") looked by Robot " << getRobotName() << endl;
+                if (robotLooked) {
+                    cout << "Robot " << robotLooked->getRobotName() 
+                        << " is at position (" << lookX << ", " << lookY 
+                        << ") looked by Robot " << getRobotName() << endl;
                 }
             }
         }
