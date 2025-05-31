@@ -93,7 +93,7 @@ class Robot{
         virtual bool isHidden() { return false; } // checks if the robot is hiding
         virtual bool isReflecting() { return false; } // checks if the robot is reflecting shots
 
-        virtual void actions(Battlefield* battlefield) = 0; // for each robot to play the game 
+        virtual void actions(Battlefield* battlefield, ostream &cout) = 0;
 
         // Set and get the robot's type
         virtual void setRobotType(int type) = 0;
@@ -107,27 +107,27 @@ class Robot{
 class SeeingRobot : virtual public Robot{
     public:
         virtual ~SeeingRobot(){}
-        virtual void actionLook(Battlefield* battlefield, int x, int y) = 0;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) = 0;
 };
 
 class ShootingRobot : virtual public Robot{
     public:
         ShootingRobot(int x, int y, string name):Robot(x, y, name){}
         virtual ~ShootingRobot(){}
-        virtual void actionFire(Battlefield* battlefield, int x, int y) = 0;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) = 0;
 };
 
 class ThinkingRobot : virtual public Robot{
     public:
         virtual ~ThinkingRobot(){}
-        virtual void actionThink(Battlefield* battlefield) = 0;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) = 0;
 };
 
 class MovingRobot : virtual public Robot{
     public:
         MovingRobot(int x, int y, string name):Robot(x, y, name){}
         virtual ~MovingRobot(){}
-        virtual void actionMove(Battlefield* battlefield, int x, int y) = 0;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) = 0;
 };
 
 /**********************************************************************
@@ -196,11 +196,11 @@ class GenericRobot : public ShootingRobot, public MovingRobot, public SeeingRobo
         void setRobotType(int type) override { robotType = type; }
         int getRobotType() const override { return robotType; }
 
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         
         void actionRand(Battlefield* battlefield);
         // void upgradeRobot(Battlefield* battlefield, int upgradeType);
@@ -220,11 +220,11 @@ class HideBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
 
     public:
         HideBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         virtual bool isHidden() override;
         //int hidesLeft() const;
         void setRobotType(int type) override { robotType = HIDE; }
@@ -238,11 +238,11 @@ class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
 
     public:
         JumpBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = JUMP; }
         int getRobotType() const override { return JUMP; }
 };
@@ -251,11 +251,11 @@ class JumpBot : public MovingRobot,public ShootingRobot, public SeeingRobot, pub
 class LongShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot{
     public:
         LongShotBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = LONGSHOT; }
         int getRobotType() const override { return LONGSHOT;}
 };
@@ -266,11 +266,11 @@ class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobo
         const int MAX_SHOTS_FIRED = 3;
     public:
         SemiAutoBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = SEMIAUTO; }
         int getRobotType() const override { return SEMIAUTO; }
 };
@@ -278,11 +278,11 @@ class SemiAutoBot : public ShootingRobot , public MovingRobot, public SeeingRobo
 class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRobot, public ThinkingRobot {
     public:
         ThirtyShotBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = THIRTYSHOT; }
         int getRobotType() const override { return THIRTYSHOT;}
 };
@@ -291,11 +291,11 @@ class ThirtyShotBot : public ShootingRobot , public MovingRobot, public SeeingRo
 class HealBot : public ShootingRobot, public MovingRobot, public SeeingRobot, public ThinkingRobot {
     public:
         HealBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = HEAL; }
         int getRobotType() const override { return HEAL; }
 };
@@ -305,11 +305,11 @@ class BombBot : public ShootingRobot, public MovingRobot, public SeeingRobot, pu
         int bombs = 1;
     public:
         BombBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = BOMB; }
         int getRobotType() const override { return BOMB; }
 };
@@ -320,11 +320,11 @@ class ReflectShotBot : public ShootingRobot , public MovingRobot, public SeeingR
         bool isReflect_ = true;
     public:
         ReflectShotBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         virtual bool isReflecting() override;
         void setRobotType(int type) override { robotType = REFLECTSHOT; }
         int getRobotType() const override { return REFLECTSHOT; }
@@ -338,11 +338,11 @@ class ScoutBot : public SeeingRobot , public MovingRobot, public ShootingRobot, 
 
     public:
         ScoutBot(int x, int y, string name):Robot( x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
         void setRobotType(int type) override { robotType = SCOUT; }
         int getRobotType() const override { return SCOUT; }
 };
@@ -355,11 +355,12 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
 
     public:
         TrackBot(int x, int y, string name):Robot(x, y, name), MovingRobot(x, y, name), ShootingRobot(x, y, name), SeeingRobot(), ThinkingRobot(){}
-        virtual void actions(Battlefield* battlefield) override;
-        virtual void actionThink(Battlefield* battlefield) override;
-        virtual void actionLook(Battlefield* battlefield, int x, int y) override;
-        virtual void actionMove(Battlefield* battlefield, int x, int y) override;
-        virtual void actionFire(Battlefield* battlefield, int x, int y) override;
+        virtual void actions(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionThink(Battlefield* battlefield, ostream &cout) override;
+        virtual void actionLook(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionMove(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        virtual void actionFire(Battlefield* battlefield, int x, int y, ostream &cout) override;
+        vector<int> getTrackedTargets() { return targets; }
         void setRobotType(int type) override { robotType = TRACK; }
         int getRobotType() const override { return TRACK; }
 };
@@ -367,18 +368,20 @@ class TrackBot : public SeeingRobot  , public MovingRobot, public ShootingRobot,
 int GenericRobot::robotIncrement = 1;
 
 ostream &operator<<(ostream &cout, const Robot &r){
-        // r.getRobotName().displayBattlefield(-5,-5, cout);
-        cout << r.getRobotName() << endl;
+    
+        cout << r.robotName << " GR0" << to_string(r.robotId) << endl;
         cout << setfill(' ') << setw(22) << "Action Log" << endl;
         cout << "----------------------------------" << endl;
-        cout <<  "Robot " << r.robotId << " is at position (" << r.robotX << ", " << r.robotY << ")." << endl << endl;
-        return cout;
+        cout <<  "GR0" << to_string(r.robotId) << " at (" << r.robotX << ", " << r.robotY << ")" << endl << endl;
+        return cout; 
 }
 
 ostream &operator<<(ostream &cout, const Battlefield &b) {
-        b.displayBattlefield(-5,-5, cout);
-    
-        return cout;
+      b.displayBattlefield(-10,-10, cout);
+      string inString = to_string(b.currentTurn_);
+      cout <<  inString << " " << endl;;
+      
+      return cout;
 }
 
 
@@ -399,8 +402,6 @@ int main() {
     do {
         currentPlayer = battlefield->getCurrentPlayer();
         battlefield->displayBattlefield(-10,-10, cout);
-        outFile << *battlefield;
-        outFile << *currentPlayer;
         cout << "Current turn: " << battlefield->currentTurn() << endl;
         cout << robotTypeName(battlefield->getCurrentPlayer()->getRobotType()) << " ";
         cout << "Current Player: " << battlefield->getCurrentPlayer()->getRobotName() << " GR0"<< battlefield->getCurrentPlayer()->getRobotID() << endl;
@@ -409,12 +410,18 @@ int main() {
         cout << "----------------------------------" << endl;
         // outFile << setw(22) << "Action Log" << endl;
         // outFile << "----------------------------------" << endl;
-        currentPlayer->actions(battlefield);
+        currentPlayer->actions(battlefield, outFile);
+      
+        outFile << *battlefield;
+        outFile << *currentPlayer;
         battlefield->nextTurn();
+        
+
 
     } while(battlefield->getCurrentPlayer() && (battlefield->currentTurn() < battlefield->turns()));
     cout << "End Game." << endl;
     outFile.close();
+
     return 0;
 }
 
@@ -813,16 +820,16 @@ void Battlefield::robotMove(int robotId, int x, int y) {
  *********************************************************************/
 // int GenericRobot::getRobotID() const { return robotId; }
 
-void GenericRobot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void GenericRobot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void GenericRobot::actionThink(Battlefield* battlefield) {
+void GenericRobot::actionThink(Battlefield* battlefield, ostream &cout) {
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     actionRand(battlefield);
 }
 
-void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
+void GenericRobot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout) {
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -860,7 +867,7 @@ void GenericRobot::actionLook(Battlefield* battlefield, int x, int y) {
     }
 }
 
-void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
+void GenericRobot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout) {
 
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -890,7 +897,7 @@ void GenericRobot::actionMove(Battlefield* battlefield, int x, int y) {
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void GenericRobot::actionFire(Battlefield* battlefield, int x, int y) {
+void GenericRobot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
     cout << "Robot " << getRobotName() << " is firing!" << endl;
 
     if (getShells() <= 0) {
@@ -1020,27 +1027,27 @@ void GenericRobot::actionRand(Battlefield* battlefield) {
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, 0, 0);
-        actionFire(battlefield, 7, 2);
+        actionMove(battlefield, 0, 0, cout);
+        actionFire(battlefield, 7, 2, cout);
     } else {
-        actionFire(battlefield, 7, 2);
-        actionMove(battlefield, 0, 0);
+        actionFire(battlefield, 7, 2, cout);
+        actionMove(battlefield, 0, 0, cout);
     }
 }
 
 /**********************************************************************
  * HideBot Functions
  *********************************************************************/
-void HideBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void HideBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void HideBot::actionThink(Battlefield* battlefield){
+void HideBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << "  is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -1069,20 +1076,20 @@ void HideBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void HideBot::actionLook(Battlefield* battlefield, int x, int y){
+void HideBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1119,7 +1126,7 @@ void HideBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void HideBot::actionMove(Battlefield* battlefield, int x, int y){
+void HideBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -1143,7 +1150,7 @@ void HideBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void HideBot::actionFire(Battlefield* battlefield, int x, int y) {
+void HideBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -1261,11 +1268,11 @@ bool HideBot::isHidden(){
 /**********************************************************************
  * JumpBot Functions
  *********************************************************************/
-void JumpBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void JumpBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void JumpBot::actionThink(Battlefield* battlefield){
+void JumpBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
 
     // int directionMove = posDistr(gen);
@@ -1292,20 +1299,20 @@ void JumpBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void JumpBot::actionLook(Battlefield* battlefield, int x, int y){
+void JumpBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1342,7 +1349,7 @@ void JumpBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
+void JumpBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     if (jumpsUsed < MAX_JUMPS) {
         string targetPosition = battlefield->getPlayer(x, y);
         if (targetPosition.empty()) { //check if theres any robots at the location
@@ -1356,7 +1363,7 @@ void JumpBot::actionMove(Battlefield* battlefield, int x, int y){
     }
 }
 
-void JumpBot::actionFire(Battlefield* battlefield, int x, int y){
+void JumpBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -1458,11 +1465,11 @@ void JumpBot::actionFire(Battlefield* battlefield, int x, int y){
 /**********************************************************************
  * LongShotBot Functions
  *********************************************************************/
-void LongShotBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void LongShotBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void LongShotBot::actionThink(Battlefield* battlefield){
+void LongShotBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -1491,20 +1498,20 @@ void LongShotBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void LongShotBot::actionLook(Battlefield* battlefield, int x, int y){
+void LongShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1541,7 +1548,7 @@ void LongShotBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void LongShotBot::actionMove(Battlefield* battlefield, int x, int y){
+void LongShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -1565,7 +1572,7 @@ void LongShotBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
+void LongShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -1666,11 +1673,11 @@ void LongShotBot::actionFire(Battlefield* battlefield, int x, int y){
 /**********************************************************************
  * SemiAutoBot Functions
  *********************************************************************/
-void SemiAutoBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void SemiAutoBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void SemiAutoBot::actionThink(Battlefield* battlefield){
+void SemiAutoBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -1699,20 +1706,20 @@ void SemiAutoBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y){
+void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1749,7 +1756,7 @@ void SemiAutoBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y){
+void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -1773,7 +1780,7 @@ void SemiAutoBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
+void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
     // Hit chance logic
     random_device rd;
@@ -1874,11 +1881,11 @@ void SemiAutoBot::actionFire(Battlefield* battlefield, int x, int y){
 /**********************************************************************
  * ThirtyShotBot Functions
  *********************************************************************/
-void ThirtyShotBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void ThirtyShotBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void ThirtyShotBot::actionThink(Battlefield* battlefield){
+void ThirtyShotBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -1907,21 +1914,20 @@ void ThirtyShotBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y){
-
+void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     int currentX = getRobotX();
     int currentY = getRobotY();
 
@@ -1958,7 +1964,7 @@ void ThirtyShotBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y){
+void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -1982,7 +1988,7 @@ void ThirtyShotBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y) {
+void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout) {
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -2080,11 +2086,11 @@ void ThirtyShotBot::actionFire(Battlefield* battlefield, int x, int y) {
 /**********************************************************************
  * HealBot Functions
  *********************************************************************/
-void HealBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void HealBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void HealBot::actionThink(Battlefield* battlefield){
+void HealBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -2113,20 +2119,20 @@ void HealBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void HealBot::actionLook(Battlefield* battlefield, int x, int y){
+void HealBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
  
     int currentX = getRobotX();
     int currentY = getRobotY();
@@ -2164,7 +2170,7 @@ void HealBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void HealBot::actionMove(Battlefield* battlefield, int x, int y){
+void HealBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -2188,7 +2194,7 @@ void HealBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void HealBot::actionFire(Battlefield* battlefield, int x, int y){
+void HealBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -2287,11 +2293,11 @@ void HealBot::actionFire(Battlefield* battlefield, int x, int y){
 /**********************************************************************
  * BombBot Functions
  *********************************************************************/
-void BombBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void BombBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void BombBot::actionThink(Battlefield* battlefield){
+void BombBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -2320,20 +2326,20 @@ void BombBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, 0, 0);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, 0, 0, cout);
     } else {
-        actionFire(battlefield, 0, 0);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, 0, 0, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void BombBot::actionLook(Battlefield* battlefield, int x, int y){
+void BombBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
 
     int currentX = getRobotX();
     int currentY = getRobotY();
@@ -2371,7 +2377,7 @@ void BombBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void BombBot::actionMove(Battlefield* battlefield, int x, int y){
+void BombBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
     return;  //check so it doesnt move to its own place or more than allowed
@@ -2394,7 +2400,7 @@ void BombBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void BombBot::actionFire(Battlefield* battlefield, int x, int y){
+void BombBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
     if(bombs){
         int cx = getRobotX();
@@ -2465,11 +2471,11 @@ void BombBot::actionFire(Battlefield* battlefield, int x, int y){
 /**********************************************************************
  * ReflectShotBot Functions
  *********************************************************************/
-void ReflectShotBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void ReflectShotBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void ReflectShotBot::actionThink(Battlefield* battlefield){
+void ReflectShotBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -2498,20 +2504,20 @@ void ReflectShotBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y){
+void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
 
     int currentX = getRobotX();
     int currentY = getRobotY();
@@ -2549,7 +2555,7 @@ void ReflectShotBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y){
+void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -2573,7 +2579,7 @@ void ReflectShotBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y){
+void ReflectShotBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -2678,11 +2684,11 @@ bool ReflectShotBot::isReflecting(){
 /**********************************************************************
  * ScoutBot Functions
  *********************************************************************/
-void ScoutBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void ScoutBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void ScoutBot::actionThink(Battlefield* battlefield){
+void ScoutBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -2711,27 +2717,27 @@ void ScoutBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, 0, 0);
+    actionLook(battlefield, 0, 0, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
-void ScoutBot::actionLook(Battlefield* battlefield, int x, int y){
+void ScoutBot::actionLook(Battlefield* battlefield, int x, int y, ostream &cout){
     if (lookCount < MAX_LOOKS) {
         cout << "Robot " << getRobotName() << " scouting the whole battlefield and knows everyone's position!" << endl;
         lookCount++;
     }
 }
 
-void ScoutBot::actionMove(Battlefield* battlefield, int x, int y){
+void ScoutBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -2755,7 +2761,7 @@ void ScoutBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void ScoutBot::actionFire(Battlefield* battlefield, int x, int y){
+void ScoutBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
@@ -2857,11 +2863,11 @@ void ScoutBot::actionFire(Battlefield* battlefield, int x, int y){
 /**********************************************************************
  * TrackBot Functions
  *********************************************************************/
-void TrackBot::actions(Battlefield* battlefield){
-    actionThink(battlefield);
+void TrackBot::actions(Battlefield* battlefield, ostream &cout){
+    actionThink(battlefield, cout);
 }
 
-void TrackBot::actionThink(Battlefield* battlefield){
+void TrackBot::actionThink(Battlefield* battlefield, ostream &cout){
     cout << "Robot " << getRobotName() << " is thinking..." << endl;
     random_device rd;
     mt19937 gen(rd());
@@ -2890,16 +2896,16 @@ void TrackBot::actionThink(Battlefield* battlefield){
     mt19937 gen2(rd2());
     uniform_int_distribution<> actionDistr(0, 10);
 
-    actionLook(battlefield, moveX, moveY);
+    actionLook(battlefield, moveX, moveY, cout);
 
     int randomInt = actionDistr(gen2);
 
     if (randomInt % 2 == 0) {
-        actionMove(battlefield, moveX, moveY);
-        actionFire(battlefield, moveX, moveY);
+        actionMove(battlefield, moveX, moveY, cout);
+        actionFire(battlefield, moveX, moveY, cout);
     } else {
-        actionFire(battlefield, moveX, moveY);
-        actionMove(battlefield, moveX, moveY);
+        actionFire(battlefield, moveX, moveY, cout);
+        actionMove(battlefield, moveX, moveY, cout);
     }
 }
 
@@ -2949,7 +2955,7 @@ void TrackBot::actionLook(Battlefield* battlefield, int x, int y){
     }
 }
 
-void TrackBot::actionMove(Battlefield* battlefield, int x, int y){
+void TrackBot::actionMove(Battlefield* battlefield, int x, int y, ostream &cout){
     
     if (abs(x) > 1 || abs(y) > 1 || (x == 0 && y == 0)) {
     cout << "Invalid move." << endl;
@@ -2973,7 +2979,7 @@ void TrackBot::actionMove(Battlefield* battlefield, int x, int y){
     cout << "Robot " << getRobotName() << " move to position (" << nextX << ", " << nextY << ")" << endl;
 }
 
-void TrackBot::actionFire(Battlefield* battlefield, int x, int y){
+void TrackBot::actionFire(Battlefield* battlefield, int x, int y, ostream &cout){
     cout << "Robot " << getRobotName() << " is Firing!" << endl;
 
     if (getShells() <= 0) {
